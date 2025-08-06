@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes Fiscales - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-file-invoice-dollar text-primary"></i> Reportes Fiscales
+                </h1>
+                <a href="{% url 'accounting:reportefiscal_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Generar Nuevo Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Reportes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">Reportes Fiscales Generados</h5>
+                </div>
+                <div class="card-body">
+                    {% if reportes %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Período</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
+                                    <th class="text-end">Base Gravable</th>
+                                    <th class="text-end">Impuesto a Pagar</th>
+                                    <th>Estado</th>
+                                    <th>Generado por</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reporte in reportes %}
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-{% if reporte.tipo == 'IVA' %}primary{% elif reporte.tipo == 'RETENCION' %}warning{% elif reporte.tipo == 'ICA' %}info{% else %}secondary{% endif %}">
+                                            {{ reporte.get_tipo_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ reporte.periodo.nombre }}</td>
+                                    <td>{{ reporte.fecha_inicio|date:"d/m/Y" }}</td>
+                                    <td>{{ reporte.fecha_fin|date:"d/m/Y" }}</td>
+                                    <td class="text-end">${{ reporte.base_gravable|floatformat:2 }}</td>
+                                    <td class="text-end">${{ reporte.impuesto_a_pagar|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if reporte.estado == 'BORRADOR' %}secondary{% elif reporte.estado == 'GENERADO' %}info{% elif reporte.estado == 'ENVIADO' %}warning{% else %}success{% endif %}">
+                                            {{ reporte.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ reporte.generado_por.username|default:"-" }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'accounting:reportefiscal_detail' reporte.pk %}" class="btn btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'accounting:reportefiscal_update' reporte.pk %}" class="btn btn-outline-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'accounting:reportefiscal_delete' reporte.pk %}" class="btn btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginación de reportes fiscales">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay reportes fiscales generados</h5>
+                        <p class="text-muted">Genera tu primer reporte fiscal para comenzar</p>
+                        <a href="{% url 'accounting:reportefiscal_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Generar Reporte
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

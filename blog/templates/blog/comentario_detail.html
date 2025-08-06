@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Comentario</h3>
+            <div>
+                <a href="{% url 'comentario_update' object.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'comentario_delete' object.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Comentario de {{ object.autor }} en <a href="{% url 'post_detail' object.post.pk %}">{{ object.post.titulo }}</a></h4>
+            <p class="card-text"><strong>Email:</strong> {{ object.email }}</p>
+            <p class="card-text"><strong>Fecha de Creación:</strong> {{ object.fecha_creacion|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>Contenido:</strong> {{ object.contenido }}</p>
+            <p class="card-text"><strong>Aprobado:</strong> {% if object.aprobado %}Sí{% else %}No{% endif %}</p>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'post_detail' object.post.pk %}" class="btn btn-secondary btn-sm">Volver a la publicación</a>
+            <a href="{% url 'comentario_list' %}" class="btn btn-info btn-sm">Ver todos los comentarios</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

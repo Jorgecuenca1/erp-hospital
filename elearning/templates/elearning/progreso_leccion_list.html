@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Progreso de Lecciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Progreso de Lecciones</h1>
+    <a href="{% url 'progreso_leccion_create' %}" class="btn btn-primary mb-3">Registrar Nuevo Progreso</a>
+    <div class="list-group">
+        {% for progreso in progreso_lecciones %}
+            <a href="{% url 'progreso_leccion_detail' progreso.pk %}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Lección: {{ progreso.leccion.titulo }}</h5>
+                    <small>Estudiante: {{ progreso.inscripcion.estudiante.username }}</small>
+                </div>
+                <p class="mb-1">Curso: {{ progreso.leccion.modulo.curso.titulo }}</p>
+                <small>Completado: {% if progreso.completado %}Sí ({{ progreso.fecha_completado|date:"d M Y" }}){% else %}No{% endif %}</small>
+            </a>
+        {% empty %}
+            <div class="list-group-item">
+                No hay progreso de lecciones registrado.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

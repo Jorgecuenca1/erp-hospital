@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Planning Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-calendar-alt"></i> Hospital Resource Planning</h1>
+                <p class="text-muted">Plan and manage hospital resources, staff schedules, and capacity</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h3>{{ total_resources }}</h3>
+                    <p>Total Resources</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h3>{{ active_allocations }}</h3>
+                    <p>Active Allocations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h3>{{ staff_schedules }}</h3>
+                    <p>Staff Schedules</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h3>{{ utilization_avg|floatformat:1 }}%</h3>
+                    <p>Avg Utilization</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'planning:allocation' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-share-alt"></i> Resource Allocation
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'planning:scheduling' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-calendar"></i> Staff Scheduling
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'planning:capacity' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-chart-bar"></i> Capacity Planning
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-info btn-block">
+                                <i class="fas fa-chart-line"></i> Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

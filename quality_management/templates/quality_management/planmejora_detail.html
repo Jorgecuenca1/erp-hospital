@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Detalle de Plan de Mejora: {{ plan_mejora.nombre_plan }}</h1>
+    {% if plan_mejora.hallazgo %}
+        <p><strong>Hallazgo Asociado:</strong> <a href="{% url 'quality_management:hallazgoauditoria_detail' plan_mejora.hallazgo.pk %}">{{ plan_mejora.hallazgo.descripcion|truncatechars:100 }}</a></p>
+    {% else %}
+        <p><strong>Hallazgo Asociado:</strong> N/A</p>
+    {% endif %}
+    <p><strong>Descripción:</strong> {{ plan_mejora.descripcion|linebreaksbr }}</p>
+    <p><strong>Fecha de Creación:</strong> {{ plan_mejora.fecha_creacion|date:"Y-m-d H:i" }}</p>
+    <p><strong>Fecha Límite:</strong> {{ plan_mejora.fecha_limite|date:"Y-m-d" }}</p>
+    <p><strong>Responsable:</strong> {{ plan_mejora.responsable.username|default:"N/A" }}</p>
+    <p><strong>Estado:</strong> {{ plan_mejora.get_estado_display }}</p>
+    <p><strong>Acciones Implementadas:</strong> {{ plan_mejora.acciones_implementadas|linebreaksbr|default:"N/A" }}</p>
+    <p><strong>Fecha de Cierre:</strong> {{ plan_mejora.fecha_cierre|date:"Y-m-d"|default:"N/A" }}</p>
+    <p><strong>Efectividad:</strong> {{ plan_mejora.efectividad|default:"N/A" }}</p>
+
+    <a href="{% url 'quality_management:planmejora_list' %}">Volver a la lista de planes de mejora</a>
+    <a href="{% url 'quality_management:planmejora_edit' plan_mejora.pk %}">Editar Plan de Mejora</a>
+    <a href="{% url 'quality_management:planmejora_delete' plan_mejora.pk %}">Eliminar Plan de Mejora</a>
+{% endblock %} 

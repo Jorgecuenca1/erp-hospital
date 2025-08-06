@@ -1,0 +1,386 @@
+{% extends 'base_hms.html' %}
+
+{% block title %}Pacientes - HMetaHIS{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Inicio</a></li>
+<li class="breadcrumb-item active">Pacientes</li>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link active" href="/patients/">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/patients/lista/">
+        <i class="fas fa-users me-2"></i>Lista de Pacientes
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/patients/crear/">
+        <i class="fas fa-user-plus me-2"></i>Nuevo Paciente
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/patients/historias/">
+        <i class="fas fa-file-medical me-2"></i>Historias Clínicas
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/patients/citas/">
+        <i class="fas fa-calendar me-2"></i>Citas
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/patients/ingresos/">
+        <i class="fas fa-procedures me-2"></i>Ingresos
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/patients/emergencias/">
+        <i class="fas fa-ambulance me-2"></i>Emergencias
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/patients/reportes/">
+        <i class="fas fa-chart-bar me-2"></i>Reportes
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-users me-2"></i>
+        Gestión de Pacientes
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="/patients/crear/" class="btn btn-primary">
+                <i class="fas fa-user-plus me-1"></i>Nuevo Paciente
+            </a>
+            <button type="button" class="btn btn-outline-secondary">
+                <i class="fas fa-download me-1"></i>Exportar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas de Pacientes -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Total Pacientes</div>
+                    <div class="h5 mb-0 font-weight-bold">2,847</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-users fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Pacientes Activos</div>
+                    <div class="h5 mb-0 font-weight-bold">1,250</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-user-check fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Citas Hoy</div>
+                    <div class="h5 mb-0 font-weight-bold">89</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-calendar-check fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Ingresos</div>
+                    <div class="h5 mb-0 font-weight-bold">45</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-procedures fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Acciones Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="/patients/crear/" class="btn btn-primary w-100">
+                            <i class="fas fa-user-plus fa-2x mb-2"></i><br>
+                            Nuevo Paciente
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/patients/citas/crear/" class="btn btn-success w-100">
+                            <i class="fas fa-calendar-plus fa-2x mb-2"></i><br>
+                            Nueva Cita
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/patients/historias/crear/" class="btn btn-info w-100">
+                            <i class="fas fa-file-medical fa-2x mb-2"></i><br>
+                            Nueva Historia
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="/patients/emergencias/crear/" class="btn btn-danger w-100">
+                            <i class="fas fa-ambulance fa-2x mb-2"></i><br>
+                            Emergencia
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Búsqueda de Pacientes -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-search me-2"></i>
+                    Búsqueda de Pacientes
+                </h5>
+            </div>
+            <div class="card-body">
+                <form class="row g-3">
+                    <div class="col-md-4">
+                        <label for="searchName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="searchName" placeholder="Nombre del paciente">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="searchId" class="form-label">Documento</label>
+                        <input type="text" class="form-control" id="searchId" placeholder="Número de documento">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="searchSpecialty" class="form-label">Especialidad</label>
+                        <select class="form-select" id="searchSpecialty">
+                            <option value="">Todas las especialidades</option>
+                            <option value="cardiology">Cardiología</option>
+                            <option value="gynecology">Ginecología</option>
+                            <option value="pediatrics">Pediatría</option>
+                            <option value="surgery">Cirugía</option>
+                            <option value="emergency">Emergencias</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Buscar
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-undo me-1"></i>Limpiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pacientes Recientes -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Pacientes Recientes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Documento</th>
+                                <th>Especialidad</th>
+                                <th>Última Visita</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/40" class="rounded-circle me-2">
+                                        <div>
+                                            <strong>María López</strong><br>
+                                            <small class="text-muted">Femenino, 35 años</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>CC 12345678</td>
+                                <td><span class="badge bg-primary">Ginecología</span></td>
+                                <td>Hoy 09:30</td>
+                                <td><span class="badge bg-success">Activo</span></td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/40" class="rounded-circle me-2">
+                                        <div>
+                                            <strong>Carlos Mendoza</strong><br>
+                                            <small class="text-muted">Masculino, 42 años</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>CC 87654321</td>
+                                <td><span class="badge bg-info">Cardiología</span></td>
+                                <td>Ayer 14:15</td>
+                                <td><span class="badge bg-success">Activo</span></td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://via.placeholder.com/40" class="rounded-circle me-2">
+                                        <div>
+                                            <strong>Ana Rodríguez</strong><br>
+                                            <small class="text-muted">Femenino, 28 años</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>CC 11223344</td>
+                                <td><span class="badge bg-warning">Pediatría</span></td>
+                                <td>Hace 2 días</td>
+                                <td><span class="badge bg-success">Activo</span></td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Distribución por Edad
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="ageChart" width="300" height="200"></canvas>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bell me-2"></i>
+                    Alertas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>5 pacientes</strong> con citas vencidas
+                </div>
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>12 pacientes</strong> requieren seguimiento
+                </div>
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>3 pacientes</strong> dados de alta hoy
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfico de distribución por edad
+const ctx = document.getElementById('ageChart').getContext('2d');
+const ageChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['0-18 años', '19-30 años', '31-50 años', '51-70 años', '70+ años'],
+        datasets: [{
+            data: [15, 25, 35, 20, 5],
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quality Control Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-shield-alt"></i> Hospital Quality Control</h1>
+                <p class="text-muted">Monitor quality standards, audits, incidents, and improvement initiatives</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ compliance_rate|floatformat:1 }}%</h3>
+                            <p>Compliance Rate</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ total_standards }}</h3>
+                            <p>Active Standards</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clipboard-list fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ open_incidents }}</h3>
+                            <p>Open Incidents</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ critical_incidents }}</h3>
+                            <p>Critical Incidents</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-fire fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-chart-line"></i> Quality Metrics</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="metric">
+                                <h4>{{ avg_audit_score|floatformat:1 }}</h4>
+                                <p class="text-muted">Average Audit Score</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric">
+                                <h4>{{ active_improvements }}</h4>
+                                <p class="text-muted">Active Improvements</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-chart-pie"></i> Compliance by Category</h5>
+                    <canvas id="complianceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Incidents -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-exclamation-circle"></i> Recent Incidents</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Severity</th>
+                                    <th>Department</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for incident in recent_incidents %}
+                                <tr>
+                                    <td>{{ incident.incident_date|date:"M d" }}</td>
+                                    <td>{{ incident.incident_type }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if incident.severity == 'critical' %}badge-danger
+                                            {% elif incident.severity == 'high' %}badge-warning
+                                            {% else %}badge-info{% endif %}">
+                                            {{ incident.severity }}
+                                        </span>
+                                    </td>
+                                    <td>{{ incident.department }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if incident.status == 'resolved' %}badge-success
+                                            {% elif incident.status == 'investigating' %}badge-warning
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ incident.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No recent incidents</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clipboard-check"></i> Recent Audits</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Department</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for audit in recent_audits %}
+                                <tr>
+                                    <td>{{ audit.audit_date|date:"M d" }}</td>
+                                    <td>{{ audit.audit_type }}</td>
+                                    <td>{{ audit.department }}</td>
+                                    <td>{{ audit.compliance_score }}%</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if audit.status == 'completed' %}badge-success
+                                            {% elif audit.status == 'in_progress' %}badge-warning
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ audit.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No recent audits</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incidents by Type Chart -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Incidents by Type</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="incidentTypesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <a href="{% url 'quality_control:standards' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-clipboard-list"></i> Standards
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'quality_control:audits' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-search"></i> Audits
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'quality_control:metrics' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-chart-line"></i> Metrics
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'quality_control:incidents' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-exclamation-circle"></i> Incidents
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'quality_control:improvements' %}" class="btn btn-secondary btn-block">
+                                <i class="fas fa-arrow-up"></i> Improvements
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'quality_control:compliance' %}" class="btn btn-dark btn-block">
+                                <i class="fas fa-chart-pie"></i> Compliance
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Compliance Chart
+const complianceCtx = document.getElementById('complianceChart').getContext('2d');
+new Chart(complianceCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Compliant', 'Non-compliant'],
+        datasets: [{
+            data: [{{ compliance_rate|floatformat:1 }}, {{ 100|add:compliance_rate|floatformat:1|mul:-1 }}],
+            backgroundColor: ['#28a745', '#dc3545']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+// Incidents by Type Chart
+const incidentTypesCtx = document.getElementById('incidentTypesChart').getContext('2d');
+new Chart(incidentTypesCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Patient Safety', 'Medication Error', 'Equipment Failure', 'Infection Control', 'Documentation'],
+        datasets: [{
+            label: 'Incidents',
+            data: [8, 5, 3, 6, 4],
+            backgroundColor: '#dc3545'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

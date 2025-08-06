@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Editar{% else %}Nueva{% endif %} Transacción DIAN - Facturación
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-{% if object %}edit{% else %}plus{% endif %}"></i>
+                        {% if object %}Editar{% else %}Nueva{% endif %} Transacción DIAN
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'billing:transaccion_dian_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.factura.id_for_label }}">Factura *</label>
+                                    {{ form.factura }}
+                                    {% if form.factura.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.factura.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.estado.id_for_label }}">Estado *</label>
+                                    {{ form.estado }}
+                                    {% if form.estado.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.estado.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.cufe.id_for_label }}">CUFE</label>
+                                    {{ form.cufe }}
+                                    {% if form.cufe.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.cufe.errors }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">Código Único de Factura Electrónica</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.fecha_transaccion.id_for_label }}">Fecha Transacción</label>
+                                    {{ form.fecha_transaccion }}
+                                    {% if form.fecha_transaccion.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.fecha_transaccion.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="{{ form.respuesta_dian.id_for_label }}">Respuesta DIAN</label>
+                                    {{ form.respuesta_dian }}
+                                    {% if form.respuesta_dian.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.respuesta_dian.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="{{ form.errores_dian.id_for_label }}">Errores DIAN</label>
+                                    {{ form.errores_dian }}
+                                    {% if form.errores_dian.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.errores_dian.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    {% if object %}Actualizar{% else %}Crear{% endif %}
+                                </button>
+                                <a href="{% url 'billing:transaccion_dian_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,9 @@
+{% extends 'pos/base.html' %}
+{% block pos_content %}
+<h2>{% if object %}Editar{% else %}Nueva{% endif %} Línea de Venta POS</h2>
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+<a href="{% url 'pos:lineaventapos_list' %}">Volver al listado</a>
+{% endblock %} 

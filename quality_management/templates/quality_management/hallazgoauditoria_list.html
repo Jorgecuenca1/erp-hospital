@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Lista de Hallazgos de Auditoría</h1>
+    <a href="{% url 'quality_management:hallazgoauditoria_create' %}">Registrar Nuevo Hallazgo</a>
+    <ul>
+        {% for hallazgo in hallazgos_auditoria %}
+            <li>
+                <a href="{% url 'quality_management:hallazgoauditoria_detail' hallazgo.pk %}">{{ hallazgo.auditoria.nombre }} - {{ hallazgo.clasificacion }}</a>
+                - Cerrado: {{ hallazgo.cerrado|yesno:"Sí,No" }}
+                (<a href="{% url 'quality_management:hallazgoauditoria_edit' hallazgo.pk %}">Editar</a> |
+                <a href="{% url 'quality_management:hallazgoauditoria_delete' hallazgo.pk %}">Eliminar</a>)
+            </li>
+        {% empty %}
+            <li>No hay hallazgos de auditoría registrados.</li>
+        {% endfor %}
+    </ul>
+{% endblock %} 

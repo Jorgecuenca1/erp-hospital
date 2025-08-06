@@ -1,0 +1,13 @@
+{% extends 'website/base.html' %}
+{% block website_content %}
+<h2>Detalle de Sección</h2>
+<ul>
+    <li><b>Página:</b> {{ object.pagina }}</li>
+    <li><b>Título:</b> {{ object.titulo }}</li>
+    <li><b>Contenido:</b> {{ object.contenido }}</li>
+    <li><b>Orden:</b> {{ object.orden }}</li>
+</ul>
+<a href="{% url 'website:seccion_update' object.pk %}">Editar</a> |
+<a href="{% url 'website:seccion_delete' object.pk %}">Eliminar</a> |
+<a href="{% url 'website:seccion_list' %}">Volver al listado</a>
+{% endblock %} 

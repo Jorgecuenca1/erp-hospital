@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Facturación - Reportes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-bar text-primary"></i>
+                        Reportes de Facturación
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'billing:dashboard' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Estadísticas Generales -->
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-primary">
+                                <div class="inner">
+                                    <h3>{{ total_facturas }}</h3>
+                                    <p>Total Facturas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-file-invoice"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ facturas_por_estado|length }}</h3>
+                                    <p>Estados Diferentes</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ top_pacientes|length }}</h3>
+                                    <p>Top Pacientes</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ facturas_por_mes|length }}</h3>
+                                    <p>Meses Analizados</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-pie"></i>
+                                        Facturas por Estado
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="facturasEstadoChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        Facturación por Mes
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="facturacionMensualChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tablas de Datos -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-table"></i>
+                                        Totales por Estado
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Estado</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for estado in totales_por_estado %}
+                                                <tr>
+                                                    <td>
+                                                        {% if estado.estado == 'BORRADOR' %}
+                                                            <span class="badge badge-secondary">Borrador</span>
+                                                        {% elif estado.estado == 'EMITIDA' %}
+                                                            <span class="badge badge-warning">Emitida</span>
+                                                        {% elif estado.estado == 'PAGADA' %}
+                                                            <span class="badge badge-success">Pagada</span>
+                                                        {% elif estado.estado == 'ANULADA' %}
+                                                            <span class="badge badge-danger">Anulada</span>
+                                                        {% else %}
+                                                            <span class="badge badge-info">{{ estado.estado }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ estado.count }}</td>
+                                                    <td>${{ estado.total|floatformat:2 }}</td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted">
+                                                        No hay datos disponibles
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-users"></i>
+                                        Top 5 Pacientes
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Paciente</th>
+                                                    <th>Facturas</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for paciente in top_pacientes %}
+                                                <tr>
+                                                    <td>{{ paciente.paciente__nombres }} {{ paciente.paciente__apellidos }}</td>
+                                                    <td>{{ paciente.total_facturas }}</td>
+                                                    <td>${{ paciente.total_facturado|floatformat:2 }}</td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted">
+                                                        No hay datos disponibles
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Facturación Mensual Detallada -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Facturación Mensual Detallada
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mes</th>
+                                                    <th>Cantidad de Facturas</th>
+                                                    <th>Total Facturado</th>
+                                                    <th>Promedio por Factura</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for mes in facturas_por_mes %}
+                                                <tr>
+                                                    <td>{{ mes.mes }}</td>
+                                                    <td>{{ mes.cantidad }}</td>
+                                                    <td>${{ mes.total|floatformat:2 }}</td>
+                                                    <td>
+                                                        {% if mes.cantidad > 0 %}
+                                                            ${{ mes.total|div:mes.cantidad|floatformat:2 }}
+                                                        {% else %}
+                                                            $0.00
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted">
+                                                        No hay datos disponibles
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(document).ready(function() {
+    // Datos para los gráficos
+    var facturasEstadoData = {
+        labels: ['Borrador', 'Emitida', 'Pagada', 'Anulada', 'Validada DIAN'],
+        data: [5, 12, 8, 2, 3]
+    };
+    
+    var facturacionMensualData = {
+        labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+        data: [15000, 18000, 22000, 19000, 25000, 28000]
+    };
+
+    // Gráfico de Facturas por Estado
+    const facturasEstadoCtx = document.getElementById('facturasEstadoChart').getContext('2d');
+    const facturasEstadoChart = new Chart(facturasEstadoCtx, {
+        type: 'doughnut',
+        data: {
+            labels: facturasEstadoData.labels,
+            datasets: [{
+                data: facturasEstadoData.data,
+                backgroundColor: [
+                    '#6c757d', // Gris para BORRADOR
+                    '#ffc107', // Amarillo para EMITIDA
+                    '#28a745', // Verde para PAGADA
+                    '#dc3545', // Rojo para ANULADA
+                    '#17a2b8'  // Azul para VALIDADA_DIAN
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Gráfico de Facturación Mensual
+    const facturacionMensualCtx = document.getElementById('facturacionMensualChart').getContext('2d');
+    const facturacionMensualChart = new Chart(facturacionMensualCtx, {
+        type: 'bar',
+        data: {
+            labels: facturacionMensualData.labels,
+            datasets: [{
+                label: 'Total Facturado ($)',
+                data: facturacionMensualData.data,
+                backgroundColor: '#007bff',
+                borderColor: '#0056b3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Detalle de Asiento Contable #{{ object.pk }}</h3>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title text-primary">{{ object.descripcion }}</h4>
+            <hr>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Fecha:</strong>
+                </div>
+                <div class="col-md-6">
+                    {{ object.fecha|date:"d M Y" }}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Diario:</strong>
+                </div>
+                <div class="col-md-6">
+                    {{ object.diario }}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Período Contable:</strong>
+                </div>
+                <div class="col-md-6">
+                    {{ object.periodo }}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Tercero:</strong>
+                </div>
+                <div class="col-md-6">
+                    {{ object.tercero }}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Referencia:</strong>
+                </div>
+                <div class="col-md-6">
+                    {{ object.referencia|default:"N/A" }}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <a href="{% url 'accounting:asientocontable_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-alt-circle-left"></i> Volver a la Lista
+            </a>
+            <a href="{% url 'accounting:asientocontable_update' object.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'accounting:asientocontable_delete' object.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Respuesta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Detalle de Respuesta</h1>
+    <div class="card">
+        <div class="card-body">
+            <p class="card-text"><strong>Pregunta:</strong> <a href="{% url 'pregunta_detail' respuesta.pregunta.pk %}">{{ respuesta.pregunta.titulo }}</a></p>
+            <p class="card-text"><strong>Autor:</strong> {{ respuesta.autor.username }}</p>
+            <p class="card-text"><strong>Fecha de Creación:</strong> {{ respuesta.fecha_creacion|date:"d M Y H:i" }}</p>
+            <p class="card-text"><strong>Contenido:</strong><br>{{ respuesta.contenido|linebreaksbr }}</p>
+            <a href="{% url 'respuesta_update' respuesta.pk %}" class="btn btn-primary">Editar</a>
+            <a href="{% url 'respuesta_delete' respuesta.pk %}" class="btn btn-danger">Eliminar</a>
+            <a href="{% url 'respuesta_list' %}" class="btn btn-secondary">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

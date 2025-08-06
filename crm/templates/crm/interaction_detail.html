@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Interaction Detail: {{ interaction.type }} with {{ interaction.contact.name }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Contact:</strong> <a href="{% url 'crm:contact_detail' interaction.contact.pk %}">{{ interaction.contact.name }}</a></p>
+            <p><strong>Type:</strong> {{ interaction.type }}</p>
+            <p><strong>Date:</strong> {{ interaction.date }}</p>
+            <p><strong>Notes:</strong> {{ interaction.notes }}</p>
+            <a href="{% url 'crm:interaction_list' %}" class="btn btn-secondary">Back to List</a>
+            <a href="{% url 'crm:interaction_update' interaction.pk %}" class="btn btn-info">Edit Interaction</a>
+            <a href="{% url 'crm:interaction_delete' interaction.pk %}" class="btn btn-danger">Delete Interaction</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

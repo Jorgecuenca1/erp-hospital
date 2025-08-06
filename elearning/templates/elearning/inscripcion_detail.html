@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de la Inscripción{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Detalle de la Inscripción</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Estudiante:</strong> {{ inscripcion.estudiante.username }}</p>
+            <p><strong>Curso:</strong> <a href="{% url 'curso_detail' inscripcion.curso.pk %}">{{ inscripcion.curso.titulo }}</a></p>
+            <p><strong>Fecha de Inscripción:</strong> {{ inscripcion.fecha_inscripcion|date:"d M Y, H:i" }}</p>
+            <p><strong>Completado:</strong> {% if inscripcion.completado %}Sí{% else %}No{% endif %}</p>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'inscripcion_update' inscripcion.pk %}" class="btn btn-info">Editar</a>
+            <a href="{% url 'inscripcion_delete' inscripcion.pk %}" class="btn btn-danger">Eliminar</a>
+            <a href="{% url 'inscripcion_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

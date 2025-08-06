@@ -1,0 +1,810 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Crear{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-plus text-success"></i>
+                        Crear Nuevo Registro Ginecológico
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'gynec:patient_list' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Tabs de tipo de registro -->
+                    <ul class="nav nav-tabs" id="createTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="patient-tab" data-toggle="tab" href="#patient" role="tab">
+                                <i class="fas fa-user"></i> Paciente
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pregnancy-tab" data-toggle="tab" href="#pregnancy" role="tab">
+                                <i class="fas fa-baby"></i> Embarazo
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="procedure-tab" data-toggle="tab" href="#procedure" role="tab">
+                                <i class="fas fa-procedures"></i> Procedimiento
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="antenatal-tab" data-toggle="tab" href="#antenatal" role="tab">
+                                <i class="fas fa-calendar-check"></i> Visita Prenatal
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="contraceptive-tab" data-toggle="tab" href="#contraceptive" role="tab">
+                                <i class="fas fa-pills"></i> Anticoncepción
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="menopause-tab" data-toggle="tab" href="#menopause" role="tab">
+                                <i class="fas fa-thermometer-half"></i> Menopausia
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Contenido de las tabs -->
+                    <div class="tab-content" id="createTabContent">
+                        <!-- Tab Paciente -->
+                        <div class="tab-pane fade show active" id="patient" role="tabpanel">
+                            <form method="post" class="mt-3">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Información Básica</h5>
+                                        <div class="form-group">
+                                            <label>Paciente</label>
+                                            <select class="form-control" name="patient" required>
+                                                <option value="">Seleccionar paciente...</option>
+                                                <option value="1">María González</option>
+                                                <option value="2">Ana Rodríguez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Edad de la menarquia</label>
+                                            <input type="number" class="form-control" name="menarche_age" min="8" max="20">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Edad de la menopausia</label>
+                                            <input type="number" class="form-control" name="menopause_age" min="40" max="60">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Historia Menstrual</h5>
+                                        <div class="form-group">
+                                            <label>Ciclo menstrual</label>
+                                            <select class="form-control" name="menstrual_cycle">
+                                                <option value="REGULAR">Regular</option>
+                                                <option value="IRREGULAR">Irregular</option>
+                                                <option value="AMENORRHEA">Amenorrea</option>
+                                                <option value="MENORRHAGIA">Menorragia</option>
+                                                <option value="OLIGOMENORRHEA">Oligomenorrea</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Duración del ciclo (días)</label>
+                                            <input type="number" class="form-control" name="cycle_length" min="21" max="35">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Última menstruación</label>
+                                            <input type="date" class="form-control" name="last_menstrual_period">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Historia Obstétrica</h5>
+                                        <div class="form-group">
+                                            <label>Gravidez</label>
+                                            <input type="number" class="form-control" name="gravida" min="0" value="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Para</label>
+                                            <input type="number" class="form-control" name="para" min="0" value="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Partos a término</label>
+                                            <input type="number" class="form-control" name="term_deliveries" min="0" value="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Partos pretérmino</label>
+                                            <input type="number" class="form-control" name="preterm_deliveries" min="0" value="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Abortos</label>
+                                            <input type="number" class="form-control" name="abortions" min="0" value="0">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Hijos vivos</label>
+                                            <input type="number" class="form-control" name="living_children" min="0" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Anticoncepción</h5>
+                                        <div class="form-group">
+                                            <label>Método actual</label>
+                                            <select class="form-control" name="current_contraceptive">
+                                                <option value="NONE">Ninguno</option>
+                                                <option value="ORAL_PILL">Píldora oral</option>
+                                                <option value="IUD">DIU</option>
+                                                <option value="CONDOM">Condón</option>
+                                                <option value="INJECTION">Inyección</option>
+                                                <option value="IMPLANT">Implante</option>
+                                                <option value="STERILIZATION">Esterilización</option>
+                                                <option value="NATURAL">Métodos naturales</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Duración del método</label>
+                                            <input type="text" class="form-control" name="contraceptive_duration">
+                                        </div>
+                                        <h5>Exámenes de Screening</h5>
+                                        <div class="form-group">
+                                            <label>Última citología</label>
+                                            <input type="date" class="form-control" name="last_pap_smear">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Resultado citología</label>
+                                            <input type="text" class="form-control" name="pap_smear_result">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Última mamografía</label>
+                                            <input type="date" class="form-control" name="last_mammogram">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Resultado mamografía</label>
+                                            <input type="text" class="form-control" name="mammogram_result">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Información Adicional</h5>
+                                        <div class="form-group">
+                                            <label>Historia quirúrgica</label>
+                                            <textarea class="form-control" name="surgical_history" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Historia familiar</label>
+                                            <textarea class="form-control" name="family_history" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> Guardar Paciente
+                                    </button>
+                                    <a href="{% url 'gynec:patient_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tab Embarazo -->
+                        <div class="tab-pane fade" id="pregnancy" role="tabpanel">
+                            <form method="post" class="mt-3">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Información del Embarazo</h5>
+                                        <div class="form-group">
+                                            <label>Paciente</label>
+                                            <select class="form-control" name="patient" required>
+                                                <option value="">Seleccionar paciente...</option>
+                                                <option value="1">María González</option>
+                                                <option value="2">Ana Rodríguez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Número de embarazo</label>
+                                            <input type="number" class="form-control" name="pregnancy_number" min="1" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha de última menstruación</label>
+                                            <input type="date" class="form-control" name="last_menstrual_period" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha probable de parto</label>
+                                            <input type="date" class="form-control" name="expected_delivery_date" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Estado del embarazo</label>
+                                            <select class="form-control" name="status">
+                                                <option value="ONGOING">En curso</option>
+                                                <option value="DELIVERED">Entregado</option>
+                                                <option value="ABORTED">Abortado</option>
+                                                <option value="ECTOPIC">Ectópico</option>
+                                                <option value="MOLAR">Molar</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Factores de Riesgo</h5>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="highRisk" name="high_risk">
+                                                <label class="custom-control-label" for="highRisk">Embarazo de alto riesgo</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Factores de riesgo</label>
+                                            <textarea class="form-control" name="risk_factors" rows="4"></textarea>
+                                        </div>
+                                        <h5>Información del Parto</h5>
+                                        <div class="form-group">
+                                            <label>Tipo de parto</label>
+                                            <select class="form-control" name="delivery_type">
+                                                <option value="">Seleccionar...</option>
+                                                <option value="NORMAL">Parto vaginal normal</option>
+                                                <option value="CESAREAN">Cesárea</option>
+                                                <option value="FORCEPS">Parto con fórceps</option>
+                                                <option value="VACUUM">Parto con ventosa</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Peso al nacer (gramos)</label>
+                                            <input type="number" class="form-control" name="birth_weight" min="500" max="6000">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Complicaciones</label>
+                                            <textarea class="form-control" name="complications" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> Guardar Embarazo
+                                    </button>
+                                    <a href="{% url 'gynec:pregnancy_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tab Procedimiento -->
+                        <div class="tab-pane fade" id="procedure" role="tabpanel">
+                            <form method="post" class="mt-3">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Información del Procedimiento</h5>
+                                        <div class="form-group">
+                                            <label>Paciente</label>
+                                            <select class="form-control" name="patient" required>
+                                                <option value="">Seleccionar paciente...</option>
+                                                <option value="1">María González</option>
+                                                <option value="2">Ana Rodríguez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Tipo de procedimiento</label>
+                                            <select class="form-control" name="procedure_type" required>
+                                                <option value="">Seleccionar...</option>
+                                                <option value="COLPOSCOPY">Colposcopia</option>
+                                                <option value="HYSTEROSCOPY">Histeroscopia</option>
+                                                <option value="LAPAROSCOPY">Laparoscopia</option>
+                                                <option value="DILATION_CURETTAGE">Dilatación y curetaje</option>
+                                                <option value="ENDOMETRIAL_BIOPSY">Biopsia endometrial</option>
+                                                <option value="CERVICAL_BIOPSY">Biopsia cervical</option>
+                                                <option value="HYSTERECTOMY">Histerectomía</option>
+                                                <option value="MYOMECTOMY">Miomectomía</option>
+                                                <option value="OOPHORECTOMY">Ooforectomía</option>
+                                                <option value="TUBAL_LIGATION">Ligadura de trompas</option>
+                                                <option value="IUD_INSERTION">Inserción de DIU</option>
+                                                <option value="IUD_REMOVAL">Remoción de DIU</option>
+                                                <option value="LOOP_ELECTROSURGICAL_EXCISION">LEEP</option>
+                                                <option value="CRYOTHERAPY">Crioterapia</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha del procedimiento</label>
+                                            <input type="date" class="form-control" name="procedure_date" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Médico</label>
+                                            <select class="form-control" name="doctor" required>
+                                                <option value="">Seleccionar médico...</option>
+                                                <option value="1">Dr. García</option>
+                                                <option value="2">Dra. Martínez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Indicación</label>
+                                            <textarea class="form-control" name="indication" rows="3" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Detalles del Procedimiento</h5>
+                                        <div class="form-group">
+                                            <label>Detalles del procedimiento</label>
+                                            <textarea class="form-control" name="procedure_details" rows="4"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Hallazgos</label>
+                                            <textarea class="form-control" name="findings" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Complicaciones</label>
+                                            <textarea class="form-control" name="complications" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Tipo de anestesia</label>
+                                            <select class="form-control" name="anesthesia_type">
+                                                <option value="">Seleccionar...</option>
+                                                <option value="LOCAL">Anestesia local</option>
+                                                <option value="REGIONAL">Anestesia regional</option>
+                                                <option value="GENERAL">Anestesia general</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Instrucciones postoperatorias</label>
+                                            <textarea class="form-control" name="post_operative_instructions" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha de seguimiento</label>
+                                            <input type="date" class="form-control" name="follow_up_date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> Guardar Procedimiento
+                                    </button>
+                                    <a href="{% url 'gynec:procedure_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tab Visita Prenatal -->
+                        <div class="tab-pane fade" id="antenatal" role="tabpanel">
+                            <form method="post" class="mt-3">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Información de la Visita</h5>
+                                        <div class="form-group">
+                                            <label>Embarazo</label>
+                                            <select class="form-control" name="pregnancy" required>
+                                                <option value="">Seleccionar embarazo...</option>
+                                                <option value="1">Embarazo 1 - Ana Rodríguez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha de visita</label>
+                                            <input type="date" class="form-control" name="visit_date" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Edad gestacional (semanas)</label>
+                                            <input type="number" class="form-control" name="gestational_age" min="4" max="42" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Médico</label>
+                                            <select class="form-control" name="doctor" required>
+                                                <option value="">Seleccionar médico...</option>
+                                                <option value="1">Dr. García</option>
+                                                <option value="2">Dra. Martínez</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Examen Físico</h5>
+                                        <div class="form-group">
+                                            <label>Peso (kg)</label>
+                                            <input type="number" class="form-control" name="weight" step="0.1" min="30" max="150">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Presión arterial sistólica</label>
+                                            <input type="number" class="form-control" name="blood_pressure_systolic" min="70" max="200">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Presión arterial diastólica</label>
+                                            <input type="number" class="form-control" name="blood_pressure_diastolic" min="40" max="120">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Altura uterina (cm)</label>
+                                            <input type="number" class="form-control" name="fundal_height" min="8" max="40">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Evaluación Fetal</h5>
+                                        <div class="form-group">
+                                            <label>Frecuencia cardíaca fetal</label>
+                                            <input type="number" class="form-control" name="fetal_heart_rate" min="100" max="200">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Movimientos fetales</label>
+                                            <input type="text" class="form-control" name="fetal_movement">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Presentación</label>
+                                            <input type="text" class="form-control" name="presentation">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Peso fetal estimado (gramos)</label>
+                                            <input type="number" class="form-control" name="estimated_fetal_weight" min="100" max="5000">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Resultados de Laboratorio</h5>
+                                        <div class="form-group">
+                                            <label>Hemoglobina (g/dL)</label>
+                                            <input type="number" class="form-control" name="hemoglobin" step="0.1" min="7" max="20">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Proteína en orina</label>
+                                            <input type="text" class="form-control" name="urine_protein">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Glucosa en orina</label>
+                                            <input type="text" class="form-control" name="urine_glucose">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Líquido amniótico</label>
+                                            <input type="text" class="form-control" name="amniotic_fluid">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Consejos y Seguimiento</h5>
+                                        <div class="form-group">
+                                            <label>Consejos</label>
+                                            <textarea class="form-control" name="advice" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Próxima fecha de visita</label>
+                                            <input type="date" class="form-control" name="next_visit_date">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Notas</label>
+                                            <textarea class="form-control" name="notes" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> Guardar Visita
+                                    </button>
+                                    <a href="{% url 'gynec:antenatal_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tab Anticoncepción -->
+                        <div class="tab-pane fade" id="contraceptive" role="tabpanel">
+                            <form method="post" class="mt-3">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Información de la Consulta</h5>
+                                        <div class="form-group">
+                                            <label>Paciente</label>
+                                            <select class="form-control" name="patient" required>
+                                                <option value="">Seleccionar paciente...</option>
+                                                <option value="1">María González</option>
+                                                <option value="2">Ana Rodríguez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha de consulta</label>
+                                            <input type="date" class="form-control" name="consultation_date" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Médico</label>
+                                            <select class="form-control" name="doctor" required>
+                                                <option value="">Seleccionar médico...</option>
+                                                <option value="1">Dr. García</option>
+                                                <option value="2">Dra. Martínez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Método actual</label>
+                                            <select class="form-control" name="current_method" required>
+                                                <option value="">Seleccionar...</option>
+                                                <option value="NONE">Ninguno</option>
+                                                <option value="ORAL_PILL">Píldora oral</option>
+                                                <option value="IUD">DIU</option>
+                                                <option value="CONDOM">Condón</option>
+                                                <option value="INJECTION">Inyección</option>
+                                                <option value="IMPLANT">Implante</option>
+                                                <option value="STERILIZATION">Esterilización</option>
+                                                <option value="NATURAL">Métodos naturales</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Satisfacción con método actual</label>
+                                            <input type="text" class="form-control" name="satisfaction_with_current">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Método Deseado</h5>
+                                        <div class="form-group">
+                                            <label>Método deseado</label>
+                                            <select class="form-control" name="desired_method" required>
+                                                <option value="">Seleccionar...</option>
+                                                <option value="NONE">Ninguno</option>
+                                                <option value="ORAL_PILL">Píldora oral</option>
+                                                <option value="IUD">DIU</option>
+                                                <option value="CONDOM">Condón</option>
+                                                <option value="INJECTION">Inyección</option>
+                                                <option value="IMPLANT">Implante</option>
+                                                <option value="STERILIZATION">Esterilización</option>
+                                                <option value="NATURAL">Métodos naturales</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Método proporcionado</label>
+                                            <select class="form-control" name="method_provided" required>
+                                                <option value="">Seleccionar...</option>
+                                                <option value="NONE">Ninguno</option>
+                                                <option value="ORAL_PILL">Píldora oral</option>
+                                                <option value="IUD">DIU</option>
+                                                <option value="CONDOM">Condón</option>
+                                                <option value="INJECTION">Inyección</option>
+                                                <option value="IMPLANT">Implante</option>
+                                                <option value="STERILIZATION">Esterilización</option>
+                                                <option value="NATURAL">Métodos naturales</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha de seguimiento</label>
+                                            <input type="date" class="form-control" name="follow_up_date">
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="followUpRequired" name="follow_up_required" checked>
+                                                <label class="custom-control-label" for="followUpRequired">Seguimiento requerido</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Consejería</h5>
+                                        <div class="form-group">
+                                            <label>Temas de consejería discutidos</label>
+                                            <textarea class="form-control" name="counseling_topics" rows="3" required></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Efectos secundarios discutidos</label>
+                                            <textarea class="form-control" name="side_effects_discussed" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Notas</label>
+                                            <textarea class="form-control" name="notes" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> Guardar Consulta
+                                    </button>
+                                    <a href="{% url 'gynec:contraceptive_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tab Menopausia -->
+                        <div class="tab-pane fade" id="menopause" role="tabpanel">
+                            <form method="post" class="mt-3">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Información de la Evaluación</h5>
+                                        <div class="form-group">
+                                            <label>Paciente</label>
+                                            <select class="form-control" name="patient" required>
+                                                <option value="">Seleccionar paciente...</option>
+                                                <option value="1">María González</option>
+                                                <option value="2">Ana Rodríguez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha de evaluación</label>
+                                            <input type="date" class="form-control" name="assessment_date" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Médico</label>
+                                            <select class="form-control" name="doctor" required>
+                                                <option value="">Seleccionar médico...</option>
+                                                <option value="1">Dr. García</option>
+                                                <option value="2">Dra. Martínez</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Estado de menopausia</label>
+                                            <select class="form-control" name="menopause_status" required>
+                                                <option value="">Seleccionar...</option>
+                                                <option value="PREMENOPAUSAL">Premenopáusica</option>
+                                                <option value="PERIMENOPAUSAL">Perimenopáusica</option>
+                                                <option value="POSTMENOPAUSAL">Postmenopáusica</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Severidad de síntomas</label>
+                                            <select class="form-control" name="symptom_severity">
+                                                <option value="">Seleccionar...</option>
+                                                <option value="MILD">Leve</option>
+                                                <option value="MODERATE">Moderada</option>
+                                                <option value="SEVERE">Severa</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Síntomas</h5>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="hotFlashes" name="hot_flashes">
+                                                <label class="custom-control-label" for="hotFlashes">Sofocos</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="nightSweats" name="night_sweats">
+                                                <label class="custom-control-label" for="nightSweats">Sudores nocturnos</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="moodChanges" name="mood_changes">
+                                                <label class="custom-control-label" for="moodChanges">Cambios de humor</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="sleepDisturbances" name="sleep_disturbances">
+                                                <label class="custom-control-label" for="sleepDisturbances">Alteraciones del sueño</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="vaginalDryness" name="vaginal_dryness">
+                                                <label class="custom-control-label" for="vaginalDryness">Sequedad vaginal</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="decreasedLibido" name="decreased_libido">
+                                                <label class="custom-control-label" for="decreasedLibido">Disminución de la libido</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Tratamiento</h5>
+                                        <div class="form-group">
+                                            <label>Tipo de tratamiento</label>
+                                            <select class="form-control" name="treatment_type">
+                                                <option value="">Seleccionar...</option>
+                                                <option value="NONE">Sin tratamiento</option>
+                                                <option value="LIFESTYLE">Modificaciones del estilo de vida</option>
+                                                <option value="HRT">Terapia de reemplazo hormonal</option>
+                                                <option value="NON_HORMONAL">Medicamentos no hormonales</option>
+                                                <option value="ALTERNATIVE">Terapias alternativas</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Detalles del tratamiento</label>
+                                            <textarea class="form-control" name="treatment_details" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Evaluaciones</h5>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="boneDensity" name="bone_density_assessment">
+                                                <label class="custom-control-label" for="boneDensity">Evaluación de densidad ósea</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="cardiovascular" name="cardiovascular_assessment">
+                                                <label class="custom-control-label" for="cardiovascular">Evaluación cardiovascular</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Fecha de seguimiento</label>
+                                            <input type="date" class="form-control" name="follow_up_date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h5>Información Adicional</h5>
+                                        <div class="form-group">
+                                            <label>Impacto en la calidad de vida</label>
+                                            <textarea class="form-control" name="quality_of_life_impact" rows="3"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Notas</label>
+                                            <textarea class="form-control" name="notes" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> Guardar Evaluación
+                                    </button>
+                                    <a href="{% url 'gynec:menopause_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Validación de formularios
+    $('form').on('submit', function(e) {
+        var requiredFields = $(this).find('[required]');
+        var isValid = true;
+        
+        requiredFields.each(function() {
+            if (!$(this).val()) {
+                $(this).addClass('is-invalid');
+                isValid = false;
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Por favor complete todos los campos requeridos.');
+        }
+    });
+
+    // Cálculo automático de fecha probable de parto
+    $('input[name="last_menstrual_period"]').on('change', function() {
+        var lmp = new Date($(this).val());
+        if (lmp) {
+            var edd = new Date(lmp);
+            edd.setDate(edd.getDate() + 280); // 40 semanas
+            $('input[name="expected_delivery_date"]').val(edd.toISOString().split('T')[0]);
+        }
+    });
+
+    // Cálculo de edad gestacional
+    $('input[name="last_menstrual_period"]').on('change', function() {
+        var lmp = new Date($(this).val());
+        if (lmp) {
+            var today = new Date();
+            var diffTime = Math.abs(today - lmp);
+            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            var weeks = Math.floor(diffDays / 7);
+            $('input[name="gestational_age"]').val(weeks);
+        }
+    });
+});
+</script>
+{% endblock %} 

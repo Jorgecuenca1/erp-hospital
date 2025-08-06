@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Rental Equipment{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-medical"></i> Rental Equipment</h1>
+                <p class="text-muted">Manage medical equipment available for rental</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Equipment
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Model</th>
+                                    <th>Manufacturer</th>
+                                    <th>Serial Number</th>
+                                    <th>Daily Rate</th>
+                                    <th>Status</th>
+                                    <th>Location</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for equipment in equipment %}
+                                <tr>
+                                    <td><strong>{{ equipment.name }}</strong></td>
+                                    <td>{{ equipment.get_category_display }}</td>
+                                    <td>{{ equipment.model }}</td>
+                                    <td>{{ equipment.manufacturer }}</td>
+                                    <td>{{ equipment.serial_number }}</td>
+                                    <td>${{ equipment.daily_rate|floatformat:2 }}/day</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if equipment.availability_status == 'available' %}badge-success
+                                            {% elif equipment.availability_status == 'rented' %}badge-warning
+                                            {% elif equipment.availability_status == 'maintenance' %}badge-info
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ equipment.get_availability_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ equipment.location }}</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% if equipment.availability_status == 'available' %}
+                                        <a href="#" class="btn btn-sm btn-success">
+                                            <i class="fas fa-handshake"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="9" class="text-center">No rental equipment found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventario - Reportes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-bar text-info"></i>
+                        Reportes de Inventario
+                    </h3>
+                    <div class="card-tools">
+                        <button class="btn btn-success btn-sm" onclick="exportReport()">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="printReport()">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros de Reporte -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Período</label>
+                            <select class="form-control" id="periodFilter">
+                                <option value="month">Este mes</option>
+                                <option value="quarter">Este trimestre</option>
+                                <option value="year" selected>Este año</option>
+                                <option value="custom">Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Desde</label>
+                            <input type="date" class="form-control" id="startDate" value="2024-01-01">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Hasta</label>
+                            <input type="date" class="form-control" id="endDate" value="2024-12-31">
+                        </div>
+                        <div class="col-md-3">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary btn-block" onclick="generateReport()">
+                                <i class="fas fa-search"></i> Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Estadísticas -->
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ total_productos }}</h3>
+                                    <p>Productos Activos</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <a href="{% url 'inventories:producto_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ productos_stock_bajo }}</h3>
+                                    <p>Stock Bajo</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <a href="{% url 'inventories:low_stock' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ entradas }}</h3>
+                                    <p>Entradas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                                <a href="{% url 'inventories:movimiento_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-danger">
+                                <div class="inner">
+                                    <h3>{{ salidas }}</h3>
+                                    <p>Salidas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <a href="{% url 'inventories:movimiento_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-chart-pie"></i>
+                                        Movimientos por Tipo
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="movementsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        Movimientos por Mes
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="monthlyChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reportes Específicos -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-table"></i>
+                                        Productos por Categoría
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Categoría</th>
+                                                    <th>Productos</th>
+                                                    <th>Stock Total</th>
+                                                    <th>Porcentaje</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Medicamentos</td>
+                                                    <td>150</td>
+                                                    <td>2,500</td>
+                                                    <td>45%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Insumos</td>
+                                                    <td>80</td>
+                                                    <td>1,200</td>
+                                                    <td>30%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Equipos</td>
+                                                    <td>45</td>
+                                                    <td>800</td>
+                                                    <td>15%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Otros</td>
+                                                    <td>25</td>
+                                                    <td>400</td>
+                                                    <td>10%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-table"></i>
+                                        Stock por Ubicación
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ubicación</th>
+                                                    <th>Productos</th>
+                                                    <th>Stock Total</th>
+                                                    <th>Porcentaje</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Almacén Principal</td>
+                                                    <td>200</td>
+                                                    <td>3,000</td>
+                                                    <td>60%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Farmacia</td>
+                                                    <td>80</td>
+                                                    <td>1,200</td>
+                                                    <td>24%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Quirófano</td>
+                                                    <td>20</td>
+                                                    <td>500</td>
+                                                    <td>10%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Emergencias</td>
+                                                    <td>20</td>
+                                                    <td>300</td>
+                                                    <td>6%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas y Notificaciones -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-bell"></i>
+                                        Alertas de Inventario
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-warning">
+                                        <h5><i class="fas fa-exclamation-triangle"></i> Productos con Stock Bajo</h5>
+                                        <p>Hay {{ productos_stock_bajo }} productos que requieren reabastecimiento inmediato.</p>
+                                        <a href="{% url 'inventories:low_stock' %}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Productos
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="alert alert-danger">
+                                        <h5><i class="fas fa-calendar-times"></i> Productos Próximos a Caducar</h5>
+                                        <p>Hay productos que caducarán en los próximos 30 días.</p>
+                                        <a href="{% url 'inventories:expired_products' %}" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Productos
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="alert alert-info">
+                                        <h5><i class="fas fa-chart-line"></i> Resumen de Movimientos</h5>
+                                        <p>En el período seleccionado se han registrado {{ entradas }} entradas y {{ salidas }} salidas.</p>
+                                        <a href="{% url 'inventories:movements_summary' %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(document).ready(function() {
+    // Gráfico de movimientos por tipo
+    var movementsCtx = document.getElementById('movementsChart').getContext('2d');
+    var movementsChart = new Chart(movementsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Entradas', 'Salidas', 'Ajustes'],
+            datasets: [{
+                data: [{{ entradas }}, {{ salidas }}, {{ ajustes }}],
+                backgroundColor: [
+                    '#28a745',
+                    '#dc3545',
+                    '#ffc107'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Gráfico de movimientos por mes
+    var monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    var monthlyChart = new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            datasets: [{
+                label: 'Entradas',
+                data: [12, 15, 18, 22, 25, 28, 30, 27, 24, 20, 18, 15],
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Salidas',
+                data: [10, 12, 15, 18, 20, 22, 25, 23, 20, 18, 16, 14],
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Filtros de período
+    $('#periodFilter').change(function() {
+        var period = $(this).val();
+        var today = new Date();
+        var startDate = new Date();
+        var endDate = new Date();
+
+        switch(period) {
+            case 'month':
+                startDate.setMonth(today.getMonth());
+                startDate.setDate(1);
+                break;
+            case 'quarter':
+                var quarter = Math.floor(today.getMonth() / 3);
+                startDate.setMonth(quarter * 3);
+                startDate.setDate(1);
+                break;
+            case 'year':
+                startDate.setFullYear(today.getFullYear());
+                startDate.setMonth(0);
+                startDate.setDate(1);
+                break;
+        }
+
+        $('#startDate').val(startDate.toISOString().split('T')[0]);
+        $('#endDate').val(endDate.toISOString().split('T')[0]);
+    });
+});
+
+function generateReport() {
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
+    
+    if (!startDate || !endDate) {
+        alert('Por favor seleccione las fechas de inicio y fin.');
+        return;
+    }
+    
+    if (startDate > endDate) {
+        alert('La fecha de inicio no puede ser mayor que la fecha de fin.');
+        return;
+    }
+    
+    // Aquí se implementaría la lógica para generar el reporte
+    console.log('Generando reporte desde', startDate, 'hasta', endDate);
+    alert('Reporte generado exitosamente.');
+}
+
+function exportReport() {
+    // Aquí se implementaría la lógica de exportación
+    alert('Función de exportación en desarrollo.');
+}
+
+function printReport() {
+    window.print();
+}
+</script>
+{% endblock %} 

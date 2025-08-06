@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Cursos</h3>
+            <a href="{% url 'curso_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Curso
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar cursos...">
+            </div>
+            <div class="list-group">
+                {% for curso in object_list %}
+                <a href="{% url 'curso_detail' curso.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ curso.titulo }}</h5>
+                        <small class="text-muted">Creado: {{ curso.fecha_creacion|date:"d/m/Y" }}</small>
+                    </div>
+                    <p class="mb-1">Instructor: {{ curso.instructor.get_full_name|default:curso.instructor.username }}</p>
+                    <small>{% if curso.activo %}Activo{% else %}Inactivo{% endif %}</small>
+                </a>
+                {% empty %}
+                <p class="text-center">No hay cursos registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.list-group-item');
+
+        items.forEach(item => {
+            let text = item.textContent || item.innerText;
+            if (text.toLowerCase().indexOf(filter) > -1) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %}

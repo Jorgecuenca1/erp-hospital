@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Resource Allocation{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-share-alt"></i> Resource Allocation</h1>
+                <p class="text-muted">Plan and allocate hospital resources</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Allocation
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Resource Type</th>
+                                    <th>Department</th>
+                                    <th>Planned</th>
+                                    <th>Allocated</th>
+                                    <th>Utilization</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Period</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for allocation in allocations %}
+                                <tr>
+                                    <td><strong>{{ allocation.resource_type.name }}</strong></td>
+                                    <td>{{ allocation.department }}</td>
+                                    <td>{{ allocation.planned_quantity }} {{ allocation.resource_type.unit }}</td>
+                                    <td>{{ allocation.allocated_quantity }} {{ allocation.resource_type.unit }}</td>
+                                    <td>
+                                        {% widthratio allocation.allocated_quantity allocation.planned_quantity 100 %}%
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if allocation.priority == 'critical' %}badge-danger
+                                            {% elif allocation.priority == 'high' %}badge-warning
+                                            {% elif allocation.priority == 'medium' %}badge-info
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ allocation.get_priority_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if allocation.status == 'completed' %}badge-success
+                                            {% elif allocation.status == 'allocated' %}badge-info
+                                            {% elif allocation.status == 'approved' %}badge-warning
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ allocation.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ allocation.start_date|date:"M d" }} - {{ allocation.end_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="9" class="text-center">No resource allocations found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

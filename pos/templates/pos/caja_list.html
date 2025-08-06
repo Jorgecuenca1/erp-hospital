@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Cajas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Cajas Registradoras</h1>
+        <a href="{% url 'pos:caja_create' %}" class="btn btn-primary">Añadir Nueva Caja</a>
+    </div>
+
+    <div class="row">
+        {% for caja in object_list %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'pos:caja_detail' caja.pk %}">{{ caja.nombre }}</a></h5>
+                    <p class="card-text text-muted">Punto de Venta: {{ caja.punto_venta.nombre }}</p>
+                    <p class="card-text">Cuenta Contable: {{ caja.cuenta_contable.nombre }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    {% if caja.activo %}
+                        <span class="badge bg-success">Activa</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactiva</span>
+                    {% endif %}
+                    <div>
+                        <a href="{% url 'pos:caja_update' caja.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        <a href="{% url 'pos:caja_delete' caja.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>No hay cajas registradoras en el sistema.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

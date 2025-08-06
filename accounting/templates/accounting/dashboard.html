@@ -1,0 +1,401 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h1 class="card-title">
+                        <i class="fas fa-calculator"></i> Sistema de Contabilidad
+                    </h1>
+                    <p class="card-text">Gestión integral de la contabilidad hospitalaria</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Rápidas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Asientos Contables</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ asientos_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Cuentas Contables</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ cuentas_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Terceros</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ terceros_count|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Períodos Activos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ periodos_activos|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulos Principales -->
+    <div class="row">
+        <!-- Gestión de Asientos -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book"></i> Gestión de Asientos Contables
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Administre los asientos contables, líneas de asiento y movimientos financieros.</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'accounting:asientocontable_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-list"></i> Ver Asientos
+                        </a>
+                        <a href="{% url 'accounting:asientocontable_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear Asiento
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan de Cuentas -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-sitemap"></i> Plan de Cuentas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Configure el plan de cuentas contables y la estructura PUC.</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'accounting:cuentacontable_list' %}" class="btn btn-outline-success">
+                            <i class="fas fa-list"></i> Ver Cuentas
+                        </a>
+                        <a href="{% url 'accounting:cuentacontable_create' %}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Crear Cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terceros -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-tie"></i> Gestión de Terceros
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Administre proveedores, clientes y otros terceros del sistema.</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'accounting:tercero_list' %}" class="btn btn-outline-info">
+                            <i class="fas fa-list"></i> Ver Terceros
+                        </a>
+                        <a href="{% url 'accounting:tercero_create' %}" class="btn btn-info">
+                            <i class="fas fa-plus"></i> Crear Tercero
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comprobantes -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-invoice"></i> Comprobantes Contables
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Gestión de comprobantes contables y certificados de retención.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'accounting:comprobantecontable_list' %}" class="btn btn-outline-warning btn-sm w-100 mb-2">
+                                <i class="fas fa-file-alt"></i> Comprobantes
+                            </a>
+                            <a href="{% url 'accounting:certificadoretencion_list' %}" class="btn btn-outline-warning btn-sm w-100">
+                                <i class="fas fa-certificate"></i> Certificados
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'accounting:datosempresa_list' %}" class="btn btn-outline-warning btn-sm w-100 mb-2">
+                                <i class="fas fa-building"></i> Empresa
+                            </a>
+                            <a href="{% url 'accounting:centrocosto_list' %}" class="btn btn-outline-warning btn-sm w-100">
+                                <i class="fas fa-sitemap"></i> Centros Costo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs"></i> Configuración
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Configure períodos, diarios, impuestos y parámetros del sistema.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'accounting:periodocontable_list' %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                                <i class="fas fa-calendar"></i> Períodos
+                            </a>
+                            <a href="{% url 'accounting:diario_list' %}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fas fa-book-open"></i> Diarios
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'accounting:impuesto_list' %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                                <i class="fas fa-percentage"></i> Impuestos
+                            </a>
+                            <a href="{% url 'accounting:lineaasiento_list' %}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fas fa-list-ul"></i> Líneas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nuevas Funcionalidades -->
+    <div class="row mt-4">
+        <!-- Conciliación Bancaria -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-university"></i> Conciliación Bancaria
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Gestión de movimientos bancarios y conciliación automática.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'accounting:movimientobancario_list' %}" class="btn btn-outline-info btn-sm w-100 mb-2">
+                                <i class="fas fa-list"></i> Movimientos
+                            </a>
+                            <a href="{% url 'accounting:movimientobancario_create' %}" class="btn btn-outline-info btn-sm w-100">
+                                <i class="fas fa-plus"></i> Nuevo Movimiento
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'accounting:reportes' %}?tipo=conciliacion" class="btn btn-outline-info btn-sm w-100 mb-2">
+                                <i class="fas fa-check-double"></i> Conciliación
+                            </a>
+                            <a href="{% url 'accounting:reportes' %}?tipo=banco" class="btn btn-outline-info btn-sm w-100">
+                                <i class="fas fa-chart-pie"></i> Reporte Banco
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cierre Contable y Presupuestos -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lock"></i> Cierre Contable y Presupuestos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Cierre de períodos contables y gestión de presupuestos.</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="{% url 'accounting:cierrecontable_list' %}" class="btn btn-outline-success btn-sm w-100 mb-2">
+                                <i class="fas fa-lock"></i> Cierres
+                            </a>
+                            <a href="{% url 'accounting:cierrecontable_create' %}" class="btn btn-outline-success btn-sm w-100">
+                                <i class="fas fa-plus"></i> Nuevo Cierre
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'accounting:presupuesto_list' %}" class="btn btn-outline-success btn-sm w-100 mb-2">
+                                <i class="fas fa-chart-line"></i> Presupuestos
+                            </a>
+                            <a href="{% url 'accounting:presupuesto_create' %}" class="btn btn-outline-success btn-sm w-100">
+                                <i class="fas fa-plus"></i> Nuevo Presupuesto
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes Rápidos -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar"></i> Reportes y Análisis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'accounting:reportes' %}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-chart-bar"></i> Reportes Generales
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo=balance" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-balance-scale"></i> Balance General
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo=resultados" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-chart-line"></i> Estado de Resultados
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo=diario" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-file-invoice"></i> Libro Diario
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes Avanzados -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie"></i> Reportes Avanzados
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=flujo_efectivo" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-money-bill-wave"></i> Flujo de Efectivo
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=presupuesto" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-chart-line"></i> Análisis Presupuestal
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=costos" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-calculator"></i> Análisis de Costos
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=fiscal" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-file-invoice-dollar"></i> Reportes Fiscales
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportefiscal_list' %}" class="btn btn-outline-danger w-100">
+                                <i class="fas fa-calculator"></i> Generar Reportes Fiscales
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=cartera" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-handshake"></i> Análisis de Cartera
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=indicadores" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-chart-pie"></i> Indicadores Financieros
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=auditoria" class="btn btn-outline-dark w-100">
+                                <i class="fas fa-shield-alt"></i> Reportes de Auditoría
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=banco" class="btn btn-outline-info w-100">
+                                <i class="fas fa-university"></i> Reporte Bancario
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=conciliacion" class="btn btn-outline-info w-100">
+                                <i class="fas fa-check-double"></i> Conciliación Bancaria
+                            </a>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <a href="{% url 'accounting:reportes' %}?tipo_reporte=movimientos" class="btn btn-outline-info w-100">
+                                <i class="fas fa-list"></i> Movimientos Bancarios
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

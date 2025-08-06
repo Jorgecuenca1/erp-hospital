@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Eliminar{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Confirmar Eliminación
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-warning">
+                        <h4><i class="fas fa-exclamation-triangle"></i> ¡Advertencia!</h4>
+                        <p>Está a punto de eliminar el siguiente registro ginecológico:</p>
+                    </div>
+
+                    <!-- Información del registro a eliminar -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-user text-primary"></i> Información del Paciente</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Nombre:</strong></td>
+                                            <td>María González</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>ID:</strong></td>
+                                            <td>G001</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Edad:</strong></td>
+                                            <td>28 años</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Estado:</strong></td>
+                                            <td><span class="badge badge-success">Activa</span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>G/P:</strong></td>
+                                            <td>G2P1</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Última menstruación:</strong></td>
+                                            <td>15/07/2024</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Método anticonceptivo:</strong></td>
+                                            <td>Píldora oral</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Última citología:</strong></td>
+                                            <td>15/06/2024</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advertencias importantes -->
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-circle"></i> Consecuencias de la eliminación:</h5>
+                        <ul class="text-left">
+                            <li>Se eliminarán todos los datos ginecológicos asociados</li>
+                            <li>Se perderá el historial de embarazos</li>
+                            <li>Se eliminarán las visitas prenatales</li>
+                            <li>Se perderán los registros de procedimientos</li>
+                            <li>Esta acción no se puede deshacer</li>
+                        </ul>
+                    </div>
+
+                    <!-- Opciones de eliminación -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-cog text-info"></i> Opciones de Eliminación</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="softDelete" name="deleteType" class="custom-control-input" value="soft" checked>
+                                    <label class="custom-control-label" for="softDelete">
+                                        <strong>Eliminación suave (Recomendado)</strong><br>
+                                        <small class="text-muted">El registro se marcará como inactivo pero se mantendrá en la base de datos para auditoría.</small>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="hardDelete" name="deleteType" class="custom-control-input" value="hard">
+                                    <label class="custom-control-label" for="hardDelete">
+                                        <strong>Eliminación permanente</strong><br>
+                                        <small class="text-muted">El registro se eliminará completamente de la base de datos. Esta acción no se puede deshacer.</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmación -->
+                    <div class="form-group">
+                        <label for="confirmationText">Para confirmar, escriba "ELIMINAR" en el siguiente campo:</label>
+                        <input type="text" class="form-control" id="confirmationText" placeholder="Escriba ELIMINAR para confirmar">
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="mt-4">
+                        <form method="post" id="deleteForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete_type" id="deleteTypeInput" value="soft">
+                            
+                            <button type="submit" class="btn btn-danger btn-lg" id="deleteBtn" disabled>
+                                <i class="fas fa-trash"></i> Eliminar Registro
+                            </button>
+                            
+                            <a href="{% url 'gynec:patient_detail' 1 %}" class="btn btn-info btn-lg">
+                                <i class="fas fa-eye"></i> Ver Detalle
+                            </a>
+                            
+                            <a href="{% url 'gynec:patient_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Validación de confirmación
+    $('#confirmationText').on('input', function() {
+        var confirmationText = $(this).val().toUpperCase();
+        var deleteBtn = $('#deleteBtn');
+        
+        if (confirmationText === 'ELIMINAR') {
+            deleteBtn.prop('disabled', false);
+            deleteBtn.removeClass('btn-secondary').addClass('btn-danger');
+        } else {
+            deleteBtn.prop('disabled', true);
+            deleteBtn.removeClass('btn-danger').addClass('btn-secondary');
+        }
+    });
+
+    // Actualizar tipo de eliminación
+    $('input[name="deleteType"]').change(function() {
+        $('#deleteTypeInput').val($(this).val());
+    });
+
+    // Confirmación adicional antes de eliminar
+    $('#deleteForm').on('submit', function(e) {
+        var deleteType = $('input[name="deleteType"]:checked').val();
+        var confirmationMessage = '';
+        
+        if (deleteType === 'hard') {
+            confirmationMessage = '¿Está completamente seguro de que desea eliminar permanentemente este registro? Esta acción NO se puede deshacer.';
+        } else {
+            confirmationMessage = '¿Está seguro de que desea marcar este registro como inactivo?';
+        }
+        
+        if (!confirm(confirmationMessage)) {
+            e.preventDefault();
+        }
+    });
+
+    // Prevenir envío accidental
+    $(window).on('beforeunload', function() {
+        if ($('#confirmationText').val().toUpperCase() === 'ELIMINAR') {
+            return '¿Está seguro de que desea salir? Los cambios no se han guardado.';
+        }
+    });
+});
+</script>
+{% endblock %} 

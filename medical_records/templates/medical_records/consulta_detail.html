@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Detalle de Consulta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3>Consulta del {{ consulta.fecha_hora|date:"d M, Y" }}</h3>
+            <p class="mb-0"><strong>Paciente:</strong> <a href="{% url 'paciente_detail' consulta.historia_clinica.paciente.pk %}">{{ consulta.historia_clinica.paciente.nombres }} {{ consulta.historia_clinica.paciente.apellidos }}</a></p>
+            <p class="mb-0"><strong>Profesional:</strong> {{ consulta.profesional.nombres }} {{ consulta.profesional.apellidos }}</p>
+        </div>
+        <div class="card-body">
+            <h5>Motivo de la Consulta</h5>
+            <p>{{ consulta.motivo_consulta }}</p>
+            <h5>Observaciones</h5>
+            <p>{{ consulta.observaciones|default:"Sin observaciones." }}</p>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="diagnosticos-tab" data-bs-toggle="tab" data-bs-target="#diagnosticos" type="button" role="tab">Diagnósticos</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="procedimientos-tab" data-bs-toggle="tab" data-bs-target="#procedimientos" type="button" role="tab">Procedimientos</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="signos-vitales-tab" data-bs-toggle="tab" data-bs-target="#signos-vitales" type="button" role="tab">Signos Vitales</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="notas-evolucion-tab" data-bs-toggle="tab" data-bs-target="#notas-evolucion" type="button" role="tab">Notas de Evolución</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab">Documentos Adjuntos</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <!-- Diagnósticos -->
+            <div class="tab-pane fade show active" id="diagnosticos" role="tabpanel">
+                <div class="card card-body">
+                    <h5>Diagnósticos</h5>
+                    <ul>
+                        {% for diagnostico in diagnosticos %}
+                            <li>{{ diagnostico.descripcion }} ({{ diagnostico.codigo_cie10 }}) {% if diagnostico.principal %}<span class="badge bg-primary">Principal</span>{% endif %}</li>
+                        {% empty %}
+                            <li>No hay diagnósticos registrados.</li>
+                        {% endfor %}
+                    </ul>
+                    <hr>
+                    <h5>Añadir Diagnóstico</h5>
+                    <form action="{% url 'add_diagnostico' consulta.pk %}" method="post">
+                        {% csrf_token %}
+                        {{ diagnostico_form|crispy }}
+                        <button type="submit" class="btn btn-primary mt-2">Añadir</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Procedimientos -->
+            <div class="tab-pane fade" id="procedimientos" role="tabpanel">
+                <div class="card card-body">
+                    <h5>Procedimientos</h5>
+                    <ul>
+                        {% for procedimiento in procedimientos %}
+                            <li>{{ procedimiento.descripcion }} ({{ procedimiento.codigo_cups }})</li>
+                        {% empty %}
+                            <li>No hay procedimientos registrados.</li>
+                        {% endfor %}
+                    </ul>
+                    <hr>
+                    <h5>Añadir Procedimiento</h5>
+                    <form action="{% url 'add_procedimiento' consulta.pk %}" method="post">
+                        {% csrf_token %}
+                        {{ procedimiento_form|crispy }}
+                        <button type="submit" class="btn btn-primary mt-2">Añadir</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Signos Vitales -->
+            <div class="tab-pane fade" id="signos-vitales" role="tabpanel">
+                <div class="card card-body">
+                    <h5>Signos Vitales</h5>
+                    {% if signos_vitales %}
+                        <p>Tensión Arterial: {{ signos_vitales.tension_sistolica }}/{{ signos_vitales.tension_diastolica }} mmHg</p>
+                        <p>Frecuencia Cardíaca: {{ signos_vitales.frecuencia_cardiaca }} lpm</p>
+                        <p>Frecuencia Respiratoria: {{ signos_vitales.frecuencia_respiratoria }} rpm</p>
+                        <p>Temperatura: {{ signos_vitales.temperatura }} °C</p>
+                        <p>Peso: {{ signos_vitales.peso }} kg</p>
+                        <p>Altura: {{ signos_vitales.altura }} m</p>
+                    {% else %}
+                        <p>No se han registrado los signos vitales.</p>
+                        <hr>
+                        <h5>Añadir Signos Vitales</h5>
+                        <form action="{% url 'add_signos_vitales' consulta.pk %}" method="post">
+                            {% csrf_token %}
+                            {{ signos_vitales_form|crispy }}
+                            <button type="submit" class="btn btn-primary mt-2">Añadir</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Notas de Evolución -->
+            <div class="tab-pane fade" id="notas-evolucion" role="tabpanel">
+                <div class="card card-body">
+                    <h5>Notas de Evolución</h5>
+                    {% for nota in notas_evolucion %}
+                        <div class="border-bottom mb-2 pb-2">
+                            <p>{{ nota.nota }}</p>
+                            <small class="text-muted">Por: {{ nota.profesional.nombres }} - {{ nota.fecha_hora|date:"d M, Y H:i" }}</small>
+                        </div>
+                    {% empty %}
+                        <p>No hay notas de evolución.</p>
+                    {% endfor %}
+                    <hr>
+                    <h5>Añadir Nota de Evolución</h5>
+                    <form action="{% url 'add_nota_evolucion' consulta.pk %}" method="post">
+                        {% csrf_token %}
+                        {{ nota_evolucion_form|crispy }}
+                        <button type="submit" class="btn btn-primary mt-2">Añadir</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Documentos Adjuntos -->
+            <div class="tab-pane fade" id="documentos" role="tabpanel">
+                <div class="card card-body">
+                    <h5>Documentos Adjuntos</h5>
+                    <ul>
+                        {% for documento in documentos_adjuntos %}
+                            <li><a href="{{ documento.archivo.url }}" target="_blank">{{ documento.nombre }}</a></li>
+                        {% empty %}
+                            <li>No hay documentos adjuntos.</li>
+                        {% endfor %}
+                    </ul>
+                    <hr>
+                    <h5>Añadir Documento</h5>
+                    <form action="{% url 'add_documento_adjunto' consulta.pk %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ documento_adjunto_form|crispy }}
+                        <button type="submit" class="btn btn-primary mt-2">Añadir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

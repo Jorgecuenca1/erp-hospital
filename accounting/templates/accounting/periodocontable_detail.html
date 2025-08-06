@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Detalle de Período Contable</h3>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title text-primary">{{ periodocontable.nombre }}</h4>
+            <hr>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Fecha de Inicio:</strong>
+                </div>
+                <div class="col-md-6">
+                    {{ periodocontable.fecha_inicio|date:"d M Y" }}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Fecha de Fin:</strong>
+                </div>
+                <div class="col-md-6">
+                    {{ periodocontable.fecha_fin|date:"d M Y" }}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Cerrado:</strong>
+                </div>
+                <div class="col-md-6">
+                    {% if periodocontable.cerrado %}
+                    <span class="badge bg-danger"><i class="fas fa-lock"></i> Sí</span>
+                    {% else %}
+                    <span class="badge bg-success"><i class="fas fa-lock-open"></i> No</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <a href="{% url 'accounting:periodocontable_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-alt-circle-left"></i> Volver a la Lista
+            </a>
+            <a href="{% url 'accounting:periodocontable_update' periodocontable.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'accounting:periodocontable_delete' periodocontable.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

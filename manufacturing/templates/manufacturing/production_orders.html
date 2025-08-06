@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Production Orders{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-cogs"></i> Production Orders</h1>
+                <p class="text-muted">Manage medical device production orders</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Production Order
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Device</th>
+                                    <th>Quantity</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Assigned To</th>
+                                    <th>Start Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><strong>{{ order.order_number }}</strong></td>
+                                    <td>{{ order.device.name }}</td>
+                                    <td>{{ order.quantity }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if order.priority == 'urgent' %}badge-danger
+                                            {% elif order.priority == 'high' %}badge-warning
+                                            {% elif order.priority == 'medium' %}badge-info
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ order.get_priority_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if order.status == 'completed' %}badge-success
+                                            {% elif order.status == 'in_progress' %}badge-warning
+                                            {% elif order.status == 'cancelled' %}badge-danger
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.assigned_to.get_full_name|default:order.assigned_to.username|default:"Unassigned" }}</td>
+                                    <td>{{ order.start_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">No production orders found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

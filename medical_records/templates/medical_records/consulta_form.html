@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        Editar Consulta
+    {% else %}
+        Nueva Consulta
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3>
+                {% if form.instance.pk %}
+                    Editar Consulta
+                {% else %}
+                    Nueva Consulta para {{ form.initial.historia_clinica.paciente.nombres }} {{ form.initial.historia_clinica.paciente.apellidos }}
+                {% endif %}
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    {% if form.instance.pk %}
+                        <a href="{% url 'consulta_detail' form.instance.pk %}" class="btn btn-secondary">Cancelar</a>
+                    {% elif form.initial.historia_clinica %}
+                         <a href="{% url 'paciente_detail' form.initial.historia_clinica.paciente.pk %}" class="btn btn-secondary">Cancelar</a>
+                    {% else %}
+                        <a href="{% url 'paciente_list' %}" class="btn btn-secondary">Cancelar</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

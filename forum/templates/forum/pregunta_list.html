@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Preguntas del Foro{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Preguntas del Foro</h1>
+        <a href="{% url 'pregunta_create' %}" class="btn btn-primary">Hacer una Pregunta</a>
+    </div>
+
+    <div class="row">
+        {% for pregunta in preguntas %}
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'pregunta_detail' pregunta.pk %}">{{ pregunta.titulo }}</a></h5>
+                    <p class="card-text">{{ pregunta.contenido|truncatewords:30 }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Por: {{ pregunta.autor.username }}</small><br>
+                        <small class="text-muted">Tema: <a href="{% url 'tema_detail' pregunta.tema.pk %}">{{ pregunta.tema.nombre }}</a></small>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">{{ pregunta.respuestas.count }} respuestas</span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>No hay preguntas en el foro.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ai_agent_user,ai.agent.user,model_ai_agent,base.group_user,1,0,0,0
+access_ai_agent_manager,ai.agent.manager,model_ai_agent,base.group_system,1,1,1,1
+access_ai_conversation_user,ai.conversation.user,model_ai_conversation,base.group_user,1,1,1,0
+access_ai_conversation_manager,ai.conversation.manager,model_ai_conversation,base.group_system,1,1,1,1
+access_ai_knowledge_base_user,ai.knowledge.base.user,model_ai_knowledge_base,base.group_user,1,0,0,0
+access_ai_knowledge_base_manager,ai.knowledge.base.manager,model_ai_knowledge_base,base.group_system,1,1,1,1 

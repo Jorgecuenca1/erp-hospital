@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Eliminación de Sesión de Caja{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirmar Eliminación</h4>
+                </div>
+                <div class="card-body">
+                    <p>¿Estás seguro de que deseas eliminar la sesión de caja <strong>#{{ object.pk }}</strong>, de la caja <strong>{{ object.caja.nombre }}</strong>, abierta por <strong>{{ object.usuario.first_name }} {{ object.usuario.last_name }}</strong> el <strong>{{ object.fecha_apertura|date:"d M, Y H:i" }}</strong>?</p>
+                    <p class="text-danger">Esta acción no se puede deshacer y eliminará todos los registros asociados a esta sesión.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Sí, Eliminar</button>
+                        <a href="{% url 'pos:sesioncaja_detail' object.pk %}" class="btn btn-secondary">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

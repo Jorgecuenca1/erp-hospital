@@ -1,0 +1,1 @@
+# Migrations for Hospitalization HMS Module 

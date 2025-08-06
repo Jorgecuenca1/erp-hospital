@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Ubicación de Almacén{% endblock %}
+
+{% block content %}
+    <h1>Eliminar Ubicación de Almacén</h1>
+    <p>¿Estás seguro de que deseas eliminar la ubicación "{{ ubicacion.nombre }}"?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Sí, eliminar</button>
+        <a href="{% url 'ubicacion_detail' ubicacion.pk %}">Cancelar</a>
+    </form>
+{% endblock %} 

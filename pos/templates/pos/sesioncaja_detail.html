@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Sesión de Caja{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Sesión de Caja #{{ object.pk }}</h3>
+            <div>
+                <a href="{% url 'pos:sesioncaja_update' object.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'pos:sesioncaja_delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <p><strong>Caja:</strong> <a href="{% url 'pos:caja_detail' object.caja.pk %}">{{ object.caja.nombre }}</a> (Punto de Venta: {{ object.caja.punto_venta.nombre }})</p>
+            <p><strong>Usuario:</strong> {{ object.usuario.first_name }} {{ object.usuario.last_name }}</p>
+            <p><strong>Fecha de Apertura:</strong> {{ object.fecha_apertura|date:"d M, Y H:i" }}</p>
+            <p><strong>Fecha de Cierre:</strong> {{ object.fecha_cierre|date:"d M, Y H:i"|default:"Abierta" }}</p>
+            <p><strong>Saldo Inicial:</strong> {{ object.saldo_inicial|floatformat:2 }}</p>
+            <p><strong>Saldo Final:</strong> {{ object.saldo_final|floatformat:2 }}</p>
+            <p><strong>Estado:</strong> 
+                {% if object.abierta %}
+                    <span class="badge bg-success">Abierta</span>
+                {% else %}
+                    <span class="badge bg-secondary">Cerrada</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'pos:sesioncaja_list' %}" class="btn btn-secondary">Volver a la Lista de Sesiones</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

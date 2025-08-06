@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Lead Detail: {{ lead.name }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Email:</strong> {{ lead.email }}</p>
+            <p><strong>Phone:</strong> {{ lead.phone }}</p>
+            <p><strong>Company:</strong> {{ lead.company }}</p>
+            <p><strong>Status:</strong> {{ lead.status }}</p>
+            <p><strong>Source:</strong> {{ lead.source }}</p>
+            <p><strong>Created At:</strong> {{ lead.created_at }}</p>
+            <p><strong>Updated At:</strong> {{ lead.updated_at }}</p>
+            <a href="{% url 'crm:lead_list' %}" class="btn btn-secondary">Back to List</a>
+            <a href="{% url 'crm:lead_update' lead.pk %}" class="btn btn-info">Edit Lead</a>
+            <a href="{% url 'crm:lead_delete' lead.pk %}" class="btn btn-danger">Delete Lead</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

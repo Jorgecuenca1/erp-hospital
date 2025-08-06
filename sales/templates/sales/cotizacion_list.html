@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Cotizaciones</h1>
+        </div>
+        <div class="card-body">
+            <a href="{% url 'sales:cotizacion_create' %}" class="btn btn-success mb-3">Add New Cotizacion</a>
+            {% if cotizaciones %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Client</th>
+                            <th>Date Quoted</th>
+                            <th>Valid Until</th>
+                            <th>Status</th>
+                            <th>Total Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cotizacion in cotizaciones %}
+                        <tr>
+                            <td><a href="{% url 'sales:cotizacion_detail' cotizacion.pk %}">{{ cotizacion.client.full_name|default:"N/A" }}</a></td>
+                            <td>{{ cotizacion.date_quoted }}</td>
+                            <td>{{ cotizacion.valid_until }}</td>
+                            <td>{{ cotizacion.status }}</td>
+                            <td>{{ cotizacion.total_amount }}</td>
+                            <td>
+                                <a href="{% url 'sales:cotizacion_update' cotizacion.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'sales:cotizacion_delete' cotizacion.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                No cotizaciones available.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

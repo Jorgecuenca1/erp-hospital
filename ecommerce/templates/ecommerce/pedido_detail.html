@@ -1,0 +1,14 @@
+{% extends 'ecommerce/base.html' %}
+{% block ecommerce_content %}
+<h2>Detalle de Pedido</h2>
+<ul>
+    <li><b>Cliente:</b> {{ object.cliente }}</li>
+    <li><b>Fecha:</b> {{ object.fecha }}</li>
+    <li><b>Total:</b> {{ object.total }}</li>
+    <li><b>Estado:</b> {{ object.estado }}</li>
+    <li><b>Dirección Envío:</b> {{ object.direccion_envio }}</li>
+</ul>
+<a href="{% url 'ecommerce:pedido_update' object.pk %}">Editar</a> |
+<a href="{% url 'ecommerce:pedido_delete' object.pk %}">Eliminar</a> |
+<a href="{% url 'ecommerce:pedido_list' %}">Volver al listado</a>
+{% endblock %} 

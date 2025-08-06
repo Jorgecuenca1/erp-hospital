@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Purchase Orders</h1>
+        </div>
+        <div class="card-body">
+            <a href="{% url 'purchases:purchaseorder_create' %}" class="btn btn-success mb-3">Add New Purchase Order</a>
+            {% if purchase_orders %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Supplier</th>
+                            <th>Order Date</th>
+                            <th>Expected Delivery</th>
+                            <th>Status</th>
+                            <th>Total Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for po in purchase_orders %}
+                        <tr>
+                            <td><a href="{% url 'purchases:purchaseorder_detail' po.pk %}">{{ po.supplier.name|default:"N/A" }}</a></td>
+                            <td>{{ po.order_date }}</td>
+                            <td>{{ po.expected_delivery_date|default:"N/A" }}</td>
+                            <td>{{ po.status }}</td>
+                            <td>{{ po.total_amount }}</td>
+                            <td>
+                                <a href="{% url 'purchases:purchaseorder_update' po.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'purchases:purchaseorder_delete' po.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                No purchase orders available.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

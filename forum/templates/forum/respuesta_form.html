@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if form.instance.pk %}
+    Editar Respuesta
+{% else %}
+    Añadir Respuesta
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">
+        {% if form.instance.pk %}
+            Editar Respuesta
+        {% else %}
+            Añadir Nueva Respuesta
+        {% endif %}
+    </h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="{% url 'respuesta_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

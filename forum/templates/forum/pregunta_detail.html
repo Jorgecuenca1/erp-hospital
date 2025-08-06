@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Pregunta: {{ pregunta.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Question Display -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>{{ pregunta.titulo }}</h3>
+            {% if request.user == pregunta.autor %}
+                <div>
+                    <a href="{% url 'pregunta_update' pregunta.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a href="{% url 'pregunta_delete' pregunta.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <p>{{ pregunta.contenido|linebreaksbr }}</p>
+        </div>
+        <div class="card-footer text-muted">
+            Preguntado por {{ pregunta.autor.username }} el {{ pregunta.fecha_creacion|date:"d M, Y" }}
+        </div>
+    </div>
+
+    <!-- Answers Section -->
+    <h4 class="mb-3">{{ pregunta.respuestas.count }} Respuestas</h4>
+    <div class="list-group mb-4">
+        {% for respuesta in pregunta.respuestas.all %}
+            <div class="list-group-item">
+                <p>{{ respuesta.contenido|linebreaksbr }}</p>
+                <small class="text-muted">Respondido por {{ respuesta.autor.username }} el {{ respuesta.fecha_creacion|date:"d M, Y" }}</small>
+            </div>
+        {% empty %}
+            <div class="list-group-item">
+                <p>Todavía no hay respuestas. ¡Sé el primero en responder!</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Add Answer Form -->
+    {% if user.is_authenticated %}
+        <div class="card">
+            <div class="card-header">
+                <h5>Escribe tu respuesta</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'respuesta_create' %}?pregunta={{ pregunta.pk }}">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-2">Publicar Respuesta</button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <p><a href="{% url 'login' %}">Inicia sesión</a> para publicar una respuesta.</p>
+    {% endif %}
+</div>
+{% endblock %}
+{% endblock %}
+{% endblock %}
+{% endblock %}
+{% endblock %}
+{% endblock %}

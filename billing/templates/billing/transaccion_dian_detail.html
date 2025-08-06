@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transacción DIAN - Facturación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-exchange-alt"></i> Transacción DIAN
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'billing:transaccion_dian_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                        <a href="{% url 'billing:transaccion_dian_edit' transaccion.id %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'billing:transaccion_dian_delete' transaccion.id %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Información de la Transacción</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>ID:</th>
+                                    <td>{{ transaccion.id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Factura:</th>
+                                    <td>
+                                        <a href="{% url 'billing:factura_detail' transaccion.factura.id %}">
+                                            {{ transaccion.factura.numero_factura }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>CUFE:</th>
+                                    <td>{{ transaccion.cufe|default:"No asignado" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Estado:</th>
+                                    <td>
+                                        <span class="badge badge-{% if transaccion.estado == 'APROBADA' %}success{% elif transaccion.estado == 'RECHAZADA' %}danger{% else %}warning{% endif %}">
+                                            {{ transaccion.get_estado_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Fecha Transacción:</th>
+                                    <td>{{ transaccion.fecha_transaccion|date:"d/m/Y H:i:s" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Respuesta DIAN</h5>
+                            <div class="alert alert-{% if transaccion.estado == 'APROBADA' %}success{% elif transaccion.estado == 'RECHAZADA' %}danger{% else %}warning{% endif %}">
+                                <strong>Estado:</strong> {{ transaccion.get_estado_display }}<br>
+                                <strong>Respuesta:</strong> {{ transaccion.respuesta_dian|default:"Sin respuesta" }}
+                            </div>
+                            
+                            {% if transaccion.errores_dian %}
+                            <div class="alert alert-danger">
+                                <h6>Errores DIAN:</h6>
+                                <pre>{{ transaccion.errores_dian }}</pre>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h5>Información de la Factura</h5>
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>Número de Factura:</th>
+                                    <td>{{ transaccion.factura.numero_factura }}</td>
+                                    <th>Paciente:</th>
+                                    <td>{{ transaccion.factura.paciente.nombres }} {{ transaccion.factura.paciente.apellidos }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Fecha de Emisión:</th>
+                                    <td>{{ transaccion.factura.fecha_emision|date:"d/m/Y" }}</td>
+                                    <th>Total:</th>
+                                    <td>${{ transaccion.factura.total_neto|floatformat:2 }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

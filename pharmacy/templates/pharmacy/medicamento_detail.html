@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle del Medicamento{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>{{ medicamento.producto.nombre }}</h3>
+            <div>
+                <a href="{% url 'medicamento_update' medicamento.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'medicamento_delete' medicamento.pk %}" class="btn btn-danger">Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <p><strong>Descripción:</strong> {{ medicamento.producto.descripcion|default:"No disponible." }}</p>
+            <p><strong>Dosis:</strong> {{ medicamento.dosis|default:"No especificada" }}</p>
+            <p><strong>Presentación:</strong> {{ medicamento.presentacion|default:"No especificada" }}</p>
+            <p><strong>Requiere Receta:</strong> {% if medicamento.requiere_receta %}Sí{% else %}No{% endif %}</p>
+            <p><strong>Indicaciones Especiales:</strong> {{ medicamento.indicaciones_especiales|default:"Ninguna." }}</p>
+            <hr>
+            <h4>Información de Inventario</h4>
+            <p><strong>Tipo de Producto:</strong> {{ medicamento.producto.get_tipo_producto_display }}</p>
+            <p><strong>Categoría:</strong> {{ medicamento.producto.categoria.nombre|default:"Sin categoría" }}</p>
+            <p><strong>Stock Actual:</strong> {{ medicamento.producto.stock_actual|floatformat:2 }} {{ medicamento.producto.unidad_medida }}</p>
+            <p><strong>Stock Mínimo:</strong> {{ medicamento.producto.stock_minimo|floatformat:2 }} {{ medicamento.producto.unidad_medida }}</p>
+            <p><strong>Ubicación:</strong> {{ medicamento.producto.ubicacion.nombre|default:"Sin ubicación" }}</p>
+            <p><strong>Fecha de Caducidad:</strong> {{ medicamento.producto.fecha_caducidad|date:"d M, Y"|default:"No aplica" }}</p>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'medicamento_list' %}" class="btn btn-secondary">Volver a la Lista de Medicamentos</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

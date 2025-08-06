@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Punto de Venta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>{{ object.nombre }}</h3>
+            <div>
+                <a href="{% url 'pos:puntoventa_update' object.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'pos:puntoventa_delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <p><strong>Ubicación:</strong> {{ object.ubicacion|default:"No especificada" }}</p>
+            <p><strong>Estado:</strong> 
+                {% if object.activo %}
+                    <span class="badge bg-success">Activo</span>
+                {% else %}
+                    <span class="badge bg-secondary">Inactivo</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'pos:puntoventa_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

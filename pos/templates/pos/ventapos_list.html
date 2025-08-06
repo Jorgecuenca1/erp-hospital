@@ -1,0 +1,22 @@
+{% extends 'pos/base.html' %}
+{% block pos_content %}
+<h2>Ventas POS</h2>
+<a href="{% url 'pos:ventapos_create' %}">Nueva Venta</a>
+<table>
+    <tr><th>Sesión</th><th>Fecha</th><th>Tercero</th><th>Total</th><th>Método Pago</th><th>Acciones</th></tr>
+    {% for obj in object_list %}
+    <tr>
+        <td>{{ obj.sesion }}</td>
+        <td>{{ obj.fecha }}</td>
+        <td>{{ obj.tercero }}</td>
+        <td>{{ obj.total }}</td>
+        <td>{{ obj.metodo_pago }}</td>
+        <td>
+            <a href="{% url 'pos:ventapos_detail' obj.pk %}">Ver</a> |
+            <a href="{% url 'pos:ventapos_update' obj.pk %}">Editar</a> |
+            <a href="{% url 'pos:ventapos_delete' obj.pk %}">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %} 

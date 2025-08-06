@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% if form.instance.pk %}Editar{% else %}Registrar{% endif %} Hallazgo de Auditoría</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar</button>
+    </form>
+    <a href="{% url 'quality_management:hallazgoauditoria_list' %}">Cancelar</a>
+{% endblock %} 

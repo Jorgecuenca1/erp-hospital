@@ -1,0 +1,9 @@
+{% extends 'ecommerce/base.html' %}
+{% block ecommerce_content %}
+<h2>Eliminar Pedido</h2>
+<p>¿Está seguro que desea eliminar el pedido de "{{ object.cliente }}"?</p>
+<form method="post">{% csrf_token %}
+    <button type="submit">Confirmar</button>
+</form>
+<a href="{% url 'ecommerce:pedido_list' %}">Cancelar</a>
+{% endblock %} 

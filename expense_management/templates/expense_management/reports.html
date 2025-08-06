@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Expense Reports{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-file-invoice"></i> Expense Reports</h1>
+                <p class="text-muted">Manage employee expense reports and approvals</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Report
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Report #</th>
+                                    <th>Employee</th>
+                                    <th>Title</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Submit Date</th>
+                                    <th>Approval Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in reports %}
+                                <tr>
+                                    <td><strong>{{ report.report_number }}</strong></td>
+                                    <td>{{ report.employee.get_full_name|default:report.employee.username }}</td>
+                                    <td>{{ report.title }}</td>
+                                    <td>{{ report.currency }} {{ report.total_amount|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if report.status == 'paid' %}badge-success
+                                            {% elif report.status == 'approved' %}badge-info
+                                            {% elif report.status == 'submitted' %}badge-warning
+                                            {% elif report.status == 'rejected' %}badge-danger
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ report.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ report.submit_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if report.approval_date %}
+                                            {{ report.approval_date|date:"M d, Y" }}
+                                        {% else %}
+                                            <span class="text-muted">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if report.status == 'draft' %}
+                                        <a href="#" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if report.status == 'submitted' %}
+                                        <a href="#" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">No expense reports found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

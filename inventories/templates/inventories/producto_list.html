@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Productos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Inventario de Productos</h1>
+        <a href="{% url 'producto_create' %}" class="btn btn-primary">Añadir Nuevo Producto</a>
+    </div>
+
+    <div class="row">
+        {% for producto in productos %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'producto_detail' producto.pk %}">{{ producto.nombre }}</a></h5>
+                    <p class="card-text">{{ producto.descripcion|truncatewords:15 }}</p>
+                    <p class="card-text"><small class="text-muted">{{ producto.categoria.nombre|default:"Sin categoría" }}</small></p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Stock:</strong> {{ producto.stock_actual|floatformat:2 }} {{ producto.unidad_medida }}
+                    </div>
+                    {% if producto.stock_actual <= producto.stock_minimo %}
+                        <span class="badge bg-danger">Bajo Stock</span>
+                    {% elif producto.stock_actual <= producto.stock_minimo|add:5 %}
+                        <span class="badge bg-warning text-dark">Stock Bajo</span>
+                    {% else %}
+                        <span class="badge bg-success">En Stock</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>No hay productos registrados en el inventario.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+            
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+            
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

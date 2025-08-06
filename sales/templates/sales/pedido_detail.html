@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Pedido Detail: #{{ pedido.pk }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Client:</strong> {{ pedido.client.full_name|default:"N/A" }}</p>
+            <p><strong>Date Ordered:</strong> {{ pedido.date_ordered }}</p>
+            <p><strong>Status:</strong> {{ pedido.status }}</p>
+            <p><strong>Total Amount:</strong> {{ pedido.total_amount }}</p>
+            <p><strong>Created By:</strong> {{ pedido.created_by.username|default:"N/A" }}</p>
+            <p><strong>Last Updated:</strong> {{ pedido.updated_at }}</p>
+            <a href="{% url 'sales:pedido_list' %}" class="btn btn-secondary">Back to List</a>
+            <a href="{% url 'sales:pedido_update' pedido.pk %}" class="btn btn-info">Edit Pedido</a>
+            <a href="{% url 'sales:pedido_delete' pedido.pk %}" class="btn btn-danger">Delete Pedido</a>
+
+            <h3 class="mt-4">Lineas de Pedido</h3>
+            {% if pedido.lines.all %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in pedido.lines.all %}
+                        <tr>
+                            <td>{{ line.product.name|default:"N/A" }}</td>
+                            <td>{{ line.quantity }}</td>
+                            <td>{{ line.price }}</td>
+                            <td>{{ line.subtotal }}</td>
+                            <td>
+                                <a href="{% url 'sales:lineapedido_update' line.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'sales:lineapedido_delete' line.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No lines for this pedido.</p>
+            {% endif %}
+            <a href="{% url 'sales:lineapedido_create' pedido.pk %}" class="btn btn-success">Add New Linea Pedido</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

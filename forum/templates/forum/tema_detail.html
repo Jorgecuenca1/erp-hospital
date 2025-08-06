@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Tema: {{ object.nombre }}</h3>
+            <div>
+                <a href="{% url 'tema_update' object.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'tema_delete' object.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="card-text"><strong>Descripción:</strong> {{ object.descripcion|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Fecha de Creación:</strong> {{ object.fecha_creacion|date:"d/m/Y H:i" }}</p>
+
+            <hr>
+            <h5>Preguntas en este Tema</h5>
+            <div class="list-group">
+                {% for pregunta in object.preguntas.all %}
+                <a href="{% url 'pregunta_detail' pregunta.pk %}" class="list-group-item list-group-item-action">
+                    <h6 class="mb-1">{{ pregunta.titulo }}</h6>
+                    <small class="text-muted">Por: {{ pregunta.autor.username }} - {{ pregunta.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                </a>
+                {% empty %}
+                <p class="text-center text-muted">No hay preguntas en este tema.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'tema_list' %}" class="btn btn-secondary btn-sm">Volver a la lista de Temas</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'pos/base.html' %}
+{% block pos_content %}
+<h2>Líneas de Venta POS</h2>
+<a href="{% url 'pos:lineaventapos_create' %}">Nueva Línea</a>
+<table>
+    <tr><th>Venta</th><th>Descripción</th><th>Cantidad</th><th>Precio Unitario</th><th>Subtotal</th><th>Impuesto</th><th>Total</th><th>Acciones</th></tr>
+    {% for obj in object_list %}
+    <tr>
+        <td>{{ obj.venta }}</td>
+        <td>{{ obj.descripcion }}</td>
+        <td>{{ obj.cantidad }}</td>
+        <td>{{ obj.precio_unitario }}</td>
+        <td>{{ obj.subtotal }}</td>
+        <td>{{ obj.impuesto }}</td>
+        <td>{{ obj.total }}</td>
+        <td>
+            <a href="{% url 'pos:lineaventapos_detail' obj.pk %}">Ver</a> |
+            <a href="{% url 'pos:lineaventapos_update' obj.pk %}">Editar</a> |
+            <a href="{% url 'pos:lineaventapos_delete' obj.pk %}">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %} 

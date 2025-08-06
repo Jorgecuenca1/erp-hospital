@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Puntos de Venta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Puntos de Venta</h1>
+        <a href="{% url 'pos:puntoventa_create' %}" class="btn btn-primary">Crear Nuevo Punto de Venta</a>
+    </div>
+
+    <div class="row">
+        {% for puntoventa in object_list %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'pos:puntoventa_detail' puntoventa.pk %}">{{ puntoventa.nombre }}</a></h5>
+                    <p class="card-text text-muted">{{ puntoventa.ubicacion|default:"Sin ubicación" }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    {% if puntoventa.activo %}
+                        <span class="badge bg-success">Activo</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactivo</span>
+                    {% endif %}
+                    <div>
+                        <a href="{% url 'pos:puntoventa_update' puntoventa.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        <a href="{% url 'pos:puntoventa_delete' puntoventa.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>No hay puntos de venta registrados.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Actualizar{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-edit text-warning"></i>
+                        Actualizar Registro Ginecológico
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'gynec:patient_detail' 1 %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-eye"></i> Ver Detalle
+                        </a>
+                        <a href="{% url 'gynec:patient_list' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="mt-3">
+                        {% csrf_token %}
+                        
+                        <!-- Información Básica -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-user text-primary"></i> Información Básica</h5>
+                                <div class="form-group">
+                                    <label>Paciente</label>
+                                    <select class="form-control" name="patient" required>
+                                        <option value="1" selected>María González</option>
+                                        <option value="2">Ana Rodríguez</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Edad de la menarquia</label>
+                                    <input type="number" class="form-control" name="menarche_age" value="13" min="8" max="20">
+                                </div>
+                                <div class="form-group">
+                                    <label>Edad de la menopausia</label>
+                                    <input type="number" class="form-control" name="menopause_age" min="40" max="60">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-calendar text-success"></i> Historia Menstrual</h5>
+                                <div class="form-group">
+                                    <label>Ciclo menstrual</label>
+                                    <select class="form-control" name="menstrual_cycle">
+                                        <option value="REGULAR" selected>Regular</option>
+                                        <option value="IRREGULAR">Irregular</option>
+                                        <option value="AMENORRHEA">Amenorrea</option>
+                                        <option value="MENORRHAGIA">Menorragia</option>
+                                        <option value="OLIGOMENORRHEA">Oligomenorrea</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Duración del ciclo (días)</label>
+                                    <input type="number" class="form-control" name="cycle_length" value="28" min="21" max="35">
+                                </div>
+                                <div class="form-group">
+                                    <label>Última menstruación</label>
+                                    <input type="date" class="form-control" name="last_menstrual_period" value="2024-07-15">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Historia Obstétrica -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-baby text-pink"></i> Historia Obstétrica</h5>
+                                <div class="form-group">
+                                    <label>Gravidez</label>
+                                    <input type="number" class="form-control" name="gravida" value="2" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Para</label>
+                                    <input type="number" class="form-control" name="para" value="1" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Partos a término</label>
+                                    <input type="number" class="form-control" name="term_deliveries" value="1" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Partos pretérmino</label>
+                                    <input type="number" class="form-control" name="preterm_deliveries" value="0" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Abortos</label>
+                                    <input type="number" class="form-control" name="abortions" value="0" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Hijos vivos</label>
+                                    <input type="number" class="form-control" name="living_children" value="1" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-pills text-purple"></i> Anticoncepción</h5>
+                                <div class="form-group">
+                                    <label>Método actual</label>
+                                    <select class="form-control" name="current_contraceptive">
+                                        <option value="NONE">Ninguno</option>
+                                        <option value="ORAL_PILL" selected>Píldora oral</option>
+                                        <option value="IUD">DIU</option>
+                                        <option value="CONDOM">Condón</option>
+                                        <option value="INJECTION">Inyección</option>
+                                        <option value="IMPLANT">Implante</option>
+                                        <option value="STERILIZATION">Esterilización</option>
+                                        <option value="NATURAL">Métodos naturales</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Duración del método</label>
+                                    <input type="text" class="form-control" name="contraceptive_duration" value="2 años">
+                                </div>
+                                <h5><i class="fas fa-microscope text-info"></i> Exámenes de Screening</h5>
+                                <div class="form-group">
+                                    <label>Última citología</label>
+                                    <input type="date" class="form-control" name="last_pap_smear" value="2024-06-15">
+                                </div>
+                                <div class="form-group">
+                                    <label>Resultado citología</label>
+                                    <input type="text" class="form-control" name="pap_smear_result" value="Normal">
+                                </div>
+                                <div class="form-group">
+                                    <label>Última mamografía</label>
+                                    <input type="date" class="form-control" name="last_mammogram" value="2024-05-10">
+                                </div>
+                                <div class="form-group">
+                                    <label>Resultado mamografía</label>
+                                    <input type="text" class="form-control" name="mammogram_result" value="Normal">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Información Adicional -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h5><i class="fas fa-plus-circle text-secondary"></i> Información Adicional</h5>
+                                <div class="form-group">
+                                    <label>Historia quirúrgica</label>
+                                    <textarea class="form-control" name="surgical_history" rows="3">Ninguna cirugía previa.</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Historia familiar</label>
+                                    <textarea class="form-control" name="family_history" rows="3">Madre con cáncer de mama a los 45 años.</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Botones de Acción -->
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Actualizar Registro
+                            </button>
+                            <a href="{% url 'gynec:patient_detail' 1 %}" class="btn btn-info">
+                                <i class="fas fa-eye"></i> Ver Detalle
+                            </a>
+                            <a href="{% url 'gynec:patient_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Validación de formularios
+    $('form').on('submit', function(e) {
+        var requiredFields = $(this).find('[required]');
+        var isValid = true;
+        
+        requiredFields.each(function() {
+            if (!$(this).val()) {
+                $(this).addClass('is-invalid');
+                isValid = false;
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Por favor complete todos los campos requeridos.');
+        }
+    });
+
+    // Confirmación antes de actualizar
+    $('button[type="submit"]').click(function(e) {
+        if (!confirm('¿Está seguro de que desea actualizar este registro?')) {
+            e.preventDefault();
+        }
+    });
+
+    // Auto-guardado de borrador
+    var autoSaveTimer;
+    $('input, select, textarea').on('change', function() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(function() {
+            console.log('Auto-guardando borrador...');
+            // Aquí se implementaría la lógica de auto-guardado
+        }, 2000);
+    });
+});
+</script>
+{% endblock %} 

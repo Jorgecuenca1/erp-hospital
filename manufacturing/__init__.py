@@ -1,0 +1,1 @@
+# Manufacturing module for HMS ERP 

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Categorías de Producto{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Categorías de Producto</h1>
+        <a href="{% url 'categoria_create' %}" class="btn btn-primary">Crear Nueva Categoría</a>
+    </div>
+
+    <div class="list-group">
+        {% for categoria in categorias %}
+        <div class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1"><a href="{% url 'categoria_detail' categoria.pk %}">{{ categoria.nombre }}</a></h5>
+                <div>
+                    <a href="{% url 'categoria_update' categoria.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <a href="{% url 'categoria_delete' categoria.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </div>
+            </div>
+            <p class="mb-1">{{ categoria.descripcion|truncatewords:20|default:"Sin descripción." }}</p>
+        </div>
+        {% empty %}
+        <div class="list-group-item">
+            <p>No hay categorías de producto registradas.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

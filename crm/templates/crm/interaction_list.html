@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Interactions</h1>
+        </div>
+        <div class="card-body">
+            <a href="{% url 'crm:interaction_create' %}" class="btn btn-success mb-3">Add New Interaction</a>
+            {% if interactions %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Contact</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interaction in interactions %}
+                        <tr>
+                            <td><a href="{% url 'crm:contact_detail' interaction.contact.pk %}">{{ interaction.contact.name }}</a></td>
+                            <td>{{ interaction.type }}</td>
+                            <td>{{ interaction.date }}</td>
+                            <td>{{ interaction.notes|truncatechars:50 }}</td>
+                            <td>
+                                <a href="{% url 'crm:interaction_update' interaction.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'crm:interaction_delete' interaction.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                No interactions available.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

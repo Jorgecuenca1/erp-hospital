@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Consulta{% endblock %}
+
+{% block content %}
+    <h1>Eliminar Consulta</h1>
+    <p>¿Estás seguro de que deseas eliminar la consulta del {{ consulta.fecha_hora|date:"d/m/Y H:i" }} realizada por {{ consulta.profesional.nombres }} {{ consulta.profesional.apellidos }}?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Sí, eliminar</button>
+        <a href="{% url 'consulta_detail' pk=consulta.pk %}">Cancelar</a>
+    </form>
+{% endblock %} 

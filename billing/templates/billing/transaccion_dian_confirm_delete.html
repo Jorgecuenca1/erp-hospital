@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Transacción DIAN - Facturación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title text-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">¿Está seguro de que desea eliminar esta transacción DIAN?</p>
+                    
+                    <div class="alert alert-warning">
+                        <h5>Detalles de la transacción a eliminar:</h5>
+                        <ul>
+                            <li><strong>ID:</strong> {{ object.id }}</li>
+                            <li><strong>Factura:</strong> {{ object.factura.numero_factura }}</li>
+                            <li><strong>CUFE:</strong> {{ object.cufe|default:"No asignado" }}</li>
+                            <li><strong>Estado:</strong> {{ object.get_estado_display }}</li>
+                            <li><strong>Fecha:</strong> {{ object.fecha_transaccion|date:"d/m/Y H:i" }}</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="text-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                    </p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Sí, Eliminar
+                        </button>
+                        <a href="{% url 'billing:transaccion_dian_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

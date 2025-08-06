@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Métodos de Pago POS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Métodos de Pago POS</h1>
+        <a href="{% url 'pos:metodopagopos_create' %}" class="btn btn-primary">Crear Nuevo Método de Pago</a>
+    </div>
+
+    <div class="row">
+        {% for metodo_pago in object_list %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'pos:metodopagopos_detail' metodo_pago.pk %}">{{ metodo_pago.nombre }}</a></h5>
+                    <p class="card-text text-muted">Cuenta Contable: {{ metodo_pago.cuenta_contable.nombre }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    {% if metodo_pago.activo %}
+                        <span class="badge bg-success">Activo</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactivo</span>
+                    {% endif %}
+                    <div>
+                        <a href="{% url 'pos:metodopagopos_update' metodo_pago.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        <a href="{% url 'pos:metodopagopos_delete' metodo_pago.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>No hay métodos de pago POS registrados.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

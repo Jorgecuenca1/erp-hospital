@@ -1,0 +1,20 @@
+{% extends 'website/base.html' %}
+{% block website_content %}
+<h2>Secciones</h2>
+<a href="{% url 'website:seccion_create' %}">Nueva Sección</a>
+<table>
+    <tr><th>Página</th><th>Título</th><th>Orden</th><th>Acciones</th></tr>
+    {% for obj in object_list %}
+    <tr>
+        <td>{{ obj.pagina }}</td>
+        <td>{{ obj.titulo }}</td>
+        <td>{{ obj.orden }}</td>
+        <td>
+            <a href="{% url 'website:seccion_detail' obj.pk %}">Ver</a> |
+            <a href="{% url 'website:seccion_update' obj.pk %}">Editar</a> |
+            <a href="{% url 'website:seccion_delete' obj.pk %}">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %} 

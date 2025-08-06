@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle del Chat - {{ chatsession.topic|default:"Chat sin Título" }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Sesión de Chat: {{ chatsession.uuid|slice:":8" }}...</h3>
+            <div>
+                {% if chatsession.active %}
+                    <span class="badge bg-success">Activa</span>
+                {% else %}
+                    <span class="badge bg-danger">Cerrada</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="card-text"><strong>Usuario:</strong> {% if chatsession.user %}{{ chatsession.user.username }}{% else %}Anónimo{% endif %}</p>
+            <p class="card-text"><strong>Agente Asignado:</strong> {% if chatsession.agent %}{{ chatsession.agent.username }}{% else %}No asignado{% endif %}</p>
+            <p class="card-text"><strong>Iniciada:</strong> {{ chatsession.start_time|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>Finalizada:</strong> {% if chatsession.end_time %}{{ chatsession.end_time|date:"d/m/Y H:i" }}{% else %}N/A{% endif %}</p>
+            <p class="card-text"><strong>Tema:</strong> {{ chatsession.topic|default_if_none:"N/A" }}</p>
+
+            <hr>
+            <h5>Mensajes del Chat</h5>
+            <div class="chat-messages" style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; padding: 10px; border-radius: 5px;">
+                {% for message in messages %}
+                <div class="message-item {% if message.sender == user %}text-end{% else %}text-start{% endif %} mb-2">
+                    <small class="text-muted">{{ message.sender.username|default:"Anónimo" }} - {{ message.timestamp|date:"H:i" }}</small>
+                    <div class="message-bubble {% if message.sender == user %}bg-primary text-white{% else %}bg-light text-dark{% endif %} p-2 rounded">
+                        {{ message.message }}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center text-muted">No hay mensajes en esta sesión.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'chatsession_list' %}" class="btn btn-secondary btn-sm">Volver a Sesiones de Chat</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

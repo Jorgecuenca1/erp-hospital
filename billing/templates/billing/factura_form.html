@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="mb-0">{% if form.instance.pk %}Editar Factura{% else %}Crear Nueva Factura{% endif %}</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+
+                <h4>Detalles de la Factura</h4>
+                <div id="detalle-formset-container">
+                    {{ detalles_formset.management_form }}
+                    {% for form in detalles_formset %}
+                        <div class="card mb-2 p-3 border rounded">
+                            {{ form|crispy }}
+                            {% if detalles_formset.can_delete %}
+                                <div class="form-check">
+                                    {{ form.DELETE }}
+                                    <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">Eliminar</label>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-info btn-sm mb-3" id="add-more-detalle">Agregar Detalle</button>
+
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar</button>
+                <a href="{% if form.instance.pk %}{% url 'factura_detail' form.instance.pk %}{% else %}{% url 'factura_list' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addMoreBtn = document.getElementById('add-more-detalle');
+        const formsetContainer = document.getElementById('detalle-formset-container');
+        let totalForms = document.querySelector('#id_detalles-TOTAL_FORMS');
+
+        addMoreBtn.addEventListener('click', function() {
+            let newForm = formsetContainer.children[0].cloneNode(true);
+            let formRegex = RegExp('__prefix__', 'g');
+            let formNum = parseInt(totalForms.value);
+
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, formNum);
+            formsetContainer.append(newForm);
+
+            totalForms.value = formNum + 1;
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Confirmar Eliminación</h1>
+    <p>¿Estás seguro de que quieres eliminar el hallazgo de auditoría "{{ hallazgo_auditoria.descripcion|truncatechars:50 }}" de la auditoría {{ hallazgo_auditoria.auditoria.nombre }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Sí, Eliminar</button>
+        <a href="{% url 'quality_management:hallazgoauditoria_detail' hallazgo_auditoria.pk %}">Cancelar</a>
+    </form>
+{% endblock %} 

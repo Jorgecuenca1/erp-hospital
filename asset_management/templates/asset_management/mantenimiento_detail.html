@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Mantenimiento</h3>
+            <div>
+                <a href="{% url 'asset_management:mantenimiento_edit' mantenimiento.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'asset_management:mantenimiento_delete' mantenimiento.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ mantenimiento.activo.nombre }}</h4>
+            <p class="card-text"><strong>Fecha de Mantenimiento:</strong> {{ mantenimiento.fecha_inicio|date:"Y-m-d H:i" }}</p>
+            <p class="card-text"><strong>Tipo de Mantenimiento:</strong> {{ mantenimiento.get_tipo_mantenimiento_display }}</p>
+            <p class="card-text"><strong>Descripción del Problema:</strong> {{ mantenimiento.descripcion_problema|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Costo:</strong> {{ mantenimiento.costo }}</p>
+            <p class="card-text"><strong>Responsable del Mantenimiento:</strong> {{ mantenimiento.responsable_mantenimiento }}</p>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'asset_management:mantenimiento_list' %}" class="btn btn-secondary btn-sm">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

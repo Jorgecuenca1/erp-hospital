@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Lecciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Lista de Lecciones</h1>
+    <a href="{% url 'leccion_create' %}" class="btn btn-primary mb-3">Crear Nueva Lección</a>
+    <div class="list-group">
+        {% for leccion in lecciones %}
+            <a href="{% url 'leccion_detail' leccion.pk %}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ leccion.titulo }}</h5>
+                    <small>Módulo: {{ leccion.modulo.titulo }}</small>
+                </div>
+                <p class="mb-1">{{ leccion.contenido|truncatewords:20 }}</p>
+                <small>Curso: {{ leccion.modulo.curso.titulo }}</small>
+            </a>
+        {% empty %}
+            <div class="list-group-item">
+                No hay lecciones disponibles.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

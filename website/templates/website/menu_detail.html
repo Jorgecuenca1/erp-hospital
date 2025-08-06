@@ -1,0 +1,13 @@
+{% extends 'website/base.html' %}
+{% block website_content %}
+<h2>Detalle de Menú</h2>
+<ul>
+    <li><b>Nombre:</b> {{ object.nombre }}</li>
+    <li><b>URL:</b> {{ object.url }}</li>
+    <li><b>Orden:</b> {{ object.orden }}</li>
+    <li><b>Activo:</b> {{ object.activo }}</li>
+</ul>
+<a href="{% url 'website:menu_update' object.pk %}">Editar</a> |
+<a href="{% url 'website:menu_delete' object.pk %}">Eliminar</a> |
+<a href="{% url 'website:menu_list' %}">Volver al listado</a>
+{% endblock %} 

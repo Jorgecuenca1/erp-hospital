@@ -1,0 +1,9 @@
+{% extends 'pos/base.html' %}
+{% block pos_content %}
+<h2>Eliminar Línea de Venta POS</h2>
+<p>¿Está seguro que desea eliminar la línea de venta POS de "{{ object.descripcion }}"?</p>
+<form method="post">{% csrf_token %}
+    <button type="submit">Confirmar</button>
+</form>
+<a href="{% url 'pos:lineaventapos_list' %}">Cancelar</a>
+{% endblock %} 

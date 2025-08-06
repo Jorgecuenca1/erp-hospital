@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Cierre Contable - Contabilidad{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-trash text-danger"></i> Eliminar Cierre Contable
+        </h1>
+        <a href="{% url 'accounting:cierrecontable_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-danger text-white">
+            <h6 class="m-0 font-weight-bold">Confirmar Eliminación</h6>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-triangle"></i> ¿Está seguro?</h5>
+                <p>Está a punto de eliminar el siguiente cierre contable:</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Período:</th>
+                            <td>{{ object.periodo.nombre }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fecha Cierre:</th>
+                            <td>{{ object.fecha_cierre|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cerrado por:</th>
+                            <td>{{ object.cerrado_por|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Estado:</th>
+                            <td>
+                                {% if object.activo %}Activo{% else %}Inactivo{% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Observaciones:</th>
+                            <td>{{ object.observaciones|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                <strong>¡Atención!</strong> Esta acción no se puede deshacer. 
+                La eliminación del cierre contable podría afectar la integridad de los datos contables.
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sí, Eliminar
+                    </button>
+                    <a href="{% url 'accounting:cierrecontable_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

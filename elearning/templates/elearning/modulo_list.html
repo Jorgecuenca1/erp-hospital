@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Módulos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Módulos de Cursos</h1>
+    <a href="{% url 'modulo_create' %}" class="btn btn-primary mb-3">Crear Nuevo Módulo</a>
+
+    <ul class="list-group">
+        {% for modulo in modulos %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1"><a href="{% url 'modulo_detail' modulo.pk %}">{{ modulo.orden }}. {{ modulo.titulo }}</a></h5>
+                <small class="text-muted">Curso: <a href="{% url 'curso_detail' modulo.curso.pk %}">{{ modulo.curso.titulo }}</a></small>
+                <p class="mb-1">{{ modulo.descripcion|truncatechars:100 }}</p>
+            </div>
+            <div>
+                <a href="{% url 'modulo_update' modulo.pk %}" class="btn btn-sm btn-info">Editar</a>
+                <a href="{% url 'modulo_delete' modulo.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </div>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No hay módulos disponibles.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                <i class="fas fa-file-invoice"></i> 
+                {% if form.instance.pk %}Editar{% else %}Crear{% endif %} Comprobante Contable
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="post" id="comprobanteForm">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                                <strong>Tipo de Comprobante *</strong>
+                            </label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                                <div class="text-danger">{{ form.tipo.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                FC: Factura de Compra, CE: Comprobante de Egreso, 
+                                FVE: Factura Electrónica, CI: Comprobante de Ingreso
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="{{ form.numero.id_for_label }}" class="form-label">
+                                <strong>Número *</strong>
+                            </label>
+                            {{ form.numero }}
+                            {% if form.numero.errors %}
+                                <div class="text-danger">{{ form.numero.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Formato: AAAA-MM-DD-NNNN (se genera automáticamente si está vacío)
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="{{ form.fecha.id_for_label }}" class="form-label">
+                                <strong>Fecha *</strong>
+                            </label>
+                            {{ form.fecha }}
+                            {% if form.fecha.errors %}
+                                <div class="text-danger">{{ form.fecha.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                <strong>Estado *</strong>
+                            </label>
+                            {{ form.estado }}
+                            {% if form.estado.errors %}
+                                <div class="text-danger">{{ form.estado.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.tercero.id_for_label }}" class="form-label">
+                                <strong>Tercero *</strong>
+                            </label>
+                            <div class="input-group">
+                                {{ form.tercero }}
+                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#terceroModal">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            {% if form.tercero.errors %}
+                                <div class="text-danger">{{ form.tercero.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.centro_costo.id_for_label }}" class="form-label">
+                                <strong>Centro de Costo</strong>
+                            </label>
+                            <div class="input-group">
+                                {{ form.centro_costo }}
+                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#centroCostoModal">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            {% if form.centro_costo.errors %}
+                                <div class="text-danger">{{ form.centro_costo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                <strong>Descripción *</strong>
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger">{{ form.descripcion.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="{{ form.valor.id_for_label }}" class="form-label">
+                                <strong>Valor *</strong>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.valor }}
+                            </div>
+                            {% if form.valor.errors %}
+                                <div class="text-danger">{{ form.valor.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{% url 'accounting:comprobantecontable_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-alt-circle-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> 
+                        {% if form.instance.pk %}Actualizar{% else %}Crear{% endif %} Comprobante
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear tercero -->
+<div class="modal fade" id="terceroModal" tabindex="-1" aria-labelledby="terceroModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="terceroModalLabel">Crear Nuevo Tercero</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="terceroForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="tercero_tipo" class="form-label">Tipo</label>
+                                <select name="tipo" id="tercero_tipo" class="form-control" required>
+                                    <option value="NATURAL">Persona Natural</option>
+                                    <option value="JURIDICA">Persona Jurídica</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="tercero_nit" class="form-label">NIT</label>
+                                <input type="text" name="nit" id="tercero_nit" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tercero_nombre" class="form-label">Nombre</label>
+                        <input type="text" name="nombre" id="tercero_nombre" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="tercero_telefono" class="form-label">Teléfono</label>
+                                <input type="text" name="telefono" id="tercero_telefono" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="tercero_email" class="form-label">Email</label>
+                                <input type="email" name="email" id="tercero_email" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tercero_direccion" class="form-label">Dirección</label>
+                        <input type="text" name="direccion" id="tercero_direccion" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="tercero_ciudad" class="form-label">Ciudad</label>
+                        <input type="text" name="ciudad" id="tercero_ciudad" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="crearTercero()">Crear Tercero</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear centro de costo -->
+<div class="modal fade" id="centroCostoModal" tabindex="-1" aria-labelledby="centroCostoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="centroCostoModalLabel">Crear Nuevo Centro de Costo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="centroCostoForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="centro_codigo" class="form-label">Código</label>
+                                <input type="text" name="codigo" id="centro_codigo" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="centro_contrato" class="form-label">Contrato</label>
+                                <input type="text" name="contrato" id="centro_contrato" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="centro_nombre" class="form-label">Nombre</label>
+                        <input type="text" name="nombre" id="centro_nombre" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="centro_descripcion" class="form-label">Descripción</label>
+                        <textarea name="descripcion" id="centro_descripcion" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="centro_fecha_inicio" class="form-label">Fecha Inicio</label>
+                                <input type="date" name="fecha_inicio" id="centro_fecha_inicio" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="centro_fecha_fin" class="form-label">Fecha Fin</label>
+                                <input type="date" name="fecha_fin" id="centro_fecha_fin" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="crearCentroCosto()">Crear Centro de Costo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function crearTercero() {
+    const formData = new FormData(document.getElementById('terceroForm'));
+    
+    fetch('{% url "accounting:tercero_create" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Agregar el nuevo tercero al select
+            const select = document.getElementById('{{ form.tercero.id_for_label }}');
+            const option = new Option(data.tercero.nombre, data.tercero.id);
+            select.add(option);
+            select.value = data.tercero.id;
+            
+            // Cerrar modal
+            bootstrap.Modal.getInstance(document.getElementById('terceroModal')).hide();
+            
+            // Limpiar formulario
+            document.getElementById('terceroForm').reset();
+        } else {
+            alert('Error al crear el tercero: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al crear el tercero');
+    });
+}
+
+function crearCentroCosto() {
+    const formData = new FormData(document.getElementById('centroCostoForm'));
+    
+    fetch('{% url "accounting:centrocosto_create" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Agregar el nuevo centro de costo al select
+            const select = document.getElementById('{{ form.centro_costo.id_for_label }}');
+            const option = new Option(data.centro_costo.nombre, data.centro_costo.id);
+            select.add(option);
+            select.value = data.centro_costo.id;
+            
+            // Cerrar modal
+            bootstrap.Modal.getInstance(document.getElementById('centroCostoModal')).hide();
+            
+            // Limpiar formulario
+            document.getElementById('centroCostoForm').reset();
+        } else {
+            alert('Error al crear el centro de costo: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al crear el centro de costo');
+    });
+}
+
+// Auto-generar número si está vacío
+document.addEventListener('DOMContentLoaded', function() {
+    const numeroField = document.getElementById('{{ form.numero.id_for_label }}');
+    const tipoField = document.getElementById('{{ form.tipo.id_for_label }}');
+    
+    if (!numeroField.value) {
+        numeroField.placeholder = 'Se generará automáticamente';
+    }
+    
+    // Cambiar placeholder según el tipo
+    tipoField.addEventListener('change', function() {
+        const tipo = this.value;
+        let placeholder = '';
+        
+        switch(tipo) {
+            case 'FC':
+                placeholder = 'FC-AAAA-MM-DD-NNNN';
+                break;
+            case 'CE':
+                placeholder = 'CE-AAAA-MM-DD-NNNN';
+                break;
+            case 'FVE':
+                placeholder = 'FVE-AAAA-MM-DD-NNNN';
+                break;
+            case 'CI':
+                placeholder = 'CI-AAAA-MM-DD-NNNN';
+                break;
+        }
+        
+        numeroField.placeholder = placeholder;
+    });
+});
+</script>
+{% endblock %} 

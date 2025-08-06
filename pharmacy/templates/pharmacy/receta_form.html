@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        Editar Receta
+    {% else %}
+        Crear Nueva Receta
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3>
+                {% if form.instance.pk %}
+                    Editar Receta
+                {% else %}
+                    Crear Nueva Receta
+                {% endif %}
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+
+                <h4>Medicamentos en la Receta</h4>
+                <div id="formset-container">
+                    {{ detalles_formset|crispy }}
+                </div>
+                <button type="button" class="btn btn-info btn-sm mt-2" id="add-more">Añadir Otro Medicamento</button>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-success">Guardar Receta</button>
+                    <a href="{% if form.instance.pk %}{% url 'receta_detail' form.instance.pk %}{% else %}{% url 'receta_list' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addMoreBtn = document.getElementById('add-more');
+        const formsetContainer = document.getElementById('formset-container');
+        let totalForms = document.querySelector('#id_detalles-TOTAL_FORMS');
+
+        addMoreBtn.addEventListener('click', function() {
+            const currentForms = parseInt(totalForms.value);
+            const newForm = formsetContainer.children[0].cloneNode(true);
+
+            // Update input names and IDs
+            newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, currentForms);
+
+            // Clear input values for the new form
+            newForm.querySelectorAll('input, select, textarea').forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+
+            formsetContainer.appendChild(newForm);
+            totalForms.value = currentForms + 1;
+        });
+    });
+</script>
+{% endblock %} 

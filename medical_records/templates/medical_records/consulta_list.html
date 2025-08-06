@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Lista de Consultas
+    {% if historia_clinica %}
+        para {{ historia_clinica.paciente.nombres }} {{ historia_clinica.paciente.apellidos }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Consultas</h1>
+            {% if historia_clinica %}
+                <h4 class="text-muted">Paciente: <a href="{% url 'paciente_detail' historia_clinica.paciente.pk %}">{{ historia_clinica.paciente.nombres }} {{ historia_clinica.paciente.apellidos }}</a></h4>
+            {% endif %}
+        </div>
+        {% if historia_clinica %}
+            <a href="{% url 'consulta_create' historia_clinica.id %}" class="btn btn-primary">Nueva Consulta</a>
+        {% endif %}
+    </div>
+
+    <div class="list-group">
+        {% for consulta in consultas %}
+        <a href="{% url 'consulta_detail' consulta.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Consulta del {{ consulta.fecha_hora|date:"d M, Y" }} a las {{ consulta.fecha_hora|time:"H:i" }}</h5>
+                <small>Dr(a). {{ consulta.profesional.apellidos }}</small>
+            </div>
+            <p class="mb-1">{{ consulta.motivo_consulta|truncatewords:20 }}</p>
+            <small>ID Consulta: {{ consulta.id }}</small>
+        </a>
+        {% empty %}
+        <div class="list-group-item">
+            <p>No hay consultas registradas {% if historia_clinica %} para este paciente{% endif %}.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+            
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+            
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

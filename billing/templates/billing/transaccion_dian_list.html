@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transacciones DIAN - Facturación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-exchange-alt"></i> Transacciones DIAN
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'billing:transaccion_dian_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Nueva Transacción
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Factura</th>
+                                    <th>CUFE</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Transacción</th>
+                                    <th>Respuesta DIAN</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaccion in transacciones %}
+                                <tr>
+                                    <td>{{ transaccion.id }}</td>
+                                    <td>
+                                        <a href="{% url 'billing:factura_detail' transaccion.factura.id %}">
+                                            {{ transaccion.factura.numero_factura }}
+                                        </a>
+                                    </td>
+                                    <td>{{ transaccion.cufe|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if transaccion.estado == 'APROBADA' %}success{% elif transaccion.estado == 'RECHAZADA' %}danger{% else %}warning{% endif %}">
+                                            {{ transaccion.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ transaccion.fecha_transaccion|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ transaccion.respuesta_dian|truncatechars:50 }}</td>
+                                    <td>
+                                        <a href="{% url 'billing:transaccion_dian_detail' transaccion.id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'billing:transaccion_dian_edit' transaccion.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'billing:transaccion_dian_delete' transaccion.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No hay transacciones DIAN registradas.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if is_paginated %}
+                    <nav aria-label="Paginación">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">&laquo; Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

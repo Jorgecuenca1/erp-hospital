@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Movimientos de Inventario{% endblock %}
+
+{% block content %}
+    <h1>Movimientos de Inventario</h1>
+    <a href="{% url 'movimiento_create' %}" class="button-link">Nuevo Movimiento</a>
+    <ul>
+        {% for movimiento in movimientos %}
+            <li>
+                <a href="{% url 'movimiento_detail' movimiento.pk %}">
+                    {{ movimiento.get_tipo_movimiento_display }} de {{ movimiento.cantidad }} {{ movimiento.producto.unidad_medida }} de {{ movimiento.producto.nombre }} el {{ movimiento.fecha_hora|date:"d/m/Y H:i" }}
+                </a>
+                - <a href="{% url 'movimiento_edit' movimiento.pk %}">Editar</a>
+                - <a href="{% url 'movimiento_delete' movimiento.pk %}">Eliminar</a>
+            </li>
+        {% empty %}
+            <li>No hay movimientos de inventario registrados.</li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; primera</a>
+                <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">siguiente</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">última &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endblock %} 

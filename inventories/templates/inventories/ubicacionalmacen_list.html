@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Ubicaciones de Almacén{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Ubicaciones de Almacén</h1>
+        <a href="{% url 'ubicacion_create' %}" class="btn btn-primary">Crear Nueva Ubicación</a>
+    </div>
+
+    <div class="list-group">
+        {% for ubicacion in ubicaciones %}
+        <div class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1"><a href="{% url 'ubicacion_detail' ubicacion.pk %}">{{ ubicacion.nombre }}</a></h5>
+                <div>
+                    <a href="{% url 'ubicacion_update' ubicacion.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <a href="{% url 'ubicacion_delete' ubicacion.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </div>
+            </div>
+            <p class="mb-1">{{ ubicacion.descripcion|truncatewords:20|default:"Sin descripción." }}</p>
+        </div>
+        {% empty %}
+        <div class="list-group-item">
+            <p>No hay ubicaciones de almacén registradas.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

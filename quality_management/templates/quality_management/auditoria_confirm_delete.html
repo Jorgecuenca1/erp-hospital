@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Confirmar Eliminación</h1>
+    <p>¿Estás seguro de que quieres eliminar la auditoría "{{ auditoria.nombre }}" realizada el {{ auditoria.fecha_inicio|date:"Y-m-d" }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Sí, Eliminar</button>
+        <a href="{% url 'quality_management:auditoria_detail' auditoria.pk %}">Cancelar</a>
+    </form>
+{% endblock %} 

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Asientos Contables</h2>
+        <a href="{% url 'accounting:asientocontable_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Asiento
+        </a>
+    </div>
+
+    {% if object_list %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for asiento in object_list %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Asiento #{{ asiento.pk }} - {{ asiento.fecha|date:"d M Y" }}</h5>
+                    <p class="card-text mb-1">
+                        <strong>Descripción:</strong> {{ asiento.descripcion }}
+                    </p>
+                    <p class="card-text mb-1">
+                        <strong>Diario:</strong> {{ asiento.diario.nombre }}
+                    </p>
+                    <p class="card-text mb-1">
+                        <strong>Período:</strong> {{ asiento.periodo.nombre }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Creado por:</strong> {{ asiento.creado_por.username|default:"N/A" }}
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 d-flex justify-content-end gap-2">
+                    <a href="{% url 'accounting:asientocontable_detail' asiento.pk %}" class="btn btn-info btn-sm"
+                        title="Ver Detalles">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{% url 'accounting:asientocontable_update' asiento.pk %}"
+                        class="btn btn-warning btn-sm" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'accounting:asientocontable_delete' asiento.pk %}"
+                        class="btn btn-danger btn-sm" title="Eliminar">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+            {% endif %}
+            <li class="page-item active">
+                <a class="page-link" href="#">{{ page_obj.number }} <span class="sr-only">(current)</span></a>
+            </li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        No hay asientos contables registrados.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

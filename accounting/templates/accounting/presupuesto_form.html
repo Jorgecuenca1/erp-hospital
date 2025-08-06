@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Editar Presupuesto{% else %}Nuevo Presupuesto{% endif %} - Contabilidad
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-chart-line text-primary"></i>
+            {% if object %}Editar Presupuesto{% else %}Nuevo Presupuesto{% endif %}
+        </h1>
+        <a href="{% url 'accounting:presupuesto_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                {% if object %}Editar{% else %}Crear{% endif %} Presupuesto
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.periodo.id_for_label }}">Período *</label>
+                            {{ form.periodo }}
+                            {% if form.periodo.errors %}
+                                <div class="text-danger">{{ form.periodo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.cuenta.id_for_label }}">Cuenta *</label>
+                            {{ form.cuenta }}
+                            {% if form.cuenta.errors %}
+                                <div class="text-danger">{{ form.cuenta.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.centro_costo.id_for_label }}">Centro de Costo</label>
+                            {{ form.centro_costo }}
+                            {% if form.centro_costo.errors %}
+                                <div class="text-danger">{{ form.centro_costo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.monto_presupuestado.id_for_label }}">Monto Presupuestado *</label>
+                            {{ form.monto_presupuestado }}
+                            {% if form.monto_presupuestado.errors %}
+                                <div class="text-danger">{{ form.monto_presupuestado.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        {% if object %}Actualizar{% else %}Guardar{% endif %}
+                    </button>
+                    <a href="{% url 'accounting:presupuesto_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

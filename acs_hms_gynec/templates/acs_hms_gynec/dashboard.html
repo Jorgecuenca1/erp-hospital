@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-female text-primary"></i>
+                        Dashboard de Ginecología
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'gynec:patient_create' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Nueva Paciente
+                        </a>
+                        <a href="{% url 'gynec:pregnancy_create' %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-baby"></i> Nuevo Embarazo
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Estadísticas Principales -->
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-primary">
+                                <div class="inner">
+                                    <h3>{{ total_patients }}</h3>
+                                    <p>Pacientes Registradas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-female"></i>
+                                </div>
+                                <a href="{% url 'gynec:patient_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ ongoing_pregnancies }}</h3>
+                                    <p>Embarazos Activos</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-baby"></i>
+                                </div>
+                                <a href="{% url 'gynec:pregnancy_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ total_procedures }}</h3>
+                                    <p>Procedimientos Realizados</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-stethoscope"></i>
+                                </div>
+                                <a href="{% url 'gynec:procedure_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ recent_visits.count }}</h3>
+                                    <p>Visitas Recientes</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <a href="{% url 'gynec:antenatal_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-bolt"></i>
+                                        Acciones Rápidas
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <a href="{% url 'gynec:patient_create' %}" class="btn btn-primary btn-block">
+                                                <i class="fas fa-user-plus"></i><br>Nueva Paciente
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'gynec:pregnancy_create' %}" class="btn btn-success btn-block">
+                                                <i class="fas fa-baby"></i><br>Nuevo Embarazo
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'gynec:antenatal_create' %}" class="btn btn-info btn-block">
+                                                <i class="fas fa-calendar-check"></i><br>Nueva Visita
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'gynec:procedure_create' %}" class="btn btn-warning btn-block">
+                                                <i class="fas fa-stethoscope"></i><br>Nuevo Procedimiento
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'gynec:contraceptive_create' %}" class="btn btn-secondary btn-block">
+                                                <i class="fas fa-pills"></i><br>Consulta Anticoncepción
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'gynec:reports' %}" class="btn btn-dark btn-block">
+                                                <i class="fas fa-chart-bar"></i><br>Reportes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Embarazos por Estado -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-pie"></i>
+                                        Embarazos por Estado
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="pregnanciesChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-bar"></i>
+                                        Procedimientos por Tipo
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="proceduresChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visitas Prenatales Recientes -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-calendar-check"></i>
+                                        Visitas Prenatales Recientes
+                                    </h5>
+                                    <div class="card-tools">
+                                        <a href="{% url 'gynec:antenatal_list' %}" class="btn btn-sm btn-info">
+                                            Ver Todas
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Paciente</th>
+                                                    <th>Embarazo</th>
+                                                    <th>Edad Gestacional</th>
+                                                    <th>Peso (kg)</th>
+                                                    <th>Presión Arterial</th>
+                                                    <th>Próxima Visita</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for visit in recent_visits %}
+                                                <tr>
+                                                    <td>{{ visit.visit_date|date:"d/m/Y" }}</td>
+                                                    <td>
+                                                        <strong>{{ visit.pregnancy.patient.patient.full_name }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-info">Embarazo {{ visit.pregnancy.pregnancy_number }}</span>
+                                                    </td>
+                                                    <td>{{ visit.gestational_age }} semanas</td>
+                                                    <td>
+                                                        {% if visit.weight %}
+                                                            {{ visit.weight }} kg
+                                                        {% else %}
+                                                            <span class="text-muted">N/A</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if visit.blood_pressure_systolic and visit.blood_pressure_diastolic %}
+                                                            {{ visit.blood_pressure_systolic }}/{{ visit.blood_pressure_diastolic }}
+                                                        {% else %}
+                                                            <span class="text-muted">N/A</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if visit.next_visit_date %}
+                                                            {{ visit.next_visit_date|date:"d/m/Y" }}
+                                                        {% else %}
+                                                            <span class="text-muted">No programada</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'gynec:antenatal_detail' visit.id %}" class="btn btn-info btn-sm">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{% url 'gynec:antenatal_update' visit.id %}" class="btn btn-warning btn-sm">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="8" class="text-center text-muted">
+                                                        No hay visitas prenatales recientes
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Actividad -->
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-users"></i>
+                                        Pacientes por Edad
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>18-25 años</span>
+                                        <span class="badge badge-primary">25%</span>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" style="width: 25%"></div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>26-35 años</span>
+                                        <span class="badge badge-success">45%</span>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 45%"></div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>36+ años</span>
+                                        <span class="badge badge-warning">30%</span>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 30%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Próximas Citas
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">María González</h6>
+                                                <small class="text-muted">Control prenatal</small>
+                                            </div>
+                                            <span class="badge badge-primary">Hoy</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">Ana Rodríguez</h6>
+                                                <small class="text-muted">Ecografía</small>
+                                            </div>
+                                            <span class="badge badge-info">Mañana</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">Carmen López</h6>
+                                                <small class="text-muted">Consulta anticoncepción</small>
+                                            </div>
+                                            <span class="badge badge-secondary">23/12</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-bell"></i>
+                                        Alertas del Sistema
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-info">
+                                        <h6><i class="fas fa-info-circle"></i> Embarazos de Alto Riesgo</h6>
+                                        <p>3 pacientes requieren seguimiento especial.</p>
+                                        <a href="#" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="alert alert-warning">
+                                        <h6><i class="fas fa-exclamation-triangle"></i> Citas Pendientes</h6>
+                                        <p>5 pacientes tienen citas vencidas.</p>
+                                        <a href="#" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="alert alert-success">
+                                        <h6><i class="fas fa-check-circle"></i> Partos Programados</h6>
+                                        <p>2 partos programados para esta semana.</p>
+                                        <a href="#" class="btn btn-success btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(document).ready(function() {
+    // Datos para los gráficos
+    var pregnanciesData = {
+        labels: ['Ongoing', 'Delivered', 'Aborted', 'Ectopic', 'Molar'],
+        data: [5, 12, 2, 1, 0]
+    };
+    
+    var proceduresData = {
+        labels: ['Colposcopy', 'Hysteroscopy', 'Laparoscopy', 'D&C', 'Biopsy'],
+        data: [8, 5, 3, 10, 6]
+    };
+
+    // Gráfico de Embarazos por Estado
+    const pregnanciesCtx = document.getElementById('pregnanciesChart').getContext('2d');
+    const pregnanciesChart = new Chart(pregnanciesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: pregnanciesData.labels,
+            datasets: [{
+                data: pregnanciesData.data,
+                backgroundColor: [
+                    '#28a745', // Verde para ONGOING
+                    '#007bff', // Azul para DELIVERED
+                    '#dc3545', // Rojo para ABORTED
+                    '#ffc107', // Amarillo para ECTOPIC
+                    '#6c757d'  // Gris para MOLAR
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Gráfico de Procedimientos por Tipo
+    const proceduresCtx = document.getElementById('proceduresChart').getContext('2d');
+    const proceduresChart = new Chart(proceduresCtx, {
+        type: 'bar',
+        data: {
+            labels: proceduresData.labels,
+            datasets: [{
+                label: 'Cantidad',
+                data: proceduresData.data,
+                backgroundColor: '#007bff',
+                borderColor: '#0056b3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %}

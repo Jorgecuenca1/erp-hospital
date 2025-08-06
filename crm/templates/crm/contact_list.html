@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Contacts</h1>
+        </div>
+        <div class="card-body">
+            <a href="{% url 'crm:contact_create' %}" class="btn btn-success mb-3">Add New Contact</a>
+            {% if contacts %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Position</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                        <tr>
+                            <td><a href="{% url 'crm:contact_detail' contact.pk %}">{{ contact.name }}</a></td>
+                            <td>{{ contact.customer.name }}</td>
+                            <td>{{ contact.email }}</td>
+                            <td>{{ contact.phone }}</td>
+                            <td>{{ contact.position }}</td>
+                            <td>
+                                <a href="{% url 'crm:contact_update' contact.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'crm:contact_delete' contact.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                No contacts available.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

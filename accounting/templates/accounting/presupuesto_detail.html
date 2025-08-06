@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle Presupuesto - Contabilidad{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-chart-line text-primary"></i> Detalle Presupuesto
+        </h1>
+        <div class="btn-group">
+            <a href="{% url 'accounting:presupuesto_update' object.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'accounting:presupuesto_delete' object.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Eliminar
+            </a>
+            <a href="{% url 'accounting:presupuesto_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Información del Presupuesto</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Período:</th>
+                            <td>{{ object.periodo.nombre }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cuenta:</th>
+                            <td>{{ object.cuenta.codigo }} - {{ object.cuenta.nombre }}</td>
+                        </tr>
+                        <tr>
+                            <th>Centro de Costo:</th>
+                            <td>{{ object.centro_costo.nombre|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Creado por:</th>
+                            <td>{{ object.creado_por|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Presupuestado:</th>
+                            <td>${{ object.monto_presupuestado|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <th>Real:</th>
+                            <td>${{ object.monto_real|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <th>Variación:</th>
+                            <td>
+                                <span class="badge badge-{% if object.variacion_porcentual <= 5 %}success{% elif object.variacion_porcentual <= 15 %}warning{% else %}danger{% endif %}">
+                                    {{ object.variacion_porcentual|floatformat:1 }}%
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Estado:</th>
+                            <td>
+                                {% if object.variacion_porcentual <= 5 %}
+                                    <span class="badge badge-success">Dentro del presupuesto</span>
+                                {% elif object.variacion_porcentual <= 15 %}
+                                    <span class="badge badge-warning">Atención</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Excede presupuesto</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 class="font-weight-bold">Análisis de Variación:</h6>
+                    <div class="progress mb-3">
+                        {% with variacion=object.variacion_porcentual %}
+                            {% if variacion <= 5 %}
+                                <div class="progress-bar bg-success" style="width: {{ variacion|add:5 }}%"></div>
+                            {% elif variacion <= 15 %}
+                                <div class="progress-bar bg-warning" style="width: {{ variacion|add:10 }}%"></div>
+                            {% else %}
+                                <div class="progress-bar bg-danger" style="width: {{ variacion|add:15 }}%"></div>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <small class="text-muted">
+                        Variación: {{ object.variacion_porcentual|floatformat:1 }}% 
+                        ({{ object.monto_real|floatformat:2 }} vs {{ object.monto_presupuestado|floatformat:2 }})
+                    </small>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <small class="text-muted">
+                        <i class="fas fa-clock"></i> Creado: {{ object.fecha_creacion|date:"d/m/Y H:i" }} | 
+                        <i class="fas fa-edit"></i> Actualizado: {{ object.fecha_modificacion|date:"d/m/Y H:i" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

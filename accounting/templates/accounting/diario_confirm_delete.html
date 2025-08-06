@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text lead">¿Estás seguro de que deseas eliminar el diario contable "<strong>{{ object.nombre }} ({{ object.codigo }})</strong>"?</p>
+            <p class="card-text text-danger">Esta acción no se puede deshacer y eliminará también los asientos contables asociados.</p>
+        </div>
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <form method="post">
+                {% csrf_token %}
+                <a href="{% url 'accounting:diario_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times-circle"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Confirmar Eliminación
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

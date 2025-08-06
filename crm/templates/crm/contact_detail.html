@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Contact Detail: {{ contact.name }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Customer:</strong> <a href="{% url 'crm:customer_detail' contact.customer.pk %}">{{ contact.customer.name }}</a></p>
+            <p><strong>Email:</strong> {{ contact.email }}</p>
+            <p><strong>Phone:</strong> {{ contact.phone }}</p>
+            <p><strong>Position:</strong> {{ contact.position }}</p>
+            <a href="{% url 'crm:contact_list' %}" class="btn btn-secondary">Back to List</a>
+            <a href="{% url 'crm:contact_update' contact.pk %}" class="btn btn-info">Edit Contact</a>
+            <a href="{% url 'crm:contact_delete' contact.pk %}" class="btn btn-danger">Delete Contact</a>
+
+            <h3 class="mt-4">Interactions</h3>
+            {% if contact.interactions.all %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interaction in contact.interactions.all %}
+                        <tr>
+                            <td>{{ interaction.type }}</td>
+                            <td>{{ interaction.date }}</td>
+                            <td>{{ interaction.notes|truncatechars:50 }}</td>
+                            <td>
+                                <a href="{% url 'crm:interaction_update' interaction.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'crm:interaction_delete' interaction.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No interactions for this contact.</p>
+            {% endif %}
+            <a href="{% url 'crm:interaction_create' %}?contact={{ contact.pk }}" class="btn btn-success">Add New Interaction</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

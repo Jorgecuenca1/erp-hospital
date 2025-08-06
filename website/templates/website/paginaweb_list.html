@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Páginas Web</h3>
+            <a href="{% url 'website:paginaweb_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nueva Página Web
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar páginas web...">
+            </div>
+            <div class="list-group">
+                {% for pagina in object_list %}
+                <a href="{% url 'website:paginaweb_detail' pagina.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ pagina.titulo }}</h5>
+                        <small class="text-muted">Última Actualización: {{ pagina.fecha_actualizacion|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1">Slug: {{ pagina.slug }}</p>
+                    <small>{% if pagina.publicada %}Publicada{% else %}Borrador{% endif %}</small>
+                </a>
+                {% empty %}
+                <p class="text-center">No hay páginas web registradas.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.list-group-item');
+
+        items.forEach(item => {
+            let text = item.textContent || item.innerText;
+            if (text.toLowerCase().indexOf(filter) > -1) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %} 

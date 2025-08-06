@@ -1,0 +1,9 @@
+{% extends 'pos/base.html' %}
+{% block pos_content %}
+<h2>Eliminar Venta POS</h2>
+<p>¿Está seguro que desea eliminar la venta POS de "{{ object.fecha }}"?</p>
+<form method="post">{% csrf_token %}
+    <button type="submit">Confirmar</button>
+</form>
+<a href="{% url 'pos:ventapos_list' %}">Cancelar</a>
+{% endblock %} 

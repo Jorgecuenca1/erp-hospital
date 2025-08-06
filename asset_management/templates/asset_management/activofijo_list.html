@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Activos Fijos</h3>
+            <a href="{% url 'activofijo_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Activo Fijo
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar activos fijos...">
+            </div>
+            <div class="list-group">
+                {% for activo in object_list %}
+                <a href="{% url 'activofijo_detail' activo.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ activo.nombre }} <small class="text-muted">({{ activo.codigo }})</small></h5>
+                        <small class="text-muted">Categoría: {{ activo.categoria.nombre }}</small>
+                    </div>
+                    <p class="mb-1">Valor: {{ activo.valor_adquisicion }} - Fecha Adquisición: {{ activo.fecha_adquisicion }}</p>
+                    <small>Ubicación: {{ activo.ubicacion }}</small>
+                </a>
+                {% empty %}
+                <p class="text-center">No hay activos fijos registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.list-group-item');
+
+        items.forEach(item => {
+            let text = item.textContent || item.innerText;
+            if (text.toLowerCase().indexOf(filter) > -1) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %}

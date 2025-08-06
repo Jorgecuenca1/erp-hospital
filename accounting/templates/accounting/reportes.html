@@ -1,0 +1,1087 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h1 class="card-title">
+                        <i class="fas fa-chart-bar"></i> Reportes Contables
+                    </h1>
+                    <p class="card-text">Análisis y reportes financieros del hospital</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">Filtros de Reporte</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="periodo" class="form-label">Período Contable</label>
+                            <select name="periodo" id="periodo" class="form-control">
+                                <option value="">Todos los períodos</option>
+                                {% for periodo in periodos %}
+                                <option value="{{ periodo.id }}" {% if periodo.id|stringformat:"s" == request.GET.periodo %}selected{% endif %}>
+                                    {{ periodo.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" 
+                                   value="{{ request.GET.fecha_inicio }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" 
+                                   value="{{ request.GET.fecha_fin }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipo_reporte" class="form-label">Tipo de Reporte</label>
+                            <select name="tipo_reporte" id="tipo_reporte" class="form-control">
+                                <option value="general" {% if request.GET.tipo_reporte == 'general' %}selected{% endif %}>Reporte General</option>
+                                <option value="banco" {% if request.GET.tipo_reporte == 'banco' %}selected{% endif %}>Reporte Bancario</option>
+                                <option value="conciliacion" {% if request.GET.tipo_reporte == 'conciliacion' %}selected{% endif %}>Conciliación Bancaria</option>
+                                <option value="movimientos" {% if request.GET.tipo_reporte == 'movimientos' %}selected{% endif %}>Movimientos Bancarios</option>
+                                <option value="flujo_efectivo" {% if request.GET.tipo_reporte == 'flujo_efectivo' %}selected{% endif %}>Flujo de Efectivo</option>
+                                <option value="presupuesto" {% if request.GET.tipo_reporte == 'presupuesto' %}selected{% endif %}>Análisis Presupuestal</option>
+                                <option value="costos" {% if request.GET.tipo_reporte == 'costos' %}selected{% endif %}>Análisis de Costos</option>
+                                <option value="fiscal" {% if request.GET.tipo_reporte == 'fiscal' %}selected{% endif %}>Reportes Fiscales</option>
+                                <option value="auditoria" {% if request.GET.tipo_reporte == 'auditoria' %}selected{% endif %}>Reportes de Auditoría</option>
+                                <option value="indicadores" {% if request.GET.tipo_reporte == 'indicadores' %}selected{% endif %}>Indicadores Financieros</option>
+                                <option value="cartera" {% if request.GET.tipo_reporte == 'cartera' %}selected{% endif %}>Análisis de Cartera</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="banco" class="form-label">Banco</label>
+                            <select name="banco" id="banco" class="form-control">
+                                <option value="">Todos los bancos</option>
+                                {% for banco in bancos %}
+                                <option value="{{ banco }}" {% if banco == request.GET.banco %}selected{% endif %}>{{ banco }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Generar Reporte
+                                </button>
+                                <a href="{% url 'accounting:reportes' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Limpiar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reporte Bancario -->
+    {% if request.GET.tipo_reporte == 'banco' or not request.GET.tipo_reporte %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-university"></i> Reporte Bancario
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if movimientos_bancarios %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Banco</th>
+                                    <th>Cuenta</th>
+                                    <th>Descripción</th>
+                                    <th>Tipo</th>
+                                    <th class="text-end">Valor</th>
+                                    <th>Estado</th>
+                                    <th>Referencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movimiento in movimientos_bancarios %}
+                                <tr>
+                                    <td>{{ movimiento.fecha|date:"d/m/Y" }}</td>
+                                    <td>{{ movimiento.banco }}</td>
+                                    <td>{{ movimiento.cuenta_bancaria }}</td>
+                                    <td>{{ movimiento.descripcion }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if movimiento.tipo == 'DEBITO' %}danger{% else %}success{% endif %}">
+                                            {{ movimiento.get_tipo_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">${{ movimiento.valor|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if movimiento.conciliado %}success{% else %}warning{% endif %}">
+                                            {% if movimiento.conciliado %}Conciliado{% else %}Pendiente{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>{{ movimiento.referencia|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay movimientos bancarios para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Conciliación Bancaria -->
+    {% if request.GET.tipo_reporte == 'conciliacion' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-double"></i> Conciliación Bancaria
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Movimientos Conciliados</h6>
+                            {% if movimientos_conciliados %}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-success">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Descripción</th>
+                                            <th class="text-end">Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for movimiento in movimientos_conciliados %}
+                                        <tr>
+                                            <td>{{ movimiento.fecha|date:"d/m/Y" }}</td>
+                                            <td>{{ movimiento.descripcion }}</td>
+                                            <td class="text-end">${{ movimiento.valor|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No hay movimientos conciliados.</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Movimientos Pendientes</h6>
+                            {% if movimientos_pendientes %}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-warning">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Descripción</th>
+                                            <th class="text-end">Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for movimiento in movimientos_pendientes %}
+                                        <tr>
+                                            <td>{{ movimiento.fecha|date:"d/m/Y" }}</td>
+                                            <td>{{ movimiento.descripcion }}</td>
+                                            <td class="text-end">${{ movimiento.valor|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No hay movimientos pendientes.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Resumen de Conciliación -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Resumen de Conciliación</h6>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <strong>Total Conciliado:</strong> ${{ total_conciliado|floatformat:2 }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Total Pendiente:</strong> ${{ total_pendiente|floatformat:2 }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Porcentaje Conciliado:</strong> {{ porcentaje_conciliado|floatformat:1 }}%
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Diferencia:</strong> ${{ diferencia_conciliacion|floatformat:2 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Movimientos Bancarios Detallado -->
+    {% if request.GET.tipo_reporte == 'movimientos' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i> Movimientos Bancarios Detallado
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if movimientos_detallados %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Banco</th>
+                                    <th>Cuenta</th>
+                                    <th>Descripción</th>
+                                    <th>Tipo</th>
+                                    <th class="text-end">Valor</th>
+                                    <th>Estado</th>
+                                    <th>Asiento</th>
+                                    <th>Referencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movimiento in movimientos_detallados %}
+                                <tr>
+                                    <td>{{ movimiento.fecha|date:"d/m/Y" }}</td>
+                                    <td>{{ movimiento.banco }}</td>
+                                    <td>{{ movimiento.cuenta_bancaria }}</td>
+                                    <td>{{ movimiento.descripcion }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if movimiento.tipo == 'DEBITO' %}danger{% else %}success{% endif %}">
+                                            {{ movimiento.get_tipo_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">${{ movimiento.valor|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if movimiento.conciliado %}success{% else %}warning{% endif %}">
+                                            {% if movimiento.conciliado %}Conciliado{% else %}Pendiente{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if movimiento.asiento %}
+                                            <a href="{% url 'accounting:asientocontable_detail' movimiento.asiento.pk %}" class="btn btn-sm btn-info">
+                                                Ver Asiento
+                                            </a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ movimiento.referencia|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay movimientos bancarios para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Flujo de Efectivo -->
+    {% if request.GET.tipo_reporte == 'flujo_efectivo' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-money-bill-wave"></i> Estado de Flujo de Efectivo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if flujo_efectivo %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Concepto</th>
+                                    <th class="text-end">Monto</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Actividades Operacionales -->
+                                <tr class="table-primary">
+                                    <th colspan="3">ACTIVIDADES OPERACIONALES</th>
+                                </tr>
+                                {% for item in flujo_efectivo.operacionales %}
+                                <tr>
+                                    <td>{{ item.concepto }}</td>
+                                    <td class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
+                                        ${{ item.monto|floatformat:2 }}
+                                    </td>
+                                    <td>{{ item.descripcion }}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="table-info">
+                                    <th>Flujo Neto Operacional</th>
+                                    <th class="text-end">${{ flujo_efectivo.neto_operacional|floatformat:2 }}</th>
+                                    <td></td>
+                                </tr>
+
+                                <!-- Actividades de Inversión -->
+                                <tr class="table-warning">
+                                    <th colspan="3">ACTIVIDADES DE INVERSIÓN</th>
+                                </tr>
+                                {% for item in flujo_efectivo.inversion %}
+                                <tr>
+                                    <td>{{ item.concepto }}</td>
+                                    <td class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
+                                        ${{ item.monto|floatformat:2 }}
+                                    </td>
+                                    <td>{{ item.descripcion }}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="table-info">
+                                    <th>Flujo Neto de Inversión</th>
+                                    <th class="text-end">${{ flujo_efectivo.neto_inversion|floatformat:2 }}</th>
+                                    <td></td>
+                                </tr>
+
+                                <!-- Actividades de Financiación -->
+                                <tr class="table-secondary">
+                                    <th colspan="3">ACTIVIDADES DE FINANCIACIÓN</th>
+                                </tr>
+                                {% for item in flujo_efectivo.financiacion %}
+                                <tr>
+                                    <td>{{ item.concepto }}</td>
+                                    <td class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
+                                        ${{ item.monto|floatformat:2 }}
+                                    </td>
+                                    <td>{{ item.descripcion }}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="table-info">
+                                    <th>Flujo Neto de Financiación</th>
+                                    <th class="text-end">${{ flujo_efectivo.neto_financiacion|floatformat:2 }}</th>
+                                    <td></td>
+                                </tr>
+
+                                <!-- Cambio Neto en Efectivo -->
+                                <tr class="table-dark">
+                                    <th>CAMBIO NETO EN EFECTIVO</th>
+                                    <th class="text-end">${{ flujo_efectivo.cambio_neto|floatformat:2 }}</th>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay datos suficientes para generar el flujo de efectivo.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Análisis Presupuestal -->
+    {% if request.GET.tipo_reporte == 'presupuesto' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Análisis Presupuestal
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if analisis_presupuestal %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Cuenta</th>
+                                    <th>Centro de Costo</th>
+                                    <th class="text-end">Presupuestado</th>
+                                    <th class="text-end">Real</th>
+                                    <th class="text-end">Variación</th>
+                                    <th class="text-end">% Variación</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in analisis_presupuestal %}
+                                <tr>
+                                    <td>{{ item.cuenta.codigo }} - {{ item.cuenta.nombre }}</td>
+                                    <td>{{ item.centro_costo.nombre|default:"-" }}</td>
+                                    <td class="text-end">${{ item.presupuestado|floatformat:2 }}</td>
+                                    <td class="text-end">${{ item.real|floatformat:2 }}</td>
+                                    <td class="text-end {% if item.variacion < 0 %}text-danger{% else %}text-success{% endif %}">
+                                        ${{ item.variacion|floatformat:2 }}
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge badge-{% if item.porcentaje_variacion <= 5 %}success{% elif item.porcentaje_variacion <= 15 %}warning{% else %}danger{% endif %}">
+                                            {{ item.porcentaje_variacion|floatformat:1 }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if item.porcentaje_variacion <= 5 %}
+                                            <span class="badge badge-success">Dentro del presupuesto</span>
+                                        {% elif item.porcentaje_variacion <= 15 %}
+                                            <span class="badge badge-warning">Atención</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">Excede presupuesto</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay datos de presupuestos para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Análisis de Costos -->
+    {% if request.GET.tipo_reporte == 'costos' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calculator"></i> Análisis de Costos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if analisis_costos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Centro de Costo</th>
+                                    <th class="text-end">Costos Directos</th>
+                                    <th class="text-end">Costos Indirectos</th>
+                                    <th class="text-end">Total Costos</th>
+                                    <th class="text-end">% del Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for costo in analisis_costos %}
+                                <tr>
+                                    <td>{{ costo.centro_costo.nombre }}</td>
+                                    <td class="text-end">${{ costo.costos_directos|floatformat:2 }}</td>
+                                    <td class="text-end">${{ costo.costos_indirectos|floatformat:2 }}</td>
+                                    <td class="text-end">${{ costo.total_costos|floatformat:2 }}</td>
+                                    <td class="text-end">{{ costo.porcentaje_total|floatformat:1 }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay datos de costos para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Reportes Fiscales -->
+    {% if request.GET.tipo_reporte == 'fiscal' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar"></i> Reportes Fiscales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- IVA -->
+                        <div class="col-md-6 mb-4">
+                            <h6>Declaración de IVA</h6>
+                            {% if iva_data %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Base Gravable</td>
+                                            <td class="text-end">${{ iva_data.base_gravable|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>IVA Generado</td>
+                                            <td class="text-end">${{ iva_data.iva_generado|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>IVA Descontable</td>
+                                            <td class="text-end">${{ iva_data.iva_descontable|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr class="table-info">
+                                            <th>IVA a Pagar</th>
+                                            <th class="text-end">${{ iva_data.iva_a_pagar|floatformat:2 }}</th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No hay datos de IVA para mostrar.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Retenciones -->
+                        <div class="col-md-6 mb-4">
+                            <h6>Retenciones</h6>
+                            {% if retenciones_data %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Base Retención</td>
+                                            <td class="text-end">${{ retenciones_data.base_retencion|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Retención en la Fuente</td>
+                                            <td class="text-end">${{ retenciones_data.retencion_fuente|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>ICA</td>
+                                            <td class="text-end">${{ retenciones_data.ica|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr class="table-info">
+                                            <th>Total Retenciones</th>
+                                            <th class="text-end">${{ retenciones_data.total_retenciones|floatformat:2 }}</th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No hay datos de retenciones para mostrar.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Reportes de Auditoría -->
+    {% if request.GET.tipo_reporte == 'auditoria' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> Reportes de Auditoría
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if auditoria_data %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Usuario</th>
+                                    <th>Acción</th>
+                                    <th>Modelo</th>
+                                    <th>Registro ID</th>
+                                    <th>IP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in auditoria_data %}
+                                <tr>
+                                    <td>{{ log.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ log.usuario|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if log.accion == 'CREATE' %}success{% elif log.accion == 'UPDATE' %}warning{% elif log.accion == 'DELETE' %}danger{% else %}info{% endif %}">
+                                            {{ log.get_accion_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.modelo }}</td>
+                                    <td>{{ log.registro_id }}</td>
+                                    <td>{{ log.ip_address|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay registros de auditoría para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Indicadores Financieros -->
+    {% if request.GET.tipo_reporte == 'indicadores' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie"></i> Indicadores Financieros
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if indicadores_financieros %}
+                    <div class="row">
+                        <!-- Liquidez -->
+                        <div class="col-md-6 mb-4">
+                            <h6>Indicadores de Liquidez</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Razón Corriente</td>
+                                            <td class="text-end">{{ indicadores_financieros.razon_corriente|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Razón Ácida</td>
+                                            <td class="text-end">{{ indicadores_financieros.razon_acida|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Capital de Trabajo</td>
+                                            <td class="text-end">${{ indicadores_financieros.capital_trabajo|floatformat:2 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Solvencia -->
+                        <div class="col-md-6 mb-4">
+                            <h6>Indicadores de Solvencia</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Razón de Endeudamiento</td>
+                                            <td class="text-end">{{ indicadores_financieros.razon_endeudamiento|floatformat:2 }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Razón de Patrimonio</td>
+                                            <td class="text-end">{{ indicadores_financieros.razon_patrimonio|floatformat:2 }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Razón de Cobertura</td>
+                                            <td class="text-end">{{ indicadores_financieros.razon_cobertura|floatformat:2 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Rentabilidad -->
+                        <div class="col-md-6 mb-4">
+                            <h6>Indicadores de Rentabilidad</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Margen Bruto</td>
+                                            <td class="text-end">{{ indicadores_financieros.margen_bruto|floatformat:2 }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Margen Operacional</td>
+                                            <td class="text-end">{{ indicadores_financieros.margen_operacional|floatformat:2 }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>ROA (Rentabilidad Activos)</td>
+                                            <td class="text-end">{{ indicadores_financieros.roa|floatformat:2 }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>ROE (Rentabilidad Patrimonio)</td>
+                                            <td class="text-end">{{ indicadores_financieros.roe|floatformat:2 }}%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Eficiencia -->
+                        <div class="col-md-6 mb-4">
+                            <h6>Indicadores de Eficiencia</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Rotación de Activos</td>
+                                            <td class="text-end">{{ indicadores_financieros.rotacion_activos|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Rotación de Inventarios</td>
+                                            <td class="text-end">{{ indicadores_financieros.rotacion_inventarios|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Período de Cobranza</td>
+                                            <td class="text-end">{{ indicadores_financieros.periodo_cobranza|floatformat:0 }} días</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay datos suficientes para calcular indicadores financieros.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Análisis de Cartera -->
+    {% if request.GET.tipo_reporte == 'cartera' %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-handshake"></i> Análisis de Cartera
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Cuentas por Cobrar -->
+                        <div class="col-md-6 mb-4">
+                            <h6>Cuentas por Cobrar</h6>
+                            {% if cuentas_por_cobrar %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Tercero</th>
+                                            <th class="text-end">Saldo</th>
+                                            <th>Días Vencido</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for cuenta in cuentas_por_cobrar %}
+                                        <tr>
+                                            <td>{{ cuenta.tercero.nombre }}</td>
+                                            <td class="text-end">${{ cuenta.saldo|floatformat:2 }}</td>
+                                            <td class="text-center">{{ cuenta.dias_vencido }}</td>
+                                            <td>
+                                                <span class="badge badge-{% if cuenta.dias_vencido <= 30 %}success{% elif cuenta.dias_vencido <= 60 %}warning{% else %}danger{% endif %}">
+                                                    {% if cuenta.dias_vencido <= 30 %}Al día{% elif cuenta.dias_vencido <= 60 %}Vencido{% else %}Mora{% endif %}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No hay cuentas por cobrar para mostrar.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Cuentas por Pagar -->
+                        <div class="col-md-6 mb-4">
+                            <h6>Cuentas por Pagar</h6>
+                            {% if cuentas_por_pagar %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Tercero</th>
+                                            <th class="text-end">Saldo</th>
+                                            <th>Días Vencido</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for cuenta in cuentas_por_pagar %}
+                                        <tr>
+                                            <td>{{ cuenta.tercero.nombre }}</td>
+                                            <td class="text-end">${{ cuenta.saldo|floatformat:2 }}</td>
+                                            <td class="text-center">{{ cuenta.dias_vencido }}</td>
+                                            <td>
+                                                <span class="badge badge-{% if cuenta.dias_vencido <= 30 %}success{% elif cuenta.dias_vencido <= 60 %}warning{% else %}danger{% endif %}">
+                                                    {% if cuenta.dias_vencido <= 30 %}Al día{% elif cuenta.dias_vencido <= 60 %}Vencido{% else %}Mora{% endif %}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No hay cuentas por pagar para mostrar.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Cartera -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Resumen de Cartera</h6>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <strong>Total por Cobrar:</strong> ${{ total_por_cobrar|floatformat:2 }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Total por Pagar:</strong> ${{ total_por_pagar|floatformat:2 }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Neto Cartera:</strong> ${{ neto_cartera|floatformat:2 }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>Antigüedad Promedio:</strong> {{ antiguedad_promedio|floatformat:0 }} días
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Reportes Generales (solo si no hay filtro específico) -->
+    {% if not request.GET.tipo_reporte or request.GET.tipo_reporte == 'general' %}
+    <!-- Balance General -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-balance-scale"></i> Balance General
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if balance_general %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Cuenta</th>
+                                    <th class="text-end">Saldo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cuenta in balance_general %}
+                                <tr>
+                                    <td>{{ cuenta.codigo }} - {{ cuenta.nombre }}</td>
+                                    <td class="text-end {% if cuenta.saldo < 0 %}text-danger{% endif %}">
+                                        ${{ cuenta.saldo|floatformat:2 }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay datos para mostrar el balance general.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado de Resultados -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Estado de Resultados
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if estado_resultados %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Concepto</th>
+                                    <th class="text-end">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for concepto in estado_resultados %}
+                                <tr>
+                                    <td>{{ concepto.nombre }}</td>
+                                    <td class="text-end {% if concepto.monto < 0 %}text-danger{% else %}text-success{% endif %}">
+                                        ${{ concepto.monto|floatformat:2 }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay datos para mostrar el estado de resultados.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Libro Diario -->
+        <div class="col-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book"></i> Libro Diario
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if asientos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Asiento</th>
+                                    <th>Descripción</th>
+                                    <th>Cuenta</th>
+                                    <th class="text-end">Débito</th>
+                                    <th class="text-end">Crédito</th>
+                                    <th>Saldo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asiento in asientos %}
+                                {% for linea in asiento.lineas.all %}
+                                <tr>
+                                    <td>{{ asiento.fecha|date:"d/m/Y" }}</td>
+                                    <td>#{{ asiento.id }}</td>
+                                    <td>{{ linea.descripcion|default:asiento.descripcion }}</td>
+                                    <td>{{ linea.cuenta.codigo }} - {{ linea.cuenta.nombre }}</td>
+                                    <td class="text-end">{% if linea.debito > 0 %}${{ linea.debito|floatformat:2 }}{% endif %}</td>
+                                    <td class="text-end">{% if linea.credito > 0 %}${{ linea.credito|floatformat:2 }}{% endif %}</td>
+                                    <td class="text-end">
+                                        {% if linea.debito > linea.credito %}
+                                            <span class="text-danger">${{ linea.debito|floatformat:2 }}</span>
+                                        {% else %}
+                                            <span class="text-success">${{ linea.credito|floatformat:2 }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay asientos contables para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Estadísticas -->
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Asientos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_asientos|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Débitos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_debitos|default:"0.00" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-arrow-down fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Créditos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_creditos|default:"0.00" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-arrow-up fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Balance</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ balance|default:"0.00" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-balance-scale fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

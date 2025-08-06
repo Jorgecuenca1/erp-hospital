@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rental Management Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-handshake"></i> Medical Equipment Rental</h1>
+                <p class="text-muted">Manage rental equipment, agreements, payments, and inspections</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ total_equipment }}</h3>
+                            <p>Total Equipment</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-medical fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ available_equipment }}</h3>
+                            <p>Available</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ active_rentals }}</h3>
+                            <p>Active Rentals</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-handshake fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>${{ total_revenue|floatformat:0 }}</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-chart-line"></i> Rental Metrics</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="metric">
+                                <h4>{{ overdue_rentals }}</h4>
+                                <p class="text-muted">Overdue Rentals</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric">
+                                <h4>85%</h4>
+                                <p class="text-muted">Utilization Rate</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Equipment by Category</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="equipmentCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Agreements -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-file-contract"></i> Recent Rental Agreements</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Agreement #</th>
+                                    <th>Equipment</th>
+                                    <th>Renter</th>
+                                    <th>Period</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>End Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for agreement in recent_agreements %}
+                                <tr>
+                                    <td><strong>{{ agreement.agreement_number }}</strong></td>
+                                    <td>{{ agreement.equipment.name }}</td>
+                                    <td>{{ agreement.renter_name }}</td>
+                                    <td>{{ agreement.get_rental_period_display }}</td>
+                                    <td>${{ agreement.total_amount|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if agreement.status == 'active' %}badge-success
+                                            {% elif agreement.status == 'completed' %}badge-info
+                                            {% elif agreement.status == 'overdue' %}badge-danger
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ agreement.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ agreement.end_date|date:"M d, Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No recent agreements found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'rental_management:equipment' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-medical"></i> Equipment
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'rental_management:agreements' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-file-contract"></i> Agreements
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'rental_management:payments' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-credit-card"></i> Payments
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-warning btn-block">
+                                <i class="fas fa-clipboard-check"></i> Inspections
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Equipment Category Chart
+const equipmentCategoryCtx = document.getElementById('equipmentCategoryChart').getContext('2d');
+new Chart(equipmentCategoryCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Diagnostic', 'Monitoring', 'Therapeutic', 'Surgical', 'Mobility', 'Respiratory'],
+        datasets: [{
+            data: [20, 18, 15, 12, 10, 8],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+{% endblock %} 

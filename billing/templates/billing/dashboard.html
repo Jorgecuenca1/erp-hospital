@@ -1,0 +1,415 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Facturación - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-invoice-dollar text-primary"></i>
+                        Dashboard de Facturación
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'billing:factura_create' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Nueva Factura
+                        </a>
+                        <a href="{% url 'billing:reports' %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-chart-bar"></i> Reportes
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Estadísticas Principales -->
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-primary">
+                                <div class="inner">
+                                    <h3>{{ total_facturas }}</h3>
+                                    <p>Total Facturas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-file-invoice"></i>
+                                </div>
+                                <a href="{% url 'billing:factura_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ facturas_pagadas }}</h3>
+                                    <p>Facturas Pagadas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <a href="{% url 'billing:factura_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ facturas_pendientes }}</h3>
+                                    <p>Facturas Pendientes</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <a href="{% url 'billing:facturas_pendientes' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>${{ total_facturado|floatformat:0 }}</h3>
+                                    <p>Total Facturado</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <a href="{% url 'billing:reports' %}" class="small-box-footer">
+                                    Ver reportes <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-bolt"></i>
+                                        Acciones Rápidas
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <a href="{% url 'billing:factura_create' %}" class="btn btn-primary btn-block">
+                                                <i class="fas fa-plus"></i><br>Nueva Factura
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'billing:factura_list' %}" class="btn btn-success btn-block">
+                                                <i class="fas fa-list"></i><br>Ver Facturas
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'billing:facturas_pendientes' %}" class="btn btn-warning btn-block">
+                                                <i class="fas fa-clock"></i><br>Pendientes
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'billing:facturas_vencidas' %}" class="btn btn-danger btn-block">
+                                                <i class="fas fa-exclamation-triangle"></i><br>Vencidas
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'billing:transaccion_dian_list' %}" class="btn btn-secondary btn-block">
+                                                <i class="fas fa-exchange-alt"></i><br>Transacciones DIAN
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'billing:reports' %}" class="btn btn-dark btn-block">
+                                                <i class="fas fa-chart-bar"></i><br>Reportes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Facturas Recientes -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-history"></i>
+                                        Facturas Recientes
+                                    </h5>
+                                    <div class="card-tools">
+                                        <a href="{% url 'billing:factura_list' %}" class="btn btn-sm btn-info">
+                                            Ver Todas
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Número</th>
+                                                    <th>Paciente</th>
+                                                    <th>Fecha</th>
+                                                    <th>Total</th>
+                                                    <th>Estado</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for factura in facturas_recientes %}
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ factura.numero_factura|default:"BORRADOR" }}</strong>
+                                                    </td>
+                                                    <td>{{ factura.paciente.nombres }} {{ factura.paciente.apellidos }}</td>
+                                                    <td>{{ factura.fecha_emision|date:"d/m/Y" }}</td>
+                                                    <td>${{ factura.total_neto|floatformat:2 }}</td>
+                                                    <td>
+                                                        {% if factura.estado == 'BORRADOR' %}
+                                                            <span class="badge badge-secondary">Borrador</span>
+                                                        {% elif factura.estado == 'EMITIDA' %}
+                                                            <span class="badge badge-warning">Emitida</span>
+                                                        {% elif factura.estado == 'PAGADA' %}
+                                                            <span class="badge badge-success">Pagada</span>
+                                                        {% elif factura.estado == 'ANULADA' %}
+                                                            <span class="badge badge-danger">Anulada</span>
+                                                        {% else %}
+                                                            <span class="badge badge-info">{{ factura.estado }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'billing:factura_detail' factura.id %}" class="btn btn-info btn-sm">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{% url 'billing:factura_edit' factura.id %}" class="btn btn-warning btn-sm">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        No hay facturas recientes
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-pie"></i>
+                                        Resumen Financiero
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>Total Facturado</span>
+                                        <span class="badge badge-primary">${{ total_facturado|floatformat:0 }}</span>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>Total Pagado</span>
+                                        <span class="badge badge-success">${{ total_pagado|floatformat:0 }}</span>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio total_pagado total_facturado 100 %}%"></div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>Total Pendiente</span>
+                                        <span class="badge badge-warning">${{ total_pendiente|floatformat:0 }}</span>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: {% widthratio total_pendiente total_facturado 100 %}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-bar"></i>
+                                        Facturas por Estado
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="facturasEstadoChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        Facturación por Mes
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="facturacionMensualChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas del Sistema -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-bell"></i>
+                                        Alertas del Sistema
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if facturas_pendientes > 0 %}
+                                    <div class="alert alert-warning">
+                                        <h6><i class="fas fa-exclamation-triangle"></i> Facturas Pendientes</h6>
+                                        <p>Hay {{ facturas_pendientes }} facturas pendientes de pago.</p>
+                                        <a href="{% url 'billing:facturas_pendientes' %}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Facturas
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if total_pendiente > 0 %}
+                                    <div class="alert alert-info">
+                                        <h6><i class="fas fa-info-circle"></i> Cobranza Pendiente</h6>
+                                        <p>Total pendiente de cobro: ${{ total_pendiente|floatformat:2 }}</p>
+                                        <a href="{% url 'billing:reports' %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-chart-bar"></i> Ver Reportes
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if facturas_pendientes == 0 and total_pendiente == 0 %}
+                                    <div class="alert alert-success">
+                                        <h6><i class="fas fa-check-circle"></i> Todo en Orden</h6>
+                                        <p>No hay facturas pendientes. La facturación está al día.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(document).ready(function() {
+    // Datos para los gráficos
+    var facturasEstadoData = {
+        labels: [
+            {% for estado in facturas_por_estado %}
+                '{{ estado.estado }}',
+            {% endfor %}
+        ],
+        data: [
+            {% for estado in facturas_por_estado %}
+                {{ estado.count }},
+            {% endfor %}
+        ]
+    };
+    
+    var facturacionMensualData = {
+        labels: [
+            {% for mes in facturas_por_mes %}
+                '{{ mes.mes }}',
+            {% endfor %}
+        ],
+        data: [
+            {% for mes in facturas_por_mes %}
+                {{ mes.total }},
+            {% endfor %}
+        ]
+    };
+
+    // Gráfico de Facturas por Estado
+    const facturasEstadoCtx = document.getElementById('facturasEstadoChart').getContext('2d');
+    const facturasEstadoChart = new Chart(facturasEstadoCtx, {
+        type: 'doughnut',
+        data: {
+            labels: facturasEstadoData.labels,
+            datasets: [{
+                data: facturasEstadoData.data,
+                backgroundColor: [
+                    '#28a745', // Verde para PAGADA
+                    '#ffc107', // Amarillo para EMITIDA
+                    '#6c757d', // Gris para BORRADOR
+                    '#dc3545', // Rojo para ANULADA
+                    '#17a2b8'  // Azul para VALIDADA_DIAN
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Gráfico de Facturación Mensual
+    const facturacionMensualCtx = document.getElementById('facturacionMensualChart').getContext('2d');
+    const facturacionMensualChart = new Chart(facturacionMensualCtx, {
+        type: 'line',
+        data: {
+            labels: facturacionMensualData.labels,
+            datasets: [{
+                label: 'Total Facturado ($)',
+                data: facturacionMensualData.data,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard de Ventas - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-chart-line text-primary"></i> Dashboard de Ventas
+                </h1>
+                <div class="btn-group">
+                    <a href="{% url 'sales:cliente_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Cliente
+                    </a>
+                    <a href="{% url 'sales:ordenventa_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nueva Orden
+                    </a>
+                    <a href="{% url 'sales:facturaventa_create' %}" class="btn btn-info">
+                        <i class="fas fa-file-invoice"></i> Nueva Factura
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas principales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Ventas del Mes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                ${{ ventas_mes|floatformat:2 }}
+                            </div>
+                            {% if crecimiento_ventas > 0 %}
+                                <div class="text-success small">
+                                    <i class="fas fa-arrow-up"></i> {{ crecimiento_ventas|floatformat:1 }}%
+                                </div>
+                            {% elif crecimiento_ventas < 0 %}
+                                <div class="text-danger small">
+                                    <i class="fas fa-arrow-down"></i> {{ crecimiento_ventas|floatformat:1 }}%
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Clientes Activos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_clientes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Órdenes Pendientes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ ordenes_pendientes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Facturas Pendientes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ facturas_pendientes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-invoice fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos y contenido principal -->
+    <div class="row">
+        <!-- Gráfico de ventas por mes -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Ventas por Mes</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="ventasChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de ventas por estado -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Ventas por Estado</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="estadoChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tablas de información -->
+    <div class="row">
+        <!-- Facturas recientes -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Facturas Recientes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Cliente</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for factura in facturas_recientes %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'sales:facturaventa_detail' factura.pk %}">
+                                            {{ factura.numero_factura }}
+                                        </a>
+                                    </td>
+                                    <td>{{ factura.cliente.nombre }}</td>
+                                    <td>${{ factura.total|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge badge-{% if factura.estado == 'PAGADA' %}success{% elif factura.estado == 'EMITIDA' %}warning{% else %}secondary{% endif %}">
+                                            {{ factura.get_estado_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No hay facturas recientes</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top clientes -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Top Clientes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Total Ventas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cliente in top_clientes %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'sales:cliente_detail' cliente.pk %}">
+                                            {{ cliente.nombre }}
+                                        </a>
+                                    </td>
+                                    <td>${{ cliente.total_ventas|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">No hay datos de clientes</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enlaces rápidos -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Acciones Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'sales:cliente_list' %}" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-users"></i> Gestionar Clientes
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'sales:ordenventa_list' %}" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-shopping-cart"></i> Órdenes de Venta
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'sales:facturaventa_list' %}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-file-invoice"></i> Facturas
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'sales:reports' %}" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-chart-bar"></i> Reportes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfico de ventas por mes
+const ventasCtx = document.getElementById('ventasChart').getContext('2d');
+const ventasLabels = [{% for mes in ventas_por_mes %}'{{ mes.mes }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+const ventasData = [{% for mes in ventas_por_mes %}{{ mes.total }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+
+const ventasChart = new Chart(ventasCtx, {
+    type: 'line',
+    data: {
+        labels: ventasLabels,
+        datasets: [{
+            label: 'Ventas ($)',
+            data: ventasData,
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Gráfico de ventas por estado
+const estadoCtx = document.getElementById('estadoChart').getContext('2d');
+const estadoLabels = [{% for estado in ventas_por_estado %}'{{ estado.estado }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+const estadoData = [{% for estado in ventas_por_estado %}{{ estado.count }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+
+const estadoChart = new Chart(estadoCtx, {
+    type: 'doughnut',
+    data: {
+        labels: estadoLabels,
+        datasets: [{
+            data: estadoData,
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 205, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

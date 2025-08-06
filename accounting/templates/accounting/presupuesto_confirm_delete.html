@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Presupuesto - Contabilidad{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-trash text-danger"></i> Eliminar Presupuesto
+        </h1>
+        <a href="{% url 'accounting:presupuesto_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-danger text-white">
+            <h6 class="m-0 font-weight-bold">Confirmar Eliminación</h6>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-triangle"></i> ¿Está seguro?</h5>
+                <p>Está a punto de eliminar el siguiente presupuesto:</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Período:</th>
+                            <td>{{ object.periodo.nombre }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cuenta:</th>
+                            <td>{{ object.cuenta.codigo }} - {{ object.cuenta.nombre }}</td>
+                        </tr>
+                        <tr>
+                            <th>Centro de Costo:</th>
+                            <td>{{ object.centro_costo.nombre|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Presupuestado:</th>
+                            <td>${{ object.monto_presupuestado|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <th>Real:</th>
+                            <td>${{ object.monto_real|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <th>Variación:</th>
+                            <td>{{ object.variacion_porcentual|floatformat:1 }}%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                <strong>¡Atención!</strong> Esta acción no se puede deshacer. 
+                La eliminación del presupuesto podría afectar los reportes de gestión.
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sí, Eliminar
+                    </button>
+                    <a href="{% url 'accounting:presupuesto_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

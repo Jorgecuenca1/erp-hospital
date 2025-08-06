@@ -1,0 +1,9 @@
+{% extends 'ecommerce/base.html' %}
+{% block ecommerce_content %}
+<h2>{% if object %}Editar{% else %}Nueva{% endif %} Línea de Carrito</h2>
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+<a href="{% url 'ecommerce:lineacarrito_list' %}">Volver al listado</a>
+{% endblock %} 

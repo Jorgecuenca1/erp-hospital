@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Reporte Generado</h3>
+            <div>
+                <a href="{% url 'reporte_update' object.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'reporte_delete' object.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ object.nombre_reporte }}</h4>
+            <p class="card-text"><strong>Fecha de Generación:</strong> {{ object.fecha_generacion|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>Parámetros de Filtro:</strong> {{ object.parametros_filtro|default_if_none:"N/A" }}</p>
+            {% if object.archivo_reporte %}
+                <p class="card-text"><strong>Archivo de Reporte:</strong> <a href="{{ object.archivo_reporte.url }}" target="_blank">Descargar</a></p>
+            {% else %}
+                <p class="card-text"><strong>Archivo de Reporte:</strong> No disponible.</p>
+            {% endif %}
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'reporte_list' %}" class="btn btn-secondary btn-sm">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

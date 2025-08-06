@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Proveedor Detail: {{ proveedor.name }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Contact Person:</strong> {{ proveedor.contact_person }}</p>
+            <p><strong>Email:</strong> {{ proveedor.email }}</p>
+            <p><strong>Phone:</strong> {{ proveedor.phone }}</p>
+            <p><strong>Address:</strong> {{ proveedor.address }}</p>
+            <p><strong>Created At:</strong> {{ proveedor.created_at }}</p>
+            <p><strong>Updated At:</strong> {{ proveedor.updated_at }}</p>
+            <a href="{% url 'purchases:proveedor_list' %}" class="btn btn-secondary">Back to List</a>
+            <a href="{% url 'purchases:proveedor_update' proveedor.pk %}" class="btn btn-info">Edit Proveedor</a>
+            <a href="{% url 'purchases:proveedor_delete' proveedor.pk %}" class="btn btn-danger">Delete Proveedor</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

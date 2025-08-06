@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Detalle de Incidente #{{ incidente.pk }}</h1>
+    <p><strong>Tipo de Incidente:</strong> {{ incidente.get_tipo_incidente_display }}</p>
+    <p><strong>Fecha y Hora del Incidente:</strong> {{ incidente.fecha_hora_incidente|date:"Y-m-d H:i" }}</p>
+    <p><strong>Descripción:</strong> {{ incidente.descripcion|linebreaksbr }}</p>
+    <p><strong>Severidad:</strong> {{ incidente.get_severidad_display }}</p>
+    <p><strong>Estado:</strong> {{ incidente.get_estado_display }}</p>
+    <p><strong>Reportado Por:</strong> {{ incidente.reportado_por.username|default:"N/A" }}</p>
+    <p><strong>Fecha y Hora de Reporte:</strong> {{ incidente.fecha_hora_reporte|date:"Y-m-d H:i" }}</p>
+    <p><strong>Investigador Asignado:</strong> {{ incidente.investigador_asignado.nombres|default:"N/A" }} {{ incidente.investigador_asignado.apellidos|default:"" }}</p>
+    <p><strong>Fecha de Cierre:</strong> {{ incidente.fecha_cierre|date:"Y-m-d H:i"|default:"N/A" }}</p>
+    <p><strong>Acciones Correctivas:</strong> {{ incidente.acciones_correctivas|linebreaksbr|default:"N/A" }}</p>
+    <p><strong>Paciente Afectado:</strong> {% if incidente.paciente_afectado %}<a href="{% url 'patients:paciente_detail' incidente.paciente_afectado.pk %}">{{ incidente.paciente_afectado.nombres }} {{ incidente.paciente_afectado.apellidos }}</a>{% else %}N/A{% endif %}</p>
+
+    <a href="{% url 'quality_management:incidente_list' %}">Volver a la lista de incidentes</a>
+    <a href="{% url 'quality_management:incidente_edit' incidente.pk %}">Editar Incidente</a>
+    <a href="{% url 'quality_management:incidente_delete' incidente.pk %}">Eliminar Incidente</a>
+{% endblock %} 

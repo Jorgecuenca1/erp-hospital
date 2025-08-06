@@ -1,0 +1,13 @@
+{% extends 'website/base.html' %}
+{% block website_content %}
+<h2>Detalle de Banner</h2>
+<ul>
+    <li><b>Título:</b> {{ object.titulo }}</li>
+    <li><b>Imagen:</b> {% if object.imagen %}<img src="{{ object.imagen.url }}" width="200"/>{% endif %}</li>
+    <li><b>URL:</b> {{ object.url }}</li>
+    <li><b>Activo:</b> {{ object.activo }}</li>
+</ul>
+<a href="{% url 'website:banner_update' object.pk %}">Editar</a> |
+<a href="{% url 'website:banner_delete' object.pk %}">Eliminar</a> |
+<a href="{% url 'website:banner_list' %}">Volver al listado</a>
+{% endblock %} 

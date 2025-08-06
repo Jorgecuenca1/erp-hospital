@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Detalle de Documento de Calidad: {{ documento_calidad.nombre }}</h1>
+    <p><strong>Código:</strong> {{ documento_calidad.codigo|default:"N/A" }}</p>
+    <p><strong>Tipo de Documento:</strong> {{ documento_calidad.get_tipo_documento_display }}</p>
+    <p><strong>Versión:</strong> {{ documento_calidad.version }}</p>
+    <p><strong>Fecha de Emisión:</strong> {{ documento_calidad.fecha_emision|date:"Y-m-d" }}</p>
+    <p><strong>Fecha de Revisión:</strong> {{ documento_calidad.fecha_revision|date:"Y-m-d"|default:"N/A" }}</p>
+    <p><strong>Archivo:</strong> <a href="{{ documento_calidad.archivo.url }}" target="_blank">Descargar Documento</a></p>
+    <p><strong>Aprobado Por:</strong> {{ documento_calidad.aprobado_por.username|default:"N/A" }}</p>
+    <p><strong>Activo:</strong> {{ documento_calidad.activo|yesno:"Sí,No" }}</p>
+
+    <a href="{% url 'quality_management:documentocalidad_list' %}">Volver a la lista de documentos</a>
+    <a href="{% url 'quality_management:documentocalidad_edit' documento_calidad.pk %}">Editar Documento</a>
+    <a href="{% url 'quality_management:documentocalidad_delete' documento_calidad.pk %}">Eliminar Documento</a>
+{% endblock %} 

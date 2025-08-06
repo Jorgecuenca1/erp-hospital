@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Lista de Documentos de Calidad</h1>
+    <a href="{% url 'quality_management:documentocalidad_create' %}">Agregar Nuevo Documento de Calidad</a>
+    <ul>
+        {% for documento in documentos_calidad %}
+            <li>
+                <a href="{% url 'quality_management:documentocalidad_detail' documento.pk %}">{{ documento.nombre }}</a>
+                - Código: {{ documento.codigo|default:"N/A" }} - Versión: {{ documento.version }}
+                (<a href="{% url 'quality_management:documentocalidad_edit' documento.pk %}">Editar</a> |
+                <a href="{% url 'quality_management:documentocalidad_delete' documento.pk %}">Eliminar</a>)
+            </li>
+        {% empty %}
+            <li>No hay documentos de calidad registrados.</li>
+        {% endfor %}
+    </ul>
+{% endblock %} 

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Receta{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Receta Médica #{{ receta.pk }}</h3>
+            <div>
+                {% if receta.activa %}
+                    <span class="badge bg-success fs-6">Activa</span>
+                {% else %}
+                    <span class="badge bg-secondary fs-6">Inactiva</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <p><strong>Paciente:</strong> <a href="{% url 'paciente_detail' receta.paciente.pk %}">{{ receta.paciente.nombres }} {{ receta.paciente.apellidos }}</a></p>
+            <p><strong>Prescrita por:</strong> <a href="{% url 'profesional_detail' receta.profesional_prescriptor.pk %}">{{ receta.profesional_prescriptor.nombres }} {{ receta.profesional_prescriptor.apellidos }}</a></p>
+            <p><strong>Fecha de Emisión:</strong> {{ receta.fecha_emision|date:"d M, Y H:i" }}</p>
+            <p><strong>Fecha de Caducidad:</strong> {{ receta.fecha_caducidad|date:"d M, Y"|default:"No especificada" }}</p>
+            <hr>
+            <h5>Instrucciones Generales</h5>
+            <p>{{ receta.instrucciones_generales|default:"Sin instrucciones generales." }}</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{% url 'receta_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+            <div>
+                <a href="{% url 'receta_update' receta.pk %}" class="btn btn-primary">Editar Receta</a>
+                <a href="{% url 'receta_delete' receta.pk %}" class="btn btn-danger">Eliminar Receta</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-header">
+            <h4>Medicamentos en esta Receta</h4>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for detalle in detalles %}
+                <li class="list-group-item">
+                    <strong>{{ detalle.medicamento.producto.nombre }}</strong>
+                    (Dosis: {{ detalle.dosis_indicada }}) - Cantidad: {{ detalle.cantidad|floatformat:2 }} {{ detalle.unidad }}
+                    {% if detalle.observaciones %}<br><small class="text-muted">Obs: {{ detalle.observaciones }}</small>{% endif %}
+                </li>
+                {% empty %}
+                <li class="list-group-item">No hay medicamentos registrados para esta receta.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

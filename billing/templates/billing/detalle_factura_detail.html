@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle de Factura - Facturación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-eye"></i> Detalle de Factura
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'billing:detalle_factura_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                        <a href="{% url 'billing:detalle_factura_edit' detalle.id %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'billing:detalle_factura_delete' detalle.id %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Información del Detalle</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>ID:</th>
+                                    <td>{{ detalle.id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Factura:</th>
+                                    <td>
+                                        <a href="{% url 'billing:factura_detail' detalle.factura.id %}">
+                                            {{ detalle.factura.numero_factura }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Descripción:</th>
+                                    <td>{{ detalle.descripcion }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Cantidad:</th>
+                                    <td>{{ detalle.cantidad }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Precio Unitario:</th>
+                                    <td>${{ detalle.precio_unitario|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Subtotal:</th>
+                                    <td><strong>${{ detalle.subtotal|floatformat:2 }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Información de la Factura</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>Número de Factura:</th>
+                                    <td>{{ detalle.factura.numero_factura }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Paciente:</th>
+                                    <td>{{ detalle.factura.paciente.nombres }} {{ detalle.factura.paciente.apellidos }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Fecha de Emisión:</th>
+                                    <td>{{ detalle.factura.fecha_emision|date:"d/m/Y" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Estado:</th>
+                                    <td>
+                                        <span class="badge badge-{% if detalle.factura.estado == 'PAGADA' %}success{% elif detalle.factura.estado == 'EMITIDA' %}warning{% else %}secondary{% endif %}">
+                                            {{ detalle.factura.get_estado_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Total Factura:</th>
+                                    <td><strong>${{ detalle.factura.total_neto|floatformat:2 }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle del Profesional{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Perfil del Profesional</h3>
+            <div>
+                <a href="{% url 'profesional_update' profesional.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'profesional_delete' profesional.pk %}" class="btn btn-danger">Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <img src="{% static 'img/avatar.png' %}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px;">
+                    <h4>{{ profesional.nombres }} {{ profesional.apellidos }}</h4>
+                    <p class="text-muted">{{ profesional.get_tipo_profesional_display }}</p>
+                </div>
+                <div class="col-md-8">
+                    <h5>Detalles</h5>
+                    <hr>
+                    <p><strong>Especialidad:</strong> {{ profesional.especialidad.nombre|default:"No especificada" }}</p>
+                    <p><strong>Registro Profesional:</strong> {{ profesional.registro_profesional|default:"No especificado" }}</p>
+                    <p><strong>Identificación:</strong> {{ profesional.get_tipo_identificacion_display }} - {{ profesional.numero_identificacion }}</p>
+                    <hr>
+                    <h5>Contacto</h5>
+                    <p><strong>Email:</strong> {{ profesional.email|default:"No especificado" }}</p>
+                    <p><strong>Teléfono:</strong> {{ profesional.telefono|default:"No especificado" }}</p>
+                    <hr>
+                    <p><strong>Estado:</strong> {% if profesional.activo %}Activo{% else %}Inactivo{% endif %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'profesional_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

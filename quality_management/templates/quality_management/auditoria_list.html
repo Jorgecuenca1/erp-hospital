@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Lista de Auditorías</h1>
+    <a href="{% url 'quality_management:auditoria_create' %}">Crear Nueva Auditoría</a>
+    <ul>
+        {% for auditoria in auditorias %}
+            <li>
+                <a href="{% url 'quality_management:auditoria_detail' auditoria.pk %}">{{ auditoria.nombre }}</a>
+                - Tipo: {{ auditoria.get_tipo_auditoria_display }} - Estado: {{ auditoria.get_estado_display }}
+                (<a href="{% url 'quality_management:auditoria_edit' auditoria.pk %}">Editar</a> |
+                <a href="{% url 'quality_management:auditoria_delete' auditoria.pk %}">Eliminar</a>)
+            </li>
+        {% empty %}
+            <li>No hay auditorías registradas.</li>
+        {% endfor %}
+    </ul>
+{% endblock %} 

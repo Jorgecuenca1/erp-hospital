@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Maintenance Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-wrench"></i> Medical Equipment Maintenance</h1>
+                <p class="text-muted">Monitor and manage medical equipment maintenance, repairs, and schedules</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ total_equipment }}</h3>
+                            <p>Total Equipment</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-heartbeat fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ operational_equipment }}</h3>
+                            <p>Operational</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ due_maintenance }}</h3>
+                            <p>Due Maintenance</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ overdue_maintenance }}</h3>
+                            <p>Overdue</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-chart-line"></i> Maintenance Metrics</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="metric">
+                                <h4>${{ total_maintenance_cost|floatformat:0 }}</h4>
+                                <p class="text-muted">Total Maintenance Cost</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric">
+                                <h4>{{ avg_downtime|floatformat:1 }}h</h4>
+                                <p class="text-muted">Average Downtime</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-bell"></i> Critical Alerts</h5>
+                    <div class="alert-list">
+                        {% for alert in alerts %}
+                        <div class="alert alert-{% if alert.priority == 'critical' %}danger{% elif alert.priority == 'high' %}warning{% else %}info{% endif %} alert-sm">
+                            <strong>{{ alert.equipment.name }}</strong>: {{ alert.message }}
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">No active alerts</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Equipment Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="equipmentStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Maintenance by Type</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="maintenanceTypeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Maintenance -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-history"></i> Recent Maintenance Activities</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Equipment</th>
+                                    <th>Type</th>
+                                    <th>Technician</th>
+                                    <th>Cost</th>
+                                    <th>Downtime</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in recent_maintenance %}
+                                <tr>
+                                    <td>{{ record.maintenance_date|date:"M d, Y" }}</td>
+                                    <td>{{ record.equipment.name }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ record.maintenance_type }}</span>
+                                    </td>
+                                    <td>{{ record.technician.get_full_name|default:record.technician.username|default:"N/A" }}</td>
+                                    <td>${{ record.cost|default:"0"|floatformat:2 }}</td>
+                                    <td>{{ record.downtime_hours }}h</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No recent maintenance records</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <a href="{% url 'maintenance:equipment_list' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-heartbeat"></i> Equipment
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'maintenance:schedule' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-calendar"></i> Schedule
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'maintenance:records' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-clipboard"></i> Records
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{% url 'maintenance:alerts' %}" class="btn btn-danger btn-block">
+                                <i class="fas fa-bell"></i> Alerts
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="#" class="btn btn-success btn-block">
+                                <i class="fas fa-plus"></i> New Schedule
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="#" class="btn btn-secondary btn-block">
+                                <i class="fas fa-chart-line"></i> Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Equipment Status Chart
+const equipmentStatusCtx = document.getElementById('equipmentStatusChart').getContext('2d');
+new Chart(equipmentStatusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Operational', 'Maintenance', 'Repair', 'Out of Service'],
+        datasets: [{
+            data: [{{ operational_equipment }}, {{ maintenance_equipment }}, {{ repair_equipment }}, 0],
+            backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+// Maintenance Type Chart
+const maintenanceTypeCtx = document.getElementById('maintenanceTypeChart').getContext('2d');
+new Chart(maintenanceTypeCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Preventive', 'Corrective', 'Calibration', 'Inspection', 'Cleaning'],
+        datasets: [{
+            label: 'Maintenance Activities',
+            data: [15, 8, 12, 6, 4],
+            backgroundColor: '#36A2EB'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

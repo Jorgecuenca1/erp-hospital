@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        Editar Medicamento
+    {% else %}
+        Añadir Nuevo Medicamento
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3>
+                {% if form.instance.pk %}
+                    Editar Medicamento
+                {% else %}
+                    Añadir Nuevo Medicamento
+                {% endif %}
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-success">Guardar Medicamento</button>
+                    <a href="{% if form.instance.pk %}{% url 'medicamento_detail' form.instance.pk %}{% else %}{% url 'medicamento_list' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

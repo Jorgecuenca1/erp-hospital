@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Cotizacion Detail: #{{ cotizacion.pk }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Client:</strong> {{ cotizacion.client.full_name|default:"N/A" }}</p>
+            <p><strong>Date Quoted:</strong> {{ cotizacion.date_quoted }}</p>
+            <p><strong>Valid Until:</strong> {{ cotizacion.valid_until }}</p>
+            <p><strong>Status:</strong> {{ cotizacion.status }}</p>
+            <p><strong>Total Amount:</strong> {{ cotizacion.total_amount }}</p>
+            <p><strong>Created By:</strong> {{ cotizacion.created_by.username|default:"N/A" }}</p>
+            <p><strong>Last Updated:</strong> {{ cotizacion.updated_at }}</p>
+            <a href="{% url 'sales:cotizacion_list' %}" class="btn btn-secondary">Back to List</a>
+            <a href="{% url 'sales:cotizacion_update' cotizacion.pk %}" class="btn btn-info">Edit Cotizacion</a>
+            <a href="{% url 'sales:cotizacion_delete' cotizacion.pk %}" class="btn btn-danger">Delete Cotizacion</a>
+
+            <h3 class="mt-4">Lineas de Cotizacion</h3>
+            {% if cotizacion.lines.all %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in cotizacion.lines.all %}
+                        <tr>
+                            <td>{{ line.product.name|default:"N/A" }}</td>
+                            <td>{{ line.quantity }}</td>
+                            <td>{{ line.price }}</td>
+                            <td>{{ line.subtotal }}</td>
+                            <td>
+                                <a href="{% url 'sales:lineacotizacion_update' line.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'sales:lineacotizacion_delete' line.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No lines for this cotizacion.</p>
+            {% endif %}
+            <a href="{% url 'sales:lineacotizacion_create' cotizacion.pk %}" class="btn btn-success">Add New Linea Cotizacion</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,9 @@
+{% extends 'website/base.html' %}
+{% block website_content %}
+<h2>Eliminar Sección</h2>
+<p>¿Está seguro que desea eliminar la sección "{{ object.titulo }}"?</p>
+<form method="post">{% csrf_token %}
+    <button type="submit">Confirmar</button>
+</form>
+<a href="{% url 'website:seccion_list' %}">Cancelar</a>
+{% endblock %} 

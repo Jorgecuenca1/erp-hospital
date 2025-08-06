@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Detalle{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-eye text-info"></i>
+                        Detalle del Registro Ginecológico
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'gynec:patient_update' 1 %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'gynec:patient_list' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Información del Paciente -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user text-primary"></i> Información del Paciente</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Nombre:</strong></td>
+                                    <td>María González</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Edad:</strong></td>
+                                    <td>28 años</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ID:</strong></td>
+                                    <td>G001</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Estado:</strong></td>
+                                    <td><span class="badge badge-success">Activa</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-calendar text-success"></i> Historia Menstrual</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Menarquia:</strong></td>
+                                    <td>13 años</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ciclo:</strong></td>
+                                    <td>Regular (28 días)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Última menstruación:</strong></td>
+                                    <td>15/07/2024</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Duración del flujo:</strong></td>
+                                    <td>5 días</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Historia Obstétrica -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5><i class="fas fa-baby text-pink"></i> Historia Obstétrica</h5>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-primary"><i class="fas fa-baby"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Gravidez</span>
+                                            <span class="info-box-number">2</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-success"><i class="fas fa-child"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Para</span>
+                                            <span class="info-box-number">1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-warning"><i class="fas fa-calendar-check"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">A término</span>
+                                            <span class="info-box-number">1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-danger"><i class="fas fa-times"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Abortos</span>
+                                            <span class="info-box-number">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Anticoncepción -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-pills text-purple"></i> Anticoncepción</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Método actual:</strong></td>
+                                    <td>Píldora oral</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Duración:</strong></td>
+                                    <td>2 años</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Última consulta:</strong></td>
+                                    <td>01/06/2024</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Próxima cita:</strong></td>
+                                    <td>01/09/2024</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-microscope text-info"></i> Exámenes de Screening</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Última citología:</strong></td>
+                                    <td>15/06/2024</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Resultado:</strong></td>
+                                    <td><span class="badge badge-success">Normal</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Última mamografía:</strong></td>
+                                    <td>10/05/2024</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Resultado:</strong></td>
+                                    <td><span class="badge badge-success">Normal</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Embarazos -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5><i class="fas fa-baby text-pink"></i> Historial de Embarazos</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Número</th>
+                                            <th>FUM</th>
+                                            <th>FPP</th>
+                                            <th>Estado</th>
+                                            <th>Tipo de Parto</th>
+                                            <th>Peso</th>
+                                            <th>Complicaciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>10/03/2022</td>
+                                            <td>16/12/2022</td>
+                                            <td><span class="badge badge-success">Entregado</span></td>
+                                            <td>Parto vaginal normal</td>
+                                            <td>3200g</td>
+                                            <td>Ninguna</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>15/07/2024</td>
+                                            <td>20/04/2025</td>
+                                            <td><span class="badge badge-warning">En curso</span></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Visitas Prenatales -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5><i class="fas fa-calendar-check text-success"></i> Visitas Prenatales (Embarazo Actual)</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Edad Gestacional</th>
+                                            <th>Peso</th>
+                                            <th>Presión</th>
+                                            <th>Altura Uterina</th>
+                                            <th>FCF</th>
+                                            <th>Próxima Cita</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>18/07/2024</td>
+                                            <td>12 semanas</td>
+                                            <td>58 kg</td>
+                                            <td>120/80</td>
+                                            <td>12 cm</td>
+                                            <td>160 lpm</td>
+                                            <td>15/08/2024</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Procedimientos -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5><i class="fas fa-procedures text-info"></i> Procedimientos Ginecológicos</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Procedimiento</th>
+                                            <th>Médico</th>
+                                            <th>Indicación</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>20/07/2024</td>
+                                            <td>Colposcopia</td>
+                                            <td>Dr. García</td>
+                                            <td>Citología anormal</td>
+                                            <td><span class="badge badge-info">Programado</span></td>
+                                            <td>
+                                                <a href="#" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Notas y Comentarios -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5><i class="fas fa-sticky-note text-warning"></i> Notas y Comentarios</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p><strong>Historia quirúrgica:</strong> Ninguna cirugía previa.</p>
+                                    <p><strong>Historia familiar:</strong> Madre con cáncer de mama a los 45 años.</p>
+                                    <p><strong>Observaciones:</strong> Paciente saludable, sin factores de riesgo significativos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Animaciones para las info-boxes
+    $('.info-box').hover(
+        function() {
+            $(this).addClass('shadow-lg');
+        },
+        function() {
+            $(this).removeClass('shadow-lg');
+        }
+    );
+
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %} 

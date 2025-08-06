@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Baja de Activo</h3>
+            <div>
+                <a href="{% url 'asset_management:bajaactivo_edit' baja_activo.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'asset_management:bajaactivo_delete' baja_activo.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ baja_activo.activo.nombre }}</h4>
+            <p class="card-text"><strong>Fecha de Baja:</strong> {{ baja_activo.fecha_baja|date:"Y-m-d" }}</p>
+            <p class="card-text"><strong>Razón de Baja:</strong> {{ baja_activo.razon_baja|linebreaksbr }}</p>
+            <p class="card-text"><strong>Valor Residual:</strong> {{ baja_activo.valor_residual|default:"N/A" }}</p>
+            <p class="card-text"><strong>Aprobado Por:</strong> {{ baja_activo.aprobado_por.username|default:"N/A" }}</p>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'asset_management:bajaactivo_list' %}" class="btn btn-secondary btn-sm">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

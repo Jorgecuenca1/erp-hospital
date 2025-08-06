@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Especialidad{% endblock %}
+
+{% block content %}
+    <h1>Eliminar Especialidad</h1>
+    <p>¿Estás seguro de que deseas eliminar la especialidad "{{ especialidad.nombre }}"?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Sí, eliminar</button>
+        <a href="{% url 'especialidad_detail' especialidad.pk %}">Cancelar</a>
+    </form>
+{% endblock %} 

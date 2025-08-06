@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Detalle de Factura - Facturación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title text-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">¿Está seguro de que desea eliminar este detalle de factura?</p>
+                    
+                    <div class="alert alert-warning">
+                        <h5>Detalles del registro a eliminar:</h5>
+                        <ul>
+                            <li><strong>ID:</strong> {{ object.id }}</li>
+                            <li><strong>Factura:</strong> {{ object.factura.numero_factura }}</li>
+                            <li><strong>Descripción:</strong> {{ object.descripcion }}</li>
+                            <li><strong>Cantidad:</strong> {{ object.cantidad }}</li>
+                            <li><strong>Precio Unitario:</strong> ${{ object.precio_unitario|floatformat:2 }}</li>
+                            <li><strong>Subtotal:</strong> ${{ object.subtotal|floatformat:2 }}</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="text-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                    </p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Sí, Eliminar
+                        </button>
+                        <a href="{% url 'billing:detalle_factura_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

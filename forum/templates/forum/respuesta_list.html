@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Respuestas del Foro{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Respuestas del Foro</h1>
+
+    <ul class="list-group">
+        {% for respuesta in respuestas %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <p class="mb-1"><strong>Pregunta:</strong> <a href="{% url 'pregunta_detail' respuesta.pregunta.pk %}">{{ respuesta.pregunta.titulo }}</a></p>
+                <p class="mb-1"><strong>Autor:</strong> {{ respuesta.autor.username }}</p>
+                <p class="mb-1"><strong>Fecha:</strong> {{ respuesta.fecha_creacion|date:"d M Y H:i" }}</p>
+                <p class="mb-0"><strong>Contenido:</strong> {{ respuesta.contenido|truncatechars:100 }}</p>
+            </div>
+            <div>
+                <a href="{% url 'respuesta_detail' respuesta.pk %}" class="btn btn-sm btn-info">Ver</a>
+                <a href="{% url 'respuesta_update' respuesta.pk %}" class="btn btn-sm btn-primary">Editar</a>
+                <a href="{% url 'respuesta_delete' respuesta.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </div>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No hay respuestas disponibles.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

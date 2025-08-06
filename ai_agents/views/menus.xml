@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_ai_agents_main" name="AI Agents" web_icon="ai_agents,static/description/icon.png" sequence="100"/>
+
+    <!-- Agents Menu -->
+    <menuitem id="menu_ai_agents" name="Agents" parent="menu_ai_agents_main" action="action_ai_agent" sequence="10"/>
+
+    <!-- Conversations Menu -->
+    <menuitem id="menu_ai_conversations" name="Conversations" parent="menu_ai_agents_main" action="action_ai_conversation" sequence="20"/>
+
+    <!-- Knowledge Base Menu -->
+    <menuitem id="menu_ai_knowledge_base" name="Knowledge Base" parent="menu_ai_agents_main" action="action_ai_knowledge_base" sequence="30"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_ai_configuration" name="Configuration" parent="menu_ai_agents_main" sequence="100"/>
+</odoo> 

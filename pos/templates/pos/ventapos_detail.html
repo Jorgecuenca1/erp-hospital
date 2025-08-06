@@ -1,0 +1,17 @@
+{% extends 'pos/base.html' %}
+{% block pos_content %}
+<h2>Detalle de Venta POS</h2>
+<ul>
+    <li><b>Sesión:</b> {{ object.sesion }}</li>
+    <li><b>Fecha:</b> {{ object.fecha }}</li>
+    <li><b>Tercero:</b> {{ object.tercero }}</li>
+    <li><b>Total:</b> {{ object.total }}</li>
+    <li><b>Método Pago:</b> {{ object.metodo_pago }}</li>
+    <li><b>Factura:</b> {{ object.factura }}</li>
+    <li><b>Diario:</b> {{ object.diario }}</li>
+    <li><b>Referencia:</b> {{ object.referencia }}</li>
+</ul>
+<a href="{% url 'pos:ventapos_update' object.pk %}">Editar</a> |
+<a href="{% url 'pos:ventapos_delete' object.pk %}">Eliminar</a> |
+<a href="{% url 'pos:ventapos_list' %}">Volver al listado</a>
+{% endblock %} 

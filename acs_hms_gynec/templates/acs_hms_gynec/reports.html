@@ -1,0 +1,510 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Reportes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-bar text-info"></i>
+                        Reportes y Estadísticas - Ginecología
+                    </h3>
+                    <div class="card-tools">
+                        <button class="btn btn-success btn-sm" onclick="exportReport()">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="printReport()">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros de Reporte -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Período</label>
+                            <select class="form-control" id="periodFilter">
+                                <option value="month">Este mes</option>
+                                <option value="quarter">Este trimestre</option>
+                                <option value="year" selected>Este año</option>
+                                <option value="custom">Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Desde</label>
+                            <input type="date" class="form-control" id="startDate" value="2024-01-01">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Hasta</label>
+                            <input type="date" class="form-control" id="endDate" value="2024-12-31">
+                        </div>
+                        <div class="col-md-3">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary btn-block" onclick="generateReport()">
+                                <i class="fas fa-search"></i> Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Estadísticas -->
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>1,250</h3>
+                                    <p>Pacientes Activas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>85</h3>
+                                    <p>Embarazos Activos</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-baby"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>320</h3>
+                                    <p>Visitas Prenatales</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-danger">
+                                <div class="inner">
+                                    <h3>45</h3>
+                                    <p>Procedimientos</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-procedures"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-chart-pie"></i>
+                                        Distribución por Edad
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="ageChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        Embarazos por Mes
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="pregnancyChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tablas de Reportes -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-table"></i>
+                                        Métodos Anticonceptivos
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Método</th>
+                                                    <th>Pacientes</th>
+                                                    <th>Porcentaje</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Píldora oral</td>
+                                                    <td>450</td>
+                                                    <td>36%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>DIU</td>
+                                                    <td>280</td>
+                                                    <td>22%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Condón</td>
+                                                    <td>200</td>
+                                                    <td>16%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Inyección</td>
+                                                    <td>150</td>
+                                                    <td>12%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Implante</td>
+                                                    <td>100</td>
+                                                    <td>8%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Otros</td>
+                                                    <td>70</td>
+                                                    <td>6%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-table"></i>
+                                        Procedimientos Realizados
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Procedimiento</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Porcentaje</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Colposcopia</td>
+                                                    <td>15</td>
+                                                    <td>33%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Histeroscopia</td>
+                                                    <td>8</td>
+                                                    <td>18%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Laparoscopia</td>
+                                                    <td>6</td>
+                                                    <td>13%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Dilatación y curetaje</td>
+                                                    <td>5</td>
+                                                    <td>11%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Biopsia endometrial</td>
+                                                    <td>4</td>
+                                                    <td>9%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Otros</td>
+                                                    <td>7</td>
+                                                    <td>16%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reporte Detallado -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-list"></i>
+                                        Reporte Detallado de Actividad
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Actividad</th>
+                                                    <th>Pacientes</th>
+                                                    <th>Médico</th>
+                                                    <th>Estado</th>
+                                                    <th>Notas</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>20/07/2024</td>
+                                                    <td>Visita prenatal</td>
+                                                    <td>Ana Rodríguez</td>
+                                                    <td>Dr. García</td>
+                                                    <td><span class="badge badge-success">Completada</span></td>
+                                                    <td>Embarazo de 12 semanas, todo normal</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>19/07/2024</td>
+                                                    <td>Consulta anticoncepción</td>
+                                                    <td>María González</td>
+                                                    <td>Dra. Martínez</td>
+                                                    <td><span class="badge badge-success">Completada</span></td>
+                                                    <td>Renovación de píldora anticonceptiva</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>18/07/2024</td>
+                                                    <td>Colposcopia</td>
+                                                    <td>Carmen López</td>
+                                                    <td>Dr. García</td>
+                                                    <td><span class="badge badge-info">Programada</span></td>
+                                                    <td>Citología anormal, requiere evaluación</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>17/07/2024</td>
+                                                    <td>Evaluación menopausia</td>
+                                                    <td>Rosa Fernández</td>
+                                                    <td>Dra. Martínez</td>
+                                                    <td><span class="badge badge-success">Completada</span></td>
+                                                    <td>Inicio de terapia hormonal</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>16/07/2024</td>
+                                                    <td>Primera consulta prenatal</td>
+                                                    <td>Laura Sánchez</td>
+                                                    <td>Dr. García</td>
+                                                    <td><span class="badge badge-success">Completada</span></td>
+                                                    <td>Embarazo de 8 semanas, primer control</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Indicadores de Calidad -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-award"></i>
+                                        Indicadores de Calidad
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="info-box">
+                                                <span class="info-box-icon bg-success"><i class="fas fa-check"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Cobertura de citologías</span>
+                                                    <span class="info-box-number">95%</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 95%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="info-box">
+                                                <span class="info-box-icon bg-info"><i class="fas fa-baby"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Control prenatal</span>
+                                                    <span class="info-box-number">88%</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 88%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="info-box">
+                                                <span class="info-box-icon bg-warning"><i class="fas fa-clock"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Tiempo de espera</span>
+                                                    <span class="info-box-number">15 min</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 75%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="info-box">
+                                                <span class="info-box-icon bg-primary"><i class="fas fa-smile"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Satisfacción</span>
+                                                    <span class="info-box-number">92%</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 92%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(document).ready(function() {
+    // Gráfico de distribución por edad
+    var ageCtx = document.getElementById('ageChart').getContext('2d');
+    var ageChart = new Chart(ageCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['15-25 años', '26-35 años', '36-45 años', '46-55 años', '55+ años'],
+            datasets: [{
+                data: [300, 450, 280, 150, 70],
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Gráfico de embarazos por mes
+    var pregnancyCtx = document.getElementById('pregnancyChart').getContext('2d');
+    var pregnancyChart = new Chart(pregnancyCtx, {
+        type: 'line',
+        data: {
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            datasets: [{
+                label: 'Embarazos',
+                data: [12, 15, 18, 22, 25, 28, 30, 27, 24, 20, 18, 15],
+                borderColor: '#36A2EB',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Filtros de período
+    $('#periodFilter').change(function() {
+        var period = $(this).val();
+        var today = new Date();
+        var startDate = new Date();
+        var endDate = new Date();
+
+        switch(period) {
+            case 'month':
+                startDate.setMonth(today.getMonth());
+                startDate.setDate(1);
+                break;
+            case 'quarter':
+                var quarter = Math.floor(today.getMonth() / 3);
+                startDate.setMonth(quarter * 3);
+                startDate.setDate(1);
+                break;
+            case 'year':
+                startDate.setFullYear(today.getFullYear());
+                startDate.setMonth(0);
+                startDate.setDate(1);
+                break;
+        }
+
+        $('#startDate').val(startDate.toISOString().split('T')[0]);
+        $('#endDate').val(endDate.toISOString().split('T')[0]);
+    });
+});
+
+function generateReport() {
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
+    
+    if (!startDate || !endDate) {
+        alert('Por favor seleccione las fechas de inicio y fin.');
+        return;
+    }
+    
+    if (startDate > endDate) {
+        alert('La fecha de inicio no puede ser mayor que la fecha de fin.');
+        return;
+    }
+    
+    // Aquí se implementaría la lógica para generar el reporte
+    console.log('Generando reporte desde', startDate, 'hasta', endDate);
+    alert('Reporte generado exitosamente.');
+}
+
+function exportReport() {
+    // Aquí se implementaría la lógica de exportación
+    alert('Función de exportación en desarrollo.');
+}
+
+function printReport() {
+    window.print();
+}
+</script>
+{% endblock %} 

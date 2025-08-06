@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Customer Detail: {{ customer.name }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Email:</strong> {{ customer.email }}</p>
+            <p><strong>Phone:</strong> {{ customer.phone }}</p>
+            <p><strong>Address:</strong> {{ customer.address }}</p>
+            <p><strong>Created At:</strong> {{ customer.created_at }}</p>
+            <p><strong>Updated At:</strong> {{ customer.updated_at }}</p>
+            <a href="{% url 'crm:customer_list' %}" class="btn btn-secondary">Back to List</a>
+            <a href="{% url 'crm:customer_update' customer.pk %}" class="btn btn-info">Edit Customer</a>
+            <a href="{% url 'crm:customer_delete' customer.pk %}" class="btn btn-danger">Delete Customer</a>
+
+            <h3 class="mt-4">Contacts</h3>
+            {% if customer.contacts.all %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Position</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in customer.contacts.all %}
+                        <tr>
+                            <td>{{ contact.name }}</td>
+                            <td>{{ contact.email }}</td>
+                            <td>{{ contact.phone }}</td>
+                            <td>{{ contact.position }}</td>
+                            <td>
+                                <a href="{% url 'crm:contact_update' contact.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'crm:contact_delete' contact.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No contacts for this customer.</p>
+            {% endif %}
+            <a href="{% url 'crm:contact_create' %}?customer={{ customer.pk }}" class="btn btn-success">Add New Contact</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

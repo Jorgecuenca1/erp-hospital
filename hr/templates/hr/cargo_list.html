@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Cargos</h3>
+            <a href="{% url 'cargo_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Cargo
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar cargos...">
+            </div>
+            <div class="list-group">
+                {% for cargo in object_list %}
+                <a href="{% url 'cargo_detail' cargo.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ cargo.nombre }}</h5>
+                        <small class="text-muted">Salario Base: {{ cargo.salario_base }}</small>
+                    </div>
+                    <p class="mb-1">{{ cargo.descripcion|default:"Sin descripción" }}</p>
+                </a>
+                {% empty %}
+                <p class="text-center">No hay cargos registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.list-group-item');
+
+        items.forEach(item => {
+            let text = item.textContent || item.innerText;
+            if (text.toLowerCase().indexOf(filter) > -1) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Facturas Vencidas - Facturación{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title text-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Facturas Vencidas
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'billing:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if facturas %}
+                        <div class="alert alert-danger">
+                            <h5><i class="fas fa-exclamation-circle"></i> Atención</h5>
+                            <p>Se encontraron <strong>{{ facturas.count }}</strong> facturas vencidas que requieren atención inmediata.</p>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Número Factura</th>
+                                        <th>Paciente</th>
+                                        <th>Fecha Emisión</th>
+                                        <th>Fecha Vencimiento</th>
+                                        <th>Días Vencida</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for factura in facturas %}
+                                    <tr class="{% if factura.dias_vencida > 30 %}table-danger{% elif factura.dias_vencida > 15 %}table-warning{% endif %}">
+                                        <td>
+                                            <strong>{{ factura.numero_factura }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ factura.paciente.nombres }} {{ factura.paciente.apellidos }}
+                                            <br>
+                                            <small class="text-muted">{{ factura.paciente.identificacion }}</small>
+                                        </td>
+                                        <td>{{ factura.fecha_emision|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <span class="text-danger">
+                                                {{ factura.fecha_vencimiento|date:"d/m/Y" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-{% if factura.dias_vencida > 30 %}danger{% elif factura.dias_vencida > 15 %}warning{% else %}info{% endif %}">
+                                                {{ factura.dias_vencida }} días
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <strong>${{ factura.total_neto|floatformat:2 }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-warning">
+                                                {{ factura.get_estado_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'billing:factura_detail' factura.id %}" class="btn btn-sm btn-info" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'billing:factura_edit' factura.id %}" class="btn btn-sm btn-warning" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-success" title="Marcar como pagada" onclick="marcarComoPagada({{ factura.id }})">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-primary" title="Enviar recordatorio" onclick="enviarRecordatorio({{ factura.id }})">
+                                                    <i class="fas fa-envelope"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {% if is_paginated %}
+                        <nav aria-label="Paginación">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">&laquo; Primera</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body">
+                                        <h5>Total Vencido</h5>
+                                        <h3>${{ total_vencido|floatformat:2 }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body">
+                                        <h5>Facturas Vencidas</h5>
+                                        <h3>{{ facturas.count }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <h5>Promedio Días</h5>
+                                        <h3>{{ promedio_dias|floatformat:0 }} días</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle"></i> ¡Excelente!</h5>
+                            <p>No hay facturas vencidas en el sistema.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function marcarComoPagada(facturaId) {
+    if (confirm('¿Está seguro de que desea marcar esta factura como pagada?')) {
+        // Aquí iría la lógica para marcar como pagada
+        alert('Función de marcar como pagada en desarrollo');
+    }
+}
+
+function enviarRecordatorio(facturaId) {
+    if (confirm('¿Desea enviar un recordatorio de pago al paciente?')) {
+        // Aquí iría la lógica para enviar recordatorio
+        alert('Función de envío de recordatorio en desarrollo');
+    }
+}
+</script>
+{% endblock %} 

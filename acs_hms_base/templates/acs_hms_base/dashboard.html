@@ -1,0 +1,582 @@
+{% extends 'base_hms.html' %}
+
+{% block title %}HMS Base - HMetaHIS{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Inicio</a></li>
+<li class="breadcrumb-item active">HMS Base</li>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link active" href="/hms/">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Especialidades Médicas</span>
+    </h6>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/gynecology/">
+        <i class="fas fa-female me-2"></i>Ginecología
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/ophthalmology/">
+        <i class="fas fa-eye me-2"></i>Oftalmología
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/pediatrics/">
+        <i class="fas fa-baby me-2"></i>Pediatría
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/aesthetic/">
+        <i class="fas fa-spa me-2"></i>Estética
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/dental/">
+        <i class="fas fa-tooth me-2"></i>Dental
+    </a>
+</li>
+<li class="nav-item">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Cirugía y Operaciones</span>
+    </h6>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/surgery/">
+        <i class="fas fa-procedures me-2"></i>Cirugía
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/operation-theater/">
+        <i class="fas fa-bed me-2"></i>Quirófanos
+    </a>
+</li>
+<li class="nav-item">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Diagnósticos</span>
+    </h6>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/laboratory/">
+        <i class="fas fa-flask me-2"></i>Laboratorio
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/radiology/">
+        <i class="fas fa-x-ray me-2"></i>Radiología
+    </a>
+</li>
+<li class="nav-item">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Emergencias</span>
+    </h6>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/emergency/">
+        <i class="fas fa-ambulance me-2"></i>Emergencias
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/nursing/">
+        <i class="fas fa-user-nurse me-2"></i>Enfermería
+    </a>
+</li>
+<li class="nav-item">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Servicios al Paciente</span>
+    </h6>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/blood-bank/">
+        <i class="fas fa-tint me-2"></i>Banco de Sangre
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/hospitalization/">
+        <i class="fas fa-procedures me-2"></i>Hospitalización
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/patient-portal/">
+        <i class="fas fa-user me-2"></i>Portal Paciente
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/pharmacy/">
+        <i class="fas fa-pills me-2"></i>Farmacia
+    </a>
+</li>
+<li class="nav-item">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Salud Digital</span>
+    </h6>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/online-appointment/">
+        <i class="fas fa-calendar-check me-2"></i>Citas Online
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/webcam/">
+        <i class="fas fa-video me-2"></i>Webcam
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/video-call/">
+        <i class="fas fa-phone me-2"></i>Video Call
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/consent-form/">
+        <i class="fas fa-file-signature me-2"></i>Consentimientos
+    </a>
+</li>
+<li class="nav-item">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Administración</span>
+    </h6>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/subscription/">
+        <i class="fas fa-credit-card me-2"></i>Suscripciones
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/insurance/">
+        <i class="fas fa-shield-alt me-2"></i>Seguros
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/commission/">
+        <i class="fas fa-percentage me-2"></i>Comisiones
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/certification/">
+        <i class="fas fa-certificate me-2"></i>Certificaciones
+    </a>
+</li>
+<li class="nav-item">
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Experiencia del Usuario</span>
+    </h6>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/hms/waiting-screen/">
+        <i class="fas fa-tv me-2"></i>Pantalla Espera
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-hospital me-2"></i>
+        HMS Base - Sistema Hospitalario
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-download me-1"></i>Exportar
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-print me-1"></i>Imprimir
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Generales -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Pacientes Activos</div>
+                    <div class="h5 mb-0 font-weight-bold">1,250</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-users fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Citas Hoy</div>
+                    <div class="h5 mb-0 font-weight-bold">89</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-calendar-check fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Ingresos</div>
+                    <div class="h5 mb-0 font-weight-bold">45</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-procedures fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-uppercase mb-1">Emergencias</div>
+                    <div class="h5 mb-0 font-weight-bold">12</div>
+                </div>
+                <div class="col-auto">
+                    <i class="fas fa-ambulance fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Módulos HMS -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-th-large me-2"></i>
+                    Módulos HMS Disponibles
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="module-grid">
+                    <!-- Especialidades Médicas -->
+                    <a href="/hms/gynecology/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-female"></i>
+                        </div>
+                        <h5>Ginecología</h5>
+                        <p class="text-muted">Ginecología y obstetricia especializada</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/ophthalmology/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h5>Oftalmología</h5>
+                        <p class="text-muted">Cuidado especializado de la vista</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/pediatrics/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-baby"></i>
+                        </div>
+                        <h5>Pediatría</h5>
+                        <p class="text-muted">Cuidado pediátrico integral</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/aesthetic/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <h5>Estética</h5>
+                        <p class="text-muted">Medicina estética y cosmética</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/dental/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-tooth"></i>
+                        </div>
+                        <h5>Dental</h5>
+                        <p class="text-muted">Odontología y salud bucal</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <!-- Cirugía y Operaciones -->
+                    <a href="/hms/surgery/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-procedures"></i>
+                        </div>
+                        <h5>Cirugía</h5>
+                        <p class="text-muted">Cirugía general y especializada</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/operation-theater/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <h5>Quirófanos</h5>
+                        <p class="text-muted">Gestión de quirófanos y equipos</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <!-- Diagnósticos -->
+                    <a href="/hms/laboratory/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h5>Laboratorio</h5>
+                        <p class="text-muted">Laboratorio clínico y análisis</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/radiology/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-x-ray"></i>
+                        </div>
+                        <h5>Radiología</h5>
+                        <p class="text-muted">Radiología e imágenes diagnósticas</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <!-- Emergencias -->
+                    <a href="/hms/emergency/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-ambulance"></i>
+                        </div>
+                        <h5>Emergencias</h5>
+                        <p class="text-muted">Servicios de emergencia 24/7</p>
+                        <span class="badge bg-danger">Crítico</span>
+                    </a>
+                    
+                    <a href="/hms/nursing/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-user-nurse"></i>
+                        </div>
+                        <h5>Enfermería</h5>
+                        <p class="text-muted">Gestión de enfermería y cuidados</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <!-- Servicios al Paciente -->
+                    <a href="/hms/blood-bank/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <h5>Banco de Sangre</h5>
+                        <p class="text-muted">Banco de sangre y transfusiones</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/hospitalization/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-procedures"></i>
+                        </div>
+                        <h5>Hospitalización</h5>
+                        <p class="text-muted">Gestión de hospitalización</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/patient-portal/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h5>Portal Paciente</h5>
+                        <p class="text-muted">Portal del paciente</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/pharmacy/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <h5>Farmacia</h5>
+                        <p class="text-muted">Farmacia hospitalaria</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <!-- Salud Digital -->
+                    <a href="/hms/online-appointment/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h5>Citas Online</h5>
+                        <p class="text-muted">Citas en línea</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/webcam/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h5>Webcam</h5>
+                        <p class="text-muted">Gestión de webcam</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/video-call/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h5>Video Call</h5>
+                        <p class="text-muted">Videollamadas médicas</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/consent-form/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+                        <h5>Consentimientos</h5>
+                        <p class="text-muted">Consentimientos digitales</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <!-- Administración -->
+                    <a href="/hms/subscription/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h5>Suscripciones</h5>
+                        <p class="text-muted">Gestión de suscripciones</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/insurance/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>Seguros</h5>
+                        <p class="text-muted">Seguros médicos</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/commission/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <h5>Comisiones</h5>
+                        <p class="text-muted">Comisiones médicas</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <a href="/hms/certification/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <h5>Certificaciones</h5>
+                        <p class="text-muted">Certificaciones médicas</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                    
+                    <!-- Experiencia del Usuario -->
+                    <a href="/hms/waiting-screen/" class="module-card">
+                        <div class="module-icon">
+                            <i class="fas fa-tv"></i>
+                        </div>
+                        <h5>Pantalla Espera</h5>
+                        <p class="text-muted">Pantallas de espera</p>
+                        <span class="badge bg-success">Activo</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actividad Reciente -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Actividad Reciente
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Nueva cita registrada</h6>
+                            <small class="text-muted">Dr. García - Cardiología</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">Hace 5 min</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Paciente dado de alta</h6>
+                            <small class="text-muted">María López - Habitación 302</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">Hace 15 min</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Emergencia ingresada</h6>
+                            <small class="text-muted">Trauma - Sala de Emergencias</small>
+                        </div>
+                        <span class="badge bg-danger rounded-pill">Hace 30 min</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Estadísticas del Día
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfico de estadísticas
+const ctx = document.getElementById('statsChart').getContext('2d');
+const statsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
+        datasets: [{
+            label: 'Pacientes',
+            data: [12, 19, 25, 32, 28, 35, 42],
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

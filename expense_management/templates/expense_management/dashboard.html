@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Expense Management Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-receipt"></i> Advanced Expense Management</h1>
+                <p class="text-muted">Manage employee expenses, reports, policies, and approval workflows</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ total_reports }}</h3>
+                            <p>Total Reports</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-file-invoice fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ pending_approvals }}</h3>
+                            <p>Pending Approvals</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ approved_reports }}</h3>
+                            <p>Approved Reports</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>${{ total_expenses|floatformat:0 }}</h3>
+                            <p>Total Expenses</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Expenses by Category</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="expenseCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5><i class="fas fa-chart-line"></i> Expense Metrics</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="metric">
+                                <h4>${{ avg_report_amount|floatformat:0 }}</h4>
+                                <p class="text-muted">Average Report Amount</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric">
+                                <h4>{{ pending_approvals }}</h4>
+                                <p class="text-muted">Pending Reviews</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reports -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-history"></i> Recent Expense Reports</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Report #</th>
+                                    <th>Employee</th>
+                                    <th>Title</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Submit Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in recent_reports %}
+                                <tr>
+                                    <td><strong>{{ report.report_number }}</strong></td>
+                                    <td>{{ report.employee.get_full_name|default:report.employee.username }}</td>
+                                    <td>{{ report.title }}</td>
+                                    <td>${{ report.total_amount|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if report.status == 'approved' %}badge-success
+                                            {% elif report.status == 'submitted' %}badge-warning
+                                            {% elif report.status == 'rejected' %}badge-danger
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ report.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ report.submit_date|date:"M d, Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No recent reports found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'expense_management:reports' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-file-invoice"></i> View Reports
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'expense_management:categories' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-tags"></i> Categories
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'expense_management:policies' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-clipboard-list"></i> Policies
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-success btn-block">
+                                <i class="fas fa-plus"></i> New Report
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Expense Category Chart
+const expenseCategoryCtx = document.getElementById('expenseCategoryChart').getContext('2d');
+new Chart(expenseCategoryCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Travel', 'Meals', 'Supplies', 'Equipment', 'Training'],
+        datasets: [{
+            data: [30, 25, 20, 15, 10],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+{% endblock %} 

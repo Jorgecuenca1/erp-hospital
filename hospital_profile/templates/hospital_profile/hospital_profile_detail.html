@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Perfil del Hospital</h3>
+            <a href="{% url 'hospital_profile:update' %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar Perfil</a>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ hospital_profile.nombre_hospital }}</h4>
+            <p class="card-text"><strong>NIT:</strong> {{ hospital_profile.nit }}</p>
+            <p class="card-text"><strong>Dirección:</strong> {{ hospital_profile.direccion }}</p>
+            <p class="card-text"><strong>Teléfono:</strong> {{ hospital_profile.telefono }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ hospital_profile.email }}</p>
+            {% if hospital_profile.sitio_web %}
+                <p class="card-text"><strong>Sitio Web:</strong> <a href="{{ hospital_profile.sitio_web }}" target="_blank">{{ hospital_profile.sitio_web }}</a></p>
+            {% endif %}
+            {% if hospital_profile.logo %}
+                <p class="card-text"><strong>Logo:</strong></p>
+                <img src="{{ hospital_profile.logo.url }}" class="img-fluid rounded" alt="Logo del Hospital" style="max-width: 200px;">
+            {% endif %}
+            <p class="card-text"><strong>Misión:</strong> {{ hospital_profile.mision|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Visión:</strong> {{ hospital_profile.vision|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Valores:</strong> {{ hospital_profile.valores|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Descripción Corta:</strong> {{ hospital_profile.descripcion_corta|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Número de Habilitación:</strong> {{ hospital_profile.numero_habilitacion|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Fecha de Habilitación:</strong> {{ hospital_profile.fecha_habilitacion|default_if_none:"N/A" }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

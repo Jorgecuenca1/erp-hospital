@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Reportes Generados</h3>
+            <a href="{% url 'reporte_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Reporte
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar reportes...">
+            </div>
+            <div class="list-group">
+                {% for reporte in object_list %}
+                <a href="{% url 'reporte_detail' reporte.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ reporte.nombre_reporte }}</h5>
+                        <small class="text-muted">Fecha de Generación: {{ reporte.fecha_generacion|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1">Parámetros: {{ reporte.parametros_filtro|default:"N/A"|truncatechars:100 }}</p>
+                    {% if reporte.archivo_reporte %}
+                        <small><a href="{{ reporte.archivo_reporte.url }}" target="_blank">Descargar Reporte</a></small>
+                    {% else %}
+                        <small>Archivo no disponible.</small>
+                    {% endif %}
+                </a>
+                {% empty %}
+                <p class="text-center">No hay reportes generados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.list-group-item');
+
+        items.forEach(item => {
+            let text = item.textContent || item.innerText;
+            if (text.toLowerCase().indexOf(filter) > -1) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %} 

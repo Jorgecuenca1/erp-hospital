@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Movimiento Bancario - Contabilidad{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-trash text-danger"></i> Eliminar Movimiento Bancario
+        </h1>
+        <a href="{% url 'accounting:movimientobancario_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-danger text-white">
+            <h6 class="m-0 font-weight-bold">Confirmar Eliminación</h6>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-triangle"></i> ¿Está seguro?</h5>
+                <p>Está a punto de eliminar el siguiente movimiento bancario:</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Banco:</th>
+                            <td>{{ object.banco }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cuenta Bancaria:</th>
+                            <td>{{ object.cuenta_bancaria }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fecha:</th>
+                            <td>{{ object.fecha }}</td>
+                        </tr>
+                        <tr>
+                            <th>Valor:</th>
+                            <td>${{ object.valor|floatformat:2 }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Tipo:</th>
+                            <td>{{ object.get_tipo_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Estado:</th>
+                            <td>
+                                {% if object.conciliado %}Conciliado{% else %}Pendiente{% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Descripción:</th>
+                            <td>{{ object.descripcion }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                <strong>¡Atención!</strong> Esta acción no se puede deshacer. 
+                Si el movimiento está conciliado, la eliminación podría afectar la conciliación bancaria.
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sí, Eliminar
+                    </button>
+                    <a href="{% url 'accounting:movimientobancario_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,9 @@
+{% extends 'website/base.html' %}
+{% block website_content %}
+<h2>{% if object %}Editar{% else %}Nuevo{% endif %} Menú</h2>
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+<a href="{% url 'website:menu_list' %}">Volver al listado</a>
+{% endblock %} 

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Inscripciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Lista de Inscripciones</h1>
+    <a href="{% url 'inscripcion_create' %}" class="btn btn-primary mb-3">Crear Nueva Inscripción</a>
+    <div class="list-group">
+        {% for inscripcion in inscripciones %}
+            <a href="{% url 'inscripcion_detail' inscripcion.pk %}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Estudiante: {{ inscripcion.estudiante.username }}</h5>
+                    <small>Fecha: {{ inscripcion.fecha_inscripcion|date:"d M Y" }}</small>
+                </div>
+                <p class="mb-1">Curso: {{ inscripcion.curso.titulo }}</p>
+                <small>Completado: {% if inscripcion.completado %}Sí{% else %}No{% endif %}</small>
+            </a>
+        {% empty %}
+            <div class="list-group-item">
+                No hay inscripciones disponibles.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

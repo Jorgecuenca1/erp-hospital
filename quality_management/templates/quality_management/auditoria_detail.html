@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Detalle de Auditoría: {{ auditoria.nombre }}</h1>
+    <p><strong>Tipo de Auditoría:</strong> {{ auditoria.get_tipo_auditoria_display }}</p>
+    <p><strong>Fecha de Inicio:</strong> {{ auditoria.fecha_inicio|date:"Y-m-d" }}</p>
+    <p><strong>Fecha de Fin:</strong> {{ auditoria.fecha_fin|date:"Y-m-d"|default:"N/A" }}</p>
+    <p><strong>Alcance:</strong> {{ auditoria.alcance|linebreaksbr }}</p>
+    <p><strong>Equipo Auditor:</strong>
+        <ul>
+            {% for profesional in auditoria.equipo_auditor.all %}
+                <li>{{ profesional.nombres }} {{ profesional.apellidos }}</li>
+            {% empty %}
+                <li>No hay miembros en el equipo auditor.</li>
+            {% endfor %}
+        </ul>
+    </p>
+    <p><strong>Estado:</strong> {{ auditoria.get_estado_display }}</p>
+    <p><strong>Informe (PDF/Doc):</strong>
+        {% if auditoria.documento_informe %}
+            <a href="{{ auditoria.documento_informe.url }}" target="_blank">Descargar Informe</a>
+        {% else %}
+            N/A
+        {% endif %}
+    </p>
+    <p><strong>Observaciones:</strong> {{ auditoria.observaciones|linebreaksbr|default:"N/A" }}</p>
+
+    <h2>Hallazgos de la Auditoría</h2>
+    {% if hallazgos %}
+        <ul>
+            {% for hallazgo in hallazgos %}
+                <li>
+                    <a href="{% url 'quality_management:hallazgoauditoria_detail' hallazgo.pk %}">Hallazgo {{ hallazgo.clasificacion }}</a>:
+                    {{ hallazgo.descripcion|truncatechars:100 }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay hallazgos registrados para esta auditoría.</p>
+    {% endif %}
+    <a href="{% url 'quality_management:hallazgoauditoria_create' auditoria_pk=auditoria.pk %}">Registrar Nuevo Hallazgo</a>
+
+    <a href="{% url 'quality_management:auditoria_list' %}">Volver a la lista de auditorías</a>
+    <a href="{% url 'quality_management:auditoria_edit' auditoria.pk %}">Editar Auditoría</a>
+    <a href="{% url 'quality_management:auditoria_delete' auditoria.pk %}">Eliminar Auditoría</a>
+{% endblock %} 

@@ -1,0 +1,13 @@
+{% extends 'ecommerce/base.html' %}
+{% block ecommerce_content %}
+<h2>Detalle de Línea de Carrito</h2>
+<ul>
+    <li><b>Carrito:</b> {{ object.carrito }}</li>
+    <li><b>Producto:</b> {{ object.producto }}</li>
+    <li><b>Cantidad:</b> {{ object.cantidad }}</li>
+    <li><b>Subtotal:</b> {{ object.subtotal }}</li>
+</ul>
+<a href="{% url 'ecommerce:lineacarrito_update' object.pk %}">Editar</a> |
+<a href="{% url 'ecommerce:lineacarrito_delete' object.pk %}">Eliminar</a> |
+<a href="{% url 'ecommerce:lineacarrito_list' %}">Volver al listado</a>
+{% endblock %} 

@@ -1,0 +1,16 @@
+{% extends 'pos/base.html' %}
+{% block pos_content %}
+<h2>Detalle de Línea de Venta POS</h2>
+<ul>
+    <li><b>Venta:</b> {{ object.venta }}</li>
+    <li><b>Descripción:</b> {{ object.descripcion }}</li>
+    <li><b>Cantidad:</b> {{ object.cantidad }}</li>
+    <li><b>Precio Unitario:</b> {{ object.precio_unitario }}</li>
+    <li><b>Subtotal:</b> {{ object.subtotal }}</li>
+    <li><b>Impuesto:</b> {{ object.impuesto }}</li>
+    <li><b>Total:</b> {{ object.total }}</li>
+</ul>
+<a href="{% url 'pos:lineaventapos_update' object.pk %}">Editar</a> |
+<a href="{% url 'pos:lineaventapos_delete' object.pk %}">Eliminar</a> |
+<a href="{% url 'pos:lineaventapos_list' %}">Volver al listado</a>
+{% endblock %} 

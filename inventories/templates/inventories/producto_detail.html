@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Producto{% endblock %}
+
+{% block content %}
+    <h1>Detalle de Producto: {{ producto.nombre }}</h1>
+    <p><strong>Descripción:</strong> {{ producto.descripcion|default:"N/A" }}</p>
+    <p><strong>Tipo de Producto:</strong> {{ producto.get_tipo_producto_display }}</p>
+    <p><strong>Categoría:</strong> {{ producto.categoria.nombre|default:"N/A" }}</p>
+    <p><strong>Unidad de Medida:</strong> {{ producto.unidad_medida }}</p>
+    <p><strong>Stock Actual:</strong> {{ producto.stock_actual }}</p>
+    <p><strong>Stock Mínimo:</strong> {{ producto.stock_minimo }}</p>
+    <p><strong>Ubicación:</strong> {{ producto.ubicacion.nombre|default:"N/A" }}</p>
+    <p><strong>Fecha de Caducidad:</strong> {{ producto.fecha_caducidad|default:"N/A" }}</p>
+    <p><strong>Activo:</strong> {{ producto.activo|yesno:"Sí,No" }}</p>
+
+    <a href="{% url 'producto_edit' producto.pk %}">Editar Producto</a> |
+    <a href="{% url 'producto_delete' producto.pk %}">Eliminar Producto</a> |
+    <a href="{% url 'producto_list' %}">Volver a la Lista de Productos</a>
+{% endblock %} 

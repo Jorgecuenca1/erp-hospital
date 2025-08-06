@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventario - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-boxes text-primary"></i>
+                        Dashboard de Inventario
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'inventories:producto_create' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Nuevo Producto
+                        </a>
+                        <a href="{% url 'inventories:movimiento_create' %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-exchange-alt"></i> Nuevo Movimiento
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Estadísticas Principales -->
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-primary">
+                                <div class="inner">
+                                    <h3>{{ total_productos }}</h3>
+                                    <p>Productos Activos</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <a href="{% url 'inventories:producto_list' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ productos_stock_bajo }}</h3>
+                                    <p>Stock Bajo</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <a href="{% url 'inventories:low_stock' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-danger">
+                                <div class="inner">
+                                    <h3>{{ productos_caducando }}</h3>
+                                    <p>Próximos a Caducar</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-calendar-times"></i>
+                                </div>
+                                <a href="{% url 'inventories:expired_products' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ total_movimientos }}</h3>
+                                    <p>Total Movimientos</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <a href="{% url 'inventories:movements_summary' %}" class="small-box-footer">
+                                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-bolt"></i>
+                                        Acciones Rápidas
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <a href="{% url 'inventories:producto_create' %}" class="btn btn-primary btn-block">
+                                                <i class="fas fa-box"></i><br>Nuevo Producto
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'inventories:movimiento_create' %}" class="btn btn-success btn-block">
+                                                <i class="fas fa-plus"></i><br>Nuevo Movimiento
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'inventories:categoria_create' %}" class="btn btn-info btn-block">
+                                                <i class="fas fa-tags"></i><br>Nueva Categoría
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'inventories:ubicacion_create' %}" class="btn btn-warning btn-block">
+                                                <i class="fas fa-map-marker-alt"></i><br>Nueva Ubicación
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'inventories:orden_create' %}" class="btn btn-secondary btn-block">
+                                                <i class="fas fa-clipboard-list"></i><br>Nueva Orden
+                                            </a>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a href="{% url 'inventories:reports' %}" class="btn btn-dark btn-block">
+                                                <i class="fas fa-chart-bar"></i><br>Reportes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Últimos Movimientos -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-history"></i>
+                                        Últimos Movimientos
+                                    </h5>
+                                    <div class="card-tools">
+                                        <a href="{% url 'inventories:movements_summary' %}" class="btn btn-sm btn-info">
+                                            Ver Todos
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Producto</th>
+                                                    <th>Tipo</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Razón</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for movimiento in ultimos_movimientos %}
+                                                <tr>
+                                                    <td>{{ movimiento.fecha_hora|date:"d/m/Y H:i" }}</td>
+                                                    <td>{{ movimiento.producto.nombre }}</td>
+                                                    <td>
+                                                        {% if movimiento.tipo_movimiento == 'ENTRADA' %}
+                                                            <span class="badge badge-success">Entrada</span>
+                                                        {% elif movimiento.tipo_movimiento == 'SALIDA' %}
+                                                            <span class="badge badge-warning">Salida</span>
+                                                        {% else %}
+                                                            <span class="badge badge-secondary">Ajuste</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ movimiento.cantidad }} {{ movimiento.producto.unidad_medida }}</td>
+                                                    <td>{{ movimiento.razon|truncatechars:30 }}</td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted">
+                                                        No hay movimientos recientes
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-pie"></i>
+                                        Stock por Categoría
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    {% for categoria in stock_por_categoria %}
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>{{ categoria.nombre }}</span>
+                                        <span class="badge badge-primary">{{ categoria.total_stock|default:0 }}</span>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" style="width: 25%"></div>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-muted text-center">No hay datos disponibles</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos Más Movidos -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-star"></i>
+                                        Productos Más Movidos
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Producto</th>
+                                                    <th>Categoría</th>
+                                                    <th>Stock Actual</th>
+                                                    <th>Total Movimientos</th>
+                                                    <th>Último Movimiento</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for producto in productos_mas_movidos %}
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ producto.nombre }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">{{ producto.descripcion|truncatechars:50 }}</small>
+                                                    </td>
+                                                    <td>
+                                                        {% if producto.categoria %}
+                                                            <span class="badge badge-info">{{ producto.categoria.nombre }}</span>
+                                                        {% else %}
+                                                            <span class="badge badge-secondary">Sin categoría</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <span class="font-weight-bold">{{ producto.stock_actual }} {{ producto.unidad_medida }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-primary">{{ producto.total_movimientos }}</span>
+                                                    </td>
+                                                    <td>
+                                                        {% if producto.movimientos.first %}
+                                                            {{ producto.movimientos.first.fecha_hora|date:"d/m/Y" }}
+                                                        {% else %}
+                                                            <span class="text-muted">N/A</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'inventories:producto_detail' producto.id %}" class="btn btn-info btn-sm">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{% url 'inventories:movimiento_create' %}" class="btn btn-success btn-sm">
+                                                            <i class="fas fa-plus"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        No hay productos con movimientos
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas y Notificaciones -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-bell"></i>
+                                        Alertas del Sistema
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    {% if productos_stock_bajo > 0 %}
+                                    <div class="alert alert-warning">
+                                        <h6><i class="fas fa-exclamation-triangle"></i> Stock Bajo</h6>
+                                        <p>Hay {{ productos_stock_bajo }} productos que requieren reabastecimiento inmediato.</p>
+                                        <a href="{% url 'inventories:low_stock' %}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Productos
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if productos_caducando > 0 %}
+                                    <div class="alert alert-danger">
+                                        <h6><i class="fas fa-calendar-times"></i> Productos Próximos a Caducar</h6>
+                                        <p>Hay {{ productos_caducando }} productos que caducarán en los próximos 30 días.</p>
+                                        <a href="{% url 'inventories:expired_products' %}" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Productos
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if productos_stock_bajo == 0 and productos_caducando == 0 %}
+                                    <div class="alert alert-success">
+                                        <h6><i class="fas fa-check-circle"></i> Todo en Orden</h6>
+                                        <p>No hay alertas pendientes. El inventario está bien gestionado.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Actualizar estadísticas en tiempo real
+    setInterval(function() {
+        // Aquí se implementaría la actualización de estadísticas
+        console.log('Actualizando estadísticas...');
+    }, 30000);
+
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %}

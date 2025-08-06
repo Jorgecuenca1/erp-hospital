@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Sesiones de Chat Activas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Sesiones de Chat Activas</h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar sesiones de chat...">
+            </div>
+            <div class="list-group">
+                {% for session in chatsessions %}
+                <a href="{% url 'chatsession_detail' session.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Chat ID: {{ session.uuid|slice:":8" }}...</h5>
+                        <small class="text-muted">Iniciado: {{ session.start_time|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1">Usuario: {% if session.user %}{{ session.user.username }}{% else %}Anónimo{% endif %}</p>
+                    <p class="mb-1">Agente: {% if session.agent %}{{ session.agent.username }}{% else %}No asignado{% endif %}</p>
+                    <small>Tema: {{ session.topic|default:"N/A" }}</small>
+                </a>
+                {% empty %}
+                <p class="text-center">No hay sesiones de chat activas.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.list-group-item');
+
+        items.forEach(item => {
+            let text = item.textContent || item.innerText;
+            if (text.toLowerCase().indexOf(filter) > -1) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %}

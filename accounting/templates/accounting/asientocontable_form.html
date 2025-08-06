@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Asiento Contable</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" id="asientoForm">
+                {% csrf_token %}
+                {{ form|crispy }}
+
+                <h5 class="mt-4">Líneas del Asiento</h5>
+                <div id="lineas-asiento">
+                    {{ linea_formset.management_form }}
+                    {% for form in linea_formset %}
+                    <div class="linea-asiento-form border p-3 mb-3 rounded">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="{{ form.cuenta.id_for_label }}">Cuenta:</label>
+                                {{ form.cuenta }}
+                                {% if form.cuenta.errors %}
+                                    <div class="text-danger">{{ form.cuenta.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.descripcion.id_for_label }}">Descripción:</label>
+                                {{ form.descripcion }}
+                                {% if form.descripcion.errors %}
+                                    <div class="text-danger">{{ form.descripcion.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="{{ form.debito.id_for_label }}">Débito:</label>
+                                {{ form.debito }}
+                                {% if form.debito.errors %}
+                                    <div class="text-danger">{{ form.debito.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="{{ form.credito.id_for_label }}">Crédito:</label>
+                                {{ form.credito }}
+                                {% if form.credito.errors %}
+                                    <div class="text-danger">{{ form.credito.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-2">
+                                <label for="{{ form.impuesto.id_for_label }}">Impuesto:</label>
+                                {{ form.impuesto }}
+                                {% if form.impuesto.errors %}
+                                    <div class="text-danger">{{ form.impuesto.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if linea_formset.can_delete %}
+                        <div class="form-check text-end mt-2">
+                            <input type="checkbox" name="{{ form.DELETE.html_name }}" id="{{ form.DELETE.id_for_label }}" class="form-check-input">
+                            <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">Eliminar línea</label>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" id="add-linea" class="btn btn-info btn-sm mt-3">
+                    <i class="fas fa-plus"></i> Agregar Línea
+                </button>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{% url 'accounting:asientocontable_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-alt-circle-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Guardar Asiento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addLineaBtn = document.getElementById('add-linea');
+        const lineasAsientoDiv = document.getElementById('lineas-asiento');
+        const totalFormsInput = document.querySelector('input[name="lineas-TOTAL_FORMS"]');
+        const emptyForm = document.querySelector('.linea-asiento-form').outerHTML.replace(/__prefix__/g, totalFormsInput.value);
+
+        addLineaBtn.addEventListener('click', function() {
+            const newForm = emptyForm.replace(/form-(\d+)/g, function(match, p1) {
+                return `form-${parseInt(p1) + 1}`;
+            }).replace(/lineas-(\d+)/g, function(match, p1) {
+                return `lineas-${parseInt(p1) + 1}`;
+            });
+
+            lineasAsientoDiv.insertAdjacentHTML('beforeend', newForm);
+            totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
+        });
+    });
+</script>
+{% endblock %}

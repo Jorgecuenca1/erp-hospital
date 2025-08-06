@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle del Progreso de Lección{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Detalle del Progreso</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Estudiante:</strong> {{ progreso_leccion.inscripcion.estudiante.username }}</p>
+            <p><strong>Curso:</strong> <a href="{% url 'curso_detail' progreso_leccion.leccion.modulo.curso.pk %}">{{ progreso_leccion.leccion.modulo.curso.titulo }}</a></p>
+            <p><strong>Módulo:</strong> <a href="{% url 'modulo_detail' progreso_leccion.leccion.modulo.pk %}">{{ progreso_leccion.leccion.modulo.titulo }}</a></p>
+            <p><strong>Lección:</strong> <a href="{% url 'leccion_detail' progreso_leccion.leccion.pk %}">{{ progreso_leccion.leccion.titulo }}</a></p>
+            <hr>
+            <p><strong>Completado:</strong> {% if progreso_leccion.completado %}Sí{% else %}No{% endif %}</p>
+            {% if progreso_leccion.fecha_completado %}
+                <p><strong>Fecha de Completado:</strong> {{ progreso_leccion.fecha_completado|date:"d M Y, H:i" }}</p>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'progreso_leccion_update' progreso_leccion.pk %}" class="btn btn-info">Editar</a>
+            <a href="{% url 'progreso_leccion_delete' progreso_leccion.pk %}" class="btn btn-danger">Eliminar</a>
+            <a href="{% url 'progreso_leccion_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

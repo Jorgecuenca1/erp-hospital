@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Mantenimientos de Activos</h3>
+            <a href="{% url 'mantenimiento_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Mantenimiento
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar mantenimientos...">
+            </div>
+            <div class="list-group">
+                {% for mantenimiento in object_list %}
+                <a href="{% url 'mantenimiento_detail' mantenimiento.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ mantenimiento.activo_fijo.nombre }} - {{ mantenimiento.fecha_mantenimiento }}</h5>
+                        <small class="text-muted">Tipo: {{ mantenimiento.tipo_mantenimiento }}</small>
+                    </div>
+                    <p class="mb-1">Costo: {{ mantenimiento.costo }}</p>
+                    <small>Realizado por: {{ mantenimiento.realizado_por }}</small>
+                </a>
+                {% empty %}
+                <p class="text-center">No hay mantenimientos registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.list-group-item');
+
+        items.forEach(item => {
+            let text = item.textContent || item.innerText;
+            if (text.toLowerCase().indexOf(filter) > -1) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manufacturing Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-industry"></i> Manufacturing & Medical Devices</h1>
+                <p class="text-muted">Manage medical device manufacturing, production orders, and quality control</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ total_devices }}</h3>
+                            <p>Total Devices</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-microchip fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ active_orders }}</h3>
+                            <p>Active Orders</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-cogs fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ completed_orders }}</h3>
+                            <p>Completed Orders</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3>{{ quality_checks }}</h3>
+                            <p>Pending QC</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clipboard-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts and Data -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Device Types Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="deviceTypesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Quality Control Stats</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="qualityStatsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Recent Production Orders</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Device</th>
+                                    <th>Quantity</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Assigned To</th>
+                                    <th>Start Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td><strong>{{ order.order_number }}</strong></td>
+                                    <td>{{ order.device.name }}</td>
+                                    <td>{{ order.quantity }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if order.priority == 'urgent' %}badge-danger
+                                            {% elif order.priority == 'high' %}badge-warning
+                                            {% elif order.priority == 'medium' %}badge-info
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ order.get_priority_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if order.status == 'completed' %}badge-success
+                                            {% elif order.status == 'in_progress' %}badge-warning
+                                            {% elif order.status == 'cancelled' %}badge-danger
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.assigned_to.get_full_name|default:order.assigned_to.username|default:"Unassigned" }}</td>
+                                    <td>{{ order.start_date|date:"M d, Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No recent orders found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{% url 'manufacturing:device_list' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-microchip"></i> Manage Devices
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'manufacturing:production_orders' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-cogs"></i> Production Orders
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'manufacturing:quality_control' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-clipboard-check"></i> Quality Control
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'manufacturing:bill_of_materials' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-list-alt"></i> Bill of Materials
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Device Types Chart
+const deviceTypesCtx = document.getElementById('deviceTypesChart').getContext('2d');
+const deviceTypesData = {
+    labels: [{% for type in device_types %}'{{ type.device_type }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+    datasets: [{
+        data: [{% for type in device_types %}{{ type.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+    }]
+};
+
+const deviceTypesChart = new Chart(deviceTypesCtx, {
+    type: 'doughnut',
+    data: deviceTypesData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+// Quality Stats Chart
+const qualityStatsCtx = document.getElementById('qualityStatsChart').getContext('2d');
+const qualityData = {
+    labels: ['Passed', 'Failed', 'Pending'],
+    datasets: [{
+        label: 'Quality Checks',
+        data: [{{ quality_stats.passed }}, {{ quality_stats.failed }}, {{ quality_stats.pending }}],
+        backgroundColor: ['#28a745', '#dc3545', '#ffc107']
+    }]
+};
+
+const qualityStatsChart = new Chart(qualityStatsCtx, {
+    type: 'bar',
+    data: qualityData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

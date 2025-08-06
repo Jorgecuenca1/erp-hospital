@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Empleado</h3>
+            <div>
+                <a href="{% url 'empleado_update' object.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'empleado_delete' object.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ object.nombres }} {{ object.apellidos }}</h4>
+            <p class="card-text"><strong>Cargo:</strong> {{ object.cargo.nombre }}</p>
+            <p class="card-text"><strong>Tipo de Identificación:</strong> {{ object.get_tipo_identificacion_display }}</p>
+            <p class="card-text"><strong>Número de Identificación:</strong> {{ object.numero_identificacion }}</p>
+            <p class="card-text"><strong>Fecha de Nacimiento:</strong> {{ object.fecha_nacimiento }}</p>
+            <p class="card-text"><strong>Dirección:</strong> {{ object.direccion|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Teléfono:</strong> {{ object.telefono|default_if_none:"N/A" }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ object.email }}</p>
+            <p class="card-text"><strong>Fecha de Contratación:</strong> {{ object.fecha_contratacion }}</p>
+            <p class="card-text"><strong>Profesional de Salud Asociado:</strong> {% if object.profesional_salud %}{{ object.profesional_salud.nombres }} {{ object.profesional_salud.apellidos }}{% else %}N/A{% endif %}</p>
+            <p class="card-text"><strong>Activo:</strong> {% if object.activo %}Sí{% else %}No{% endif %}</p>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'empleado_list' %}" class="btn btn-secondary btn-sm">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

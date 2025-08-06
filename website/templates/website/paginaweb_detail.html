@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Página Web</h3>
+            <div>
+                <a href="{% url 'website:paginaweb_update' object.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'website:paginaweb_delete' object.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ object.titulo }}</h4>
+            <p class="card-text"><strong>Slug:</strong> {{ object.slug }}</p>
+            <p class="card-text"><strong>Fecha de Creación:</strong> {{ object.fecha_creacion|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>Última Actualización:</strong> {{ object.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>Publicada:</strong> {% if object.publicada %}Sí{% else %}No{% endif %}</p>
+
+            <hr>
+            <h5>Contenido</h5>
+            <div class="page-content">
+                {{ object.contenido|safe|default:"<p>No hay contenido para esta página.</p>" }}
+            </div>
+            
+            <hr>
+            <h5>Secciones</h5>
+            {% if object.secciones.all %}
+            <ul class="list-group mb-3">
+                {% for seccion in object.secciones.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ seccion.titulo }}</strong><br>
+                        <small>Orden: {{ seccion.orden }}</small>
+                    </div>
+                    <a href="{% url 'website:seccion_detail' seccion.pk %}" class="btn btn-sm btn-info">Ver Detalle</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No hay secciones para esta página.</p>
+            {% endif %}
+
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'website:paginaweb_list' %}" class="btn btn-secondary btn-sm">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

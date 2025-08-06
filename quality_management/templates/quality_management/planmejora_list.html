@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Lista de Planes de Mejora</h1>
+    <a href="{% url 'quality_management:planmejora_create' %}">Crear Nuevo Plan de Mejora</a>
+    <ul>
+        {% for plan in planes_mejora %}
+            <li>
+                <a href="{% url 'quality_management:planmejora_detail' plan.pk %}">{{ plan.nombre_plan }}</a>
+                - Estado: {{ plan.get_estado_display }} - Responsable: {{ plan.responsable.username|default:"N/A" }}
+                (<a href="{% url 'quality_management:planmejora_edit' plan.pk %}">Editar</a> |
+                <a href="{% url 'quality_management:planmejora_delete' plan.pk %}">Eliminar</a>)
+            </li>
+        {% empty %}
+            <li>No hay planes de mejora registrados.</li>
+        {% endfor %}
+    </ul>
+{% endblock %} 

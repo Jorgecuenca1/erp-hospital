@@ -1,0 +1,9 @@
+{% extends 'ecommerce/base.html' %}
+{% block ecommerce_content %}
+<h2>Eliminar Línea de Carrito</h2>
+<p>¿Está seguro que desea eliminar la línea de carrito de "{{ object.producto }}"?</p>
+<form method="post">{% csrf_token %}
+    <button type="submit">Confirmar</button>
+</form>
+<a href="{% url 'ecommerce:lineacarrito_list' %}">Cancelar</a>
+{% endblock %} 

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{{ post.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Publicación</h3>
+            <div>
+                <a href="{% url 'post_update' object.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'post_delete' object.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ object.titulo }}</h4>
+            <p class="card-text"><small class="text-muted">Publicado por {{ object.autor.get_full_name|default:object.autor.username }} el {{ object.fecha_publicacion|date:"d/m/Y H:i" }}</small></p>
+            <p class="card-text"><strong>Categoría:</strong> {{ object.categoria.nombre|default:"N/A" }}</p>
+            <hr>
+            <div class="post-content">
+                {{ object.contenido|safe }}
+            </div>
+
+            <hr>
+            <h5>Comentarios</h5>
+            {% if object.comentarios.all %}
+            <div class="list-group mb-3">
+                {% for comentario in object.comentarios.all %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ comentario.autor }} <small class="text-muted">({{ comentario.email }})</small></h6>
+                            <small>{{ comentario.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <p class="mb-1">{{ comentario.contenido }}</p>
+                        {% if comentario.aprobado %}
+                            <span class="badge bg-success">Aprobado</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pendiente de Aprobación</span>
+                        {% endif %}
+                        <div class="mt-2">
+                            <a href="{% url 'comentario_update' comentario.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                            <a href="{% url 'comentario_delete' comentario.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No hay comentarios para esta publicación.</p>
+            {% endif %}
+
+            <hr>
+            <h5>Dejar un Comentario</h5>
+            <form method="post" action="{% url 'comentario_create' %}?post={{ object.pk }}">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary mt-2">Enviar Comentario</button>
+            </form>
+
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'post_list' %}" class="btn btn-secondary btn-sm">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

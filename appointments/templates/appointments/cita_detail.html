@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de la Cita{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>Detalle de la Cita</h3>
+            <div>
+                {% if cita.estado == 'PENDIENTE' %}
+                    <span class="badge bg-warning text-dark fs-6">Pendiente</span>
+                {% elif cita.estado == 'CONFIRMADA' %}
+                    <span class="badge bg-success fs-6">Confirmada</span>
+                {% elif cita.estado == 'CANCELADA' %}
+                    <span class="badge bg-danger fs-6">Cancelada</span>
+                {% elif cita.estado == 'FINALIZADA' %}
+                    <span class="badge bg-secondary fs-6">Finalizada</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Cita #{{ cita.pk }}</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Paciente:</strong> <a href="{% url 'paciente_detail' cita.paciente.pk %}">{{ cita.paciente.nombres }} {{ cita.paciente.apellidos }}</a></p>
+                    <p><strong>Profesional:</strong> <a href="{% url 'profesional_detail' cita.profesional.pk %}">{{ cita.profesional.nombres }} {{ cita.profesional.apellidos }}</a></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fecha:</strong> {{ cita.fecha_hora_inicio|date:"l, d F Y" }}</p>
+                    <p><strong>Hora:</strong> {{ cita.fecha_hora_inicio|time:"H:i A" }} - {{ cita.fecha_hora_fin|time:"H:i A" }}</p>
+                </div>
+            </div>
+            <hr>
+            <h6>Motivo de la Cita</h6>
+            <p>{{ cita.motivo|default:"No especificado." }}</p>
+            <h6>Notas Adicionales</h6>
+            <p>{{ cita.notas|default:"Sin notas." }}</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{% url 'cita_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+            <div>
+                <a href="{% url 'cita_update' cita.pk %}" class="btn btn-primary">Editar Cita</a>
+                <a href="{% url 'cita_delete' cita.pk %}" class="btn btn-danger">Cancelar Cita</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

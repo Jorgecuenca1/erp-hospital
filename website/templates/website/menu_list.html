@@ -1,0 +1,21 @@
+{% extends 'website/base.html' %}
+{% block website_content %}
+<h2>Menús</h2>
+<a href="{% url 'website:menu_create' %}">Nuevo Menú</a>
+<table>
+    <tr><th>Nombre</th><th>URL</th><th>Orden</th><th>Activo</th><th>Acciones</th></tr>
+    {% for obj in object_list %}
+    <tr>
+        <td>{{ obj.nombre }}</td>
+        <td>{{ obj.url }}</td>
+        <td>{{ obj.orden }}</td>
+        <td>{{ obj.activo }}</td>
+        <td>
+            <a href="{% url 'website:menu_detail' obj.pk %}">Ver</a> |
+            <a href="{% url 'website:menu_update' obj.pk %}">Editar</a> |
+            <a href="{% url 'website:menu_delete' obj.pk %}">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %} 

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Detalle de Carrito de Compra</h3>
+            <div>
+                <a href="{% url 'ecommerce:carrito_update' object.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Editar</a>
+                <a href="{% url 'ecommerce:carrito_delete' object.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Carrito #{{ object.pk }}</h4>
+            <p class="card-text"><strong>Cliente:</strong> {{ object.cliente.usuario.get_full_name|default:object.cliente.usuario.username }}</p>
+            <p class="card-text"><strong>Fecha de Creación:</strong> {{ object.creado|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>Activo:</strong> {% if object.activo %}Sí{% else %}No{% endif %}</p>
+            
+            <hr>
+            <h5>Líneas del Carrito</h5>
+            {% if object.lineas.all %}
+            <ul class="list-group mb-3">
+                {% for linea in object.lineas.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ linea.producto.nombre }}</strong><br>
+                        <small>Cantidad: {{ linea.cantidad }} | Subtotal: {{ linea.subtotal }}</small>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No hay productos en este carrito.</p>
+            {% endif %}
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'ecommerce:carrito_list' %}" class="btn btn-secondary btn-sm">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

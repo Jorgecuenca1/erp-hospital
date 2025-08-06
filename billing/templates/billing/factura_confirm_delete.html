@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Factura{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h3 class="mb-0">Confirmar Eliminación</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text">¿Estás seguro de que quieres eliminar la factura "<strong>No. {{ object.numero_factura|default:"BORRADOR" }}</strong>" para el paciente "<strong>{{ object.paciente.nombres }} {{ object.paciente.apellidos }}</strong>"?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
+                <a href="{% url 'factura_detail' object.pk %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

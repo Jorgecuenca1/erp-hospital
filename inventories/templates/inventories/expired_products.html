@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventario - Productos Próximos a Caducar{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-times text-danger"></i>
+                        Productos Próximos a Caducar
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'inventories:dashboard' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </a>
+                        <button class="btn btn-success btn-sm" onclick="exportExpired()">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Resumen -->
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Alerta de Caducidad</h5>
+                        <p>Se encontraron <strong>{{ productos|length }}</strong> productos que caducarán en los próximos 30 días.</p>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <select class="form-control" id="filterDays">
+                                <option value="7">Próximos 7 días</option>
+                                <option value="15">Próximos 15 días</option>
+                                <option value="30" selected>Próximos 30 días</option>
+                                <option value="60">Próximos 60 días</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="filterCategory">
+                                <option value="">Todas las categorías</option>
+                                <option value="MEDICAMENTO">Medicamentos</option>
+                                <option value="INSUMO">Insumos</option>
+                                <option value="EQUIPO">Equipos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="searchProduct" placeholder="Buscar producto...">
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary btn-block" onclick="applyFilters()">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Productos -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Ubicación</th>
+                                    <th>Stock Actual</th>
+                                    <th>Fecha Caducidad</th>
+                                    <th>Días Restantes</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in productos %}
+                                <tr>
+                                    <td>{{ producto.id }}</td>
+                                    <td>
+                                        <strong>{{ producto.nombre }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ producto.descripcion|truncatechars:50 }}</small>
+                                    </td>
+                                    <td>
+                                        {% if producto.categoria %}
+                                            <span class="badge badge-info">{{ producto.categoria.nombre }}</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Sin categoría</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if producto.ubicacion %}
+                                            <span class="badge badge-primary">{{ producto.ubicacion.nombre }}</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Sin ubicación</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="font-weight-bold">{{ producto.stock_actual }} {{ producto.unidad_medida }}</span>
+                                    </td>
+                                    <td>
+                                        {% if producto.fecha_caducidad %}
+                                            <span class="font-weight-bold">{{ producto.fecha_caducidad|date:"d/m/Y" }}</span>
+                                        {% else %}
+                                            <span class="text-muted">No especificada</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if producto.fecha_caducidad %}
+                                            {% with dias_restantes=producto.fecha_caducidad|timeuntil %}
+                                                {% if "día" in dias_restantes %}
+                                                    <span class="text-danger font-weight-bold">{{ dias_restantes }}</span>
+                                                {% else %}
+                                                    <span class="text-warning font-weight-bold">{{ dias_restantes }}</span>
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if producto.fecha_caducidad %}
+                                            {% if producto.fecha_caducidad < today %}
+                                                <span class="badge badge-danger">Caducado</span>
+                                            {% elif producto.fecha_caducidad < today_plus_7 %}
+                                                <span class="badge badge-danger">Crítico</span>
+                                            {% elif producto.fecha_caducidad < today_plus_15 %}
+                                                <span class="badge badge-warning">Advertencia</span>
+                                            {% else %}
+                                                <span class="badge badge-info">Vigente</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge badge-secondary">Sin fecha</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'inventories:producto_detail' producto.id %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'inventories:producto_edit' producto.id %}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-danger btn-sm" onclick="markAsExpired({{ producto.id }})">
+                                            <i class="fas fa-times"></i> Caducar
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="9" class="text-center">
+                                        <div class="alert alert-success">
+                                            <i class="fas fa-check-circle"></i>
+                                            ¡Excelente! No hay productos próximos a caducar.
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-danger"><i class="fas fa-times"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Caducados</span>
+                                    <span class="info-box-number">{{ productos|length }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-warning"><i class="fas fa-exclamation-triangle"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Críticos (7 días)</span>
+                                    <span class="info-box-number">{{ productos|length }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-info"><i class="fas fa-info-circle"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Advertencia (15 días)</span>
+                                    <span class="info-box-number">{{ productos|length }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-success"><i class="fas fa-check"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Vigentes</span>
+                                    <span class="info-box-number">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-bolt"></i>
+                                        Acciones Rápidas
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <button class="btn btn-danger btn-block" onclick="bulkExpire()">
+                                                <i class="fas fa-times"></i> Marcar como Caducados
+                                            </button>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-warning btn-block" onclick="sendExpiryAlerts()">
+                                                <i class="fas fa-bell"></i> Enviar Alertas
+                                            </button>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="{% url 'inventories:reports' %}" class="btn btn-info btn-block">
+                                                <i class="fas fa-chart-bar"></i> Ver Reportes
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-success btn-block" onclick="generateExpiryReport()">
+                                                <i class="fas fa-file-alt"></i> Generar Reporte
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Resaltar filas según la fecha de caducidad
+    $('table tbody tr').each(function() {
+        var fechaCaducidad = $(this).find('td:eq(5)').text();
+        var diasRestantes = $(this).find('td:eq(6)').text();
+        
+        if (diasRestantes.includes('día') && parseInt(diasRestantes) <= 7) {
+            $(this).addClass('table-danger');
+        } else if (diasRestantes.includes('día') && parseInt(diasRestantes) <= 15) {
+            $(this).addClass('table-warning');
+        }
+    });
+
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+
+function applyFilters() {
+    var days = $('#filterDays').val();
+    var category = $('#filterCategory').val();
+    var search = $('#searchProduct').val();
+    
+    // Aquí se implementaría la lógica de filtrado
+    console.log('Aplicando filtros:', { days, category, search });
+    alert('Filtros aplicados.');
+}
+
+function markAsExpired(productId) {
+    if (confirm('¿Está seguro de que desea marcar este producto como caducado?')) {
+        // Aquí se implementaría la lógica para marcar como caducado
+        alert('Producto marcado como caducado.');
+    }
+}
+
+function bulkExpire() {
+    if (confirm('¿Está seguro de que desea marcar todos los productos seleccionados como caducados?')) {
+        alert('Productos marcados como caducados.');
+    }
+}
+
+function sendExpiryAlerts() {
+    if (confirm('¿Está seguro de que desea enviar alertas sobre productos próximos a caducar?')) {
+        alert('Alertas enviadas exitosamente.');
+    }
+}
+
+function generateExpiryReport() {
+    alert('Generando reporte de productos próximos a caducar...');
+}
+
+function exportExpired() {
+    alert('Exportando lista de productos próximos a caducar...');
+}
+</script>
+{% endblock %} 

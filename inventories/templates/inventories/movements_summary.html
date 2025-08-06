@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inventario - Resumen de Movimientos{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-exchange-alt text-info"></i>
+                        Resumen de Movimientos de Inventario
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'inventories:dashboard' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </a>
+                        <button class="btn btn-success btn-sm" onclick="exportMovements()">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label>Tipo de Movimiento</label>
+                            <select class="form-control" id="filterType">
+                                <option value="">Todos</option>
+                                <option value="ENTRADA">Entradas</option>
+                                <option value="SALIDA">Salidas</option>
+                                <option value="AJUSTE">Ajustes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Producto</label>
+                            <input type="text" class="form-control" id="filterProduct" placeholder="Buscar producto...">
+                        </div>
+                        <div class="col-md-2">
+                            <label>Desde</label>
+                            <input type="date" class="form-control" id="startDate" value="2024-01-01">
+                        </div>
+                        <div class="col-md-2">
+                            <label>Hasta</label>
+                            <input type="date" class="form-control" id="endDate" value="2024-12-31">
+                        </div>
+                        <div class="col-md-2">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary btn-block" onclick="applyFilters()">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <label>&nbsp;</label>
+                            <a href="{% url 'inventories:movimiento_create' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-plus"></i> Nuevo Movimiento
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas Rápidas -->
+                    <div class="row">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ movimientos|length }}</h3>
+                                    <p>Total de Movimientos</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ entradas_count }}</h3>
+                                    <p>Entradas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ salidas_count }}</h3>
+                                    <p>Salidas</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-secondary">
+                                <div class="inner">
+                                    <h3>{{ ajustes_count }}</h3>
+                                    <p>Ajustes</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Movimientos -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Producto</th>
+                                    <th>Tipo</th>
+                                    <th>Cantidad</th>
+                                    <th>Stock Anterior</th>
+                                    <th>Stock Posterior</th>
+                                    <th>Razón</th>
+                                    <th>Referencia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movimiento in movimientos %}
+                                <tr>
+                                    <td>{{ movimiento.id }}</td>
+                                    <td>
+                                        <strong>{{ movimiento.fecha_hora|date:"d/m/Y" }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ movimiento.fecha_hora|time:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ movimiento.producto.nombre }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ movimiento.producto.categoria.nombre|default:"Sin categoría" }}</small>
+                                    </td>
+                                    <td>
+                                        {% if movimiento.tipo_movimiento == 'ENTRADA' %}
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-arrow-down"></i> Entrada
+                                            </span>
+                                        {% elif movimiento.tipo_movimiento == 'SALIDA' %}
+                                            <span class="badge badge-warning">
+                                                <i class="fas fa-arrow-up"></i> Salida
+                                            </span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">
+                                                <i class="fas fa-cog"></i> Ajuste
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="font-weight-bold">
+                                            {% if movimiento.tipo_movimiento == 'ENTRADA' %}
+                                                <span class="text-success">+{{ movimiento.cantidad }}</span>
+                                            {% elif movimiento.tipo_movimiento == 'SALIDA' %}
+                                                <span class="text-danger">-{{ movimiento.cantidad }}</span>
+                                            {% else %}
+                                                <span class="text-secondary">{{ movimiento.cantidad }}</span>
+                                            {% endif %}
+                                            {{ movimiento.producto.unidad_medida }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ movimiento.producto.stock_actual|add:movimiento.cantidad }} {{ movimiento.producto.unidad_medida }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="font-weight-bold">{{ movimiento.producto.stock_actual }} {{ movimiento.producto.unidad_medida }}</span>
+                                    </td>
+                                    <td>
+                                        {% if movimiento.razon %}
+                                            <span data-toggle="tooltip" title="{{ movimiento.razon }}">
+                                                {{ movimiento.razon|truncatechars:30 }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Sin razón</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if movimiento.referencia_documento %}
+                                            <span class="badge badge-info">{{ movimiento.referencia_documento }}</span>
+                                        {% else %}
+                                            <span class="text-muted">Sin referencia</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'inventories:movimiento_detail' movimiento.id %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'inventories:movimiento_edit' movimiento.id %}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'inventories:movimiento_delete' movimiento.id %}" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            No hay movimientos registrados.
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginación de movimientos">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">&laquo; Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    <!-- Gráfico de Movimientos -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-pie"></i>
+                                        Distribución por Tipo
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="movementsChart" style="min-height: 200px; height: 200px; max-height: 200px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        Movimientos por Día
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="dailyChart" style="min-height: 200px; height: 200px; max-height: 200px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(document).ready(function() {
+    // Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Gráfico de distribución por tipo
+    var movementsCtx = document.getElementById('movementsChart').getContext('2d');
+    var movementsChart = new Chart(movementsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Entradas', 'Salidas', 'Ajustes'],
+            datasets: [{
+                data: [{{ entradas_count }}, {{ salidas_count }}, {{ ajustes_count }}],
+                backgroundColor: [
+                    '#28a745',
+                    '#ffc107',
+                    '#6c757d'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Gráfico de movimientos por día
+    var dailyCtx = document.getElementById('dailyChart').getContext('2d');
+    var dailyChart = new Chart(dailyCtx, {
+        type: 'line',
+        data: {
+            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            datasets: [{
+                label: 'Movimientos',
+                data: [12, 15, 8, 22, 18, 10, 5],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+
+function applyFilters() {
+    var type = $('#filterType').val();
+    var product = $('#filterProduct').val();
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
+    
+    // Aquí se implementaría la lógica de filtrado
+    console.log('Aplicando filtros:', { type, product, startDate, endDate });
+    alert('Filtros aplicados.');
+}
+
+function exportMovements() {
+    alert('Exportando resumen de movimientos...');
+}
+</script>
+{% endblock %} 

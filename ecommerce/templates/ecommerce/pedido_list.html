@@ -1,0 +1,22 @@
+{% extends 'ecommerce/base.html' %}
+{% block ecommerce_content %}
+<h2>Pedidos</h2>
+<a href="{% url 'ecommerce:pedido_create' %}">Nuevo Pedido</a>
+<table>
+    <tr><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Dirección Envío</th><th>Acciones</th></tr>
+    {% for obj in object_list %}
+    <tr>
+        <td>{{ obj.cliente }}</td>
+        <td>{{ obj.fecha }}</td>
+        <td>{{ obj.total }}</td>
+        <td>{{ obj.estado }}</td>
+        <td>{{ obj.direccion_envio }}</td>
+        <td>
+            <a href="{% url 'ecommerce:pedido_detail' obj.pk %}">Ver</a> |
+            <a href="{% url 'ecommerce:pedido_update' obj.pk %}">Editar</a> |
+            <a href="{% url 'ecommerce:pedido_delete' obj.pk %}">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %} 

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Editar{% else %}Nuevo{% endif %} Detalle de Factura - Facturación
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-{% if object %}edit{% else %}plus{% endif %}"></i>
+                        {% if object %}Editar{% else %}Nuevo{% endif %} Detalle de Factura
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'billing:detalle_factura_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.factura.id_for_label }}">Factura *</label>
+                                    {{ form.factura }}
+                                    {% if form.factura.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.factura.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.descripcion.id_for_label }}">Descripción *</label>
+                                    {{ form.descripcion }}
+                                    {% if form.descripcion.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.descripcion.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.cantidad.id_for_label }}">Cantidad *</label>
+                                    {{ form.cantidad }}
+                                    {% if form.cantidad.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.cantidad.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.precio_unitario.id_for_label }}">Precio Unitario *</label>
+                                    {{ form.precio_unitario }}
+                                    {% if form.precio_unitario.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.precio_unitario.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="{{ form.subtotal.id_for_label }}">Subtotal</label>
+                                    {{ form.subtotal }}
+                                    {% if form.subtotal.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.subtotal.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    {% if object %}Actualizar{% else %}Crear{% endif %}
+                                </button>
+                                <a href="{% url 'billing:detalle_factura_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cantidadInput = document.getElementById('{{ form.cantidad.id_for_label }}');
+    const precioInput = document.getElementById('{{ form.precio_unitario.id_for_label }}');
+    const subtotalInput = document.getElementById('{{ form.subtotal.id_for_label }}');
+    
+    function calcularSubtotal() {
+        const cantidad = parseFloat(cantidadInput.value) || 0;
+        const precio = parseFloat(precioInput.value) || 0;
+        const subtotal = cantidad * precio;
+        subtotalInput.value = subtotal.toFixed(2);
+    }
+    
+    cantidadInput.addEventListener('input', calcularSubtotal);
+    precioInput.addEventListener('input', calcularSubtotal);
+});
+</script>
+{% endblock %} 

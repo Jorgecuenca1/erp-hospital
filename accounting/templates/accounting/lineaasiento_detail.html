@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Detalle de Línea de Asiento #{{ object.pk }}</h3>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title text-primary">Asiento #{{ object.asiento.pk }} - {{ object.cuenta.nombre }}</h4>
+            <hr>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Asiento Contable:</strong>
+                </div>
+                <div class="col-md-6">
+                    <a href="{% url 'accounting:asientocontable_detail' object.asiento.pk %}" class="text-decoration-none">#{{ object.asiento.pk }} - {{ object.asiento.descripcion }}</a>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Cuenta Contable:</strong>
+                </div>
+                <div class="col-md-6">
+                    <a href="{% url 'accounting:cuentacontable_detail' object.cuenta.pk %}" class="text-decoration-none">{{ object.cuenta.codigo }} - {{ object.cuenta.nombre }}</a>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Descripción:</strong>
+                </div>
+                <div class="col-md-6">
+                    {{ object.descripcion|default:"N/A" }}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Débito:</strong>
+                </div>
+                <div class="col-md-6">
+                    <span class="badge bg-success">$ {{ object.debito|floatformat:2 }}</span>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Crédito:</strong>
+                </div>
+                <div class="col-md-6">
+                    <span class="badge bg-danger">$ {{ object.credito|floatformat:2 }}</span>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Impuesto:</strong>
+                </div>
+                <div class="col-md-6">
+                    {% if object.impuesto %}
+                    <a href="{% url 'accounting:impuesto_detail' object.impuesto.pk %}" class="text-decoration-none">{{ object.impuesto.nombre }} ({{ object.impuesto.porcentaje }}%)</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <strong>Tercero:</strong>
+                </div>
+                <div class="col-md-6">
+                    {% if object.tercero %}
+                    <a href="{% url 'accounting:tercero_detail' object.tercero.pk %}" class="text-decoration-none">{{ object.tercero.nombre }} ({{ object.tercero.nit }})</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <a href="{% url 'accounting:lineaasiento_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-alt-circle-left"></i> Volver a la Lista
+            </a>
+            <a href="{% url 'accounting:lineaasiento_update' object.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'accounting:lineaasiento_delete' object.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

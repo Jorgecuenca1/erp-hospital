@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Órdenes de Dispensación{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Órdenes de Dispensación</h1>
+        <a href="{% url 'orden_create' %}" class="btn btn-primary">Crear Nueva Orden</a>
+    </div>
+
+    <div class="list-group">
+        {% for orden in ordenes %}
+        <a href="{% url 'orden_detail' orden.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Orden #{{ orden.pk }} para {{ orden.paciente.nombres }} {{ orden.paciente.apellidos }}</h5>
+                <small class="text-muted">{{ orden.fecha_dispensacion|date:"d M, Y H:i" }}</small>
+            </div>
+            <p class="mb-1">Observaciones: {{ orden.observaciones|truncatewords:15|default:"Sin observaciones." }}</p>
+        </a>
+        {% empty %}
+        <div class="list-group-item">
+            <p>No hay órdenes de dispensación registradas.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+            
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+            
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %} 

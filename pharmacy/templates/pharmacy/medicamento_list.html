@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Medicamentos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Medicamentos en Farmacia</h1>
+        <a href="{% url 'medicamento_create' %}" class="btn btn-primary">Añadir Nuevo Medicamento</a>
+    </div>
+
+    <div class="row">
+        {% for medicamento in medicamentos %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'medicamento_detail' medicamento.pk %}">{{ medicamento.producto.nombre }}</a></h5>
+                    <p class="card-text text-muted">{{ medicamento.presentacion|default:'Sin presentación' }}</p>
+                    <p class="card-text"><strong>Dosis:</strong> {{ medicamento.dosis|default:'No especificada' }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    {% if medicamento.requiere_receta %}
+                        <span class="badge bg-warning text-dark">Requiere Receta</span>
+                    {% else %}
+                        <span class="badge bg-info text-dark">Venta Libre</span>
+                    {% endif %}
+                    <span class="badge bg-primary">Stock: {{ medicamento.producto.stock_actual|floatformat:0 }} {{ medicamento.producto.unidad_medida }}</span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>No hay medicamentos registrados en la farmacia.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+            
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+            
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

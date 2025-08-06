@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Sesiones de Caja{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Sesiones de Caja</h1>
+        <a href="{% url 'pos:sesioncaja_create' %}" class="btn btn-primary">Crear Nueva Sesión de Caja</a>
+    </div>
+
+    <div class="row">
+        {% for sesioncaja in object_list %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'pos:sesioncaja_detail' sesioncaja.pk %}">Sesión #{{ sesioncaja.pk }}</a></h5>
+                    <p class="card-text text-muted">Caja: {{ sesioncaja.caja.nombre }} ({{ sesioncaja.caja.punto_venta.nombre }})</p>
+                    <p class="card-text">Usuario: {{ sesioncaja.usuario.first_name }} {{ sesioncaja.usuario.last_name }}</p>
+                    <p class="card-text">Apertura: {{ sesioncaja.fecha_apertura|date:"d M, Y H:i" }}</p>
+                    <p class="card-text">Saldo Inicial: {{ sesioncaja.saldo_inicial|floatformat:2 }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    {% if sesioncaja.abierta %}
+                        <span class="badge bg-success">Abierta</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Cerrada</span>
+                    {% endif %}
+                    <div>
+                        <a href="{% url 'pos:sesioncaja_update' sesioncaja.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        <a href="{% url 'pos:sesioncaja_delete' sesioncaja.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <p>No hay sesiones de caja registradas.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

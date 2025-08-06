@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text lead">¿Estás seguro de que deseas eliminar la cuenta contable "<strong>{{ cuentacontable.nombre }} ({{ cuentacontable.codigo }})</strong>"?</p>
+            <p class="card-text text-danger">Esta acción eliminará también todas las subcuentas y movimientos asociados. No se puede deshacer.</p>
+        </div>
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <form method="post">
+                {% csrf_token %}
+                <a href="{% url 'accounting:cuentacontable_detail' cuentacontable.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times-circle"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Confirmar Eliminación
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMetaHIS - Dashboard Administrativo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --warning-color: #fd7e14;
+            --danger-color: #dc3545;
+            --info-color: #0dcaf0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0b5ed7 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0b5ed7 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .module-category {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .module-category h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .module-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .module-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .module-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .module-description {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .badge-category {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .hms-badge { background: var(--success-color); }
+        .erp-badge { background: var(--info-color); }
+        .esg-badge { background: var(--warning-color); }
+
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            width: 100%;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'landing_page' %}">
+                <i class="fas fa-hospital-alt me-2"></i>
+                HMetaHIS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'landing_page' %}">
+                            <i class="fas fa-home me-1"></i>Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/">
+                            <i class="fas fa-cogs me-1"></i>Admin Django
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout/">
+                            <i class="fas fa-sign-out-alt me-1"></i>Salir
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-tachometer-alt me-3"></i>
+                        Dashboard Administrativo
+                    </h1>
+                    <p class="lead mb-0">
+                        Sistema ERP Hospitalario Completo - Superior a Odoo Enterprise
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-light" id="refreshStats">
+                            <i class="fas fa-sync-alt me-1"></i>Actualizar
+                        </button>
+                        <button type="button" class="btn btn-light" onclick="window.print()">
+                            <i class="fas fa-print me-1"></i>Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Estadísticas Rápidas -->
+        <div class="quick-stats">
+            <div class="stats-card text-center">
+                <div class="stats-number">{{ stats.total_modules }}</div>
+                <div class="text-muted">Módulos Totales</div>
+            </div>
+            <div class="stats-card text-center">
+                <div class="stats-number">{{ stats.hms_modules }}</div>
+                <div class="text-muted">Módulos HMS</div>
+            </div>
+            <div class="stats-card text-center">
+                <div class="stats-number">{{ stats.erp_modules }}</div>
+                <div class="text-muted">Módulos ERP</div>
+            </div>
+            <div class="stats-card text-center">
+                <div class="stats-number">{{ stats.completion_rate }}%</div>
+                <div class="text-muted">Completitud</div>
+            </div>
+        </div>
+
+        <!-- Búsqueda -->
+        <div class="search-container">
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="text" class="search-box" id="moduleSearch" placeholder="Buscar módulos por nombre o descripción...">
+                </div>
+                <div class="col-md-4">
+                    <select class="search-box" id="categoryFilter">
+                        <option value="">Todas las categorías</option>
+                        <option value="hms">HMS</option>
+                        <option value="erp">ERP</option>
+                        <option value="esg">ESG</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Módulos HMS -->
+        <div class="module-category">
+            <h3><i class="fas fa-hospital-alt me-2"></i>Módulos HMS (Hospital Management System)</h3>
+            
+            {% for category, modules in hms_modules.items %}
+                <div class="mb-4">
+                    <h5 class="mb-3">
+                        {% if category == 'core' %}
+                            <i class="fas fa-hospital me-2"></i>Core & Fundación
+                        {% elif category == 'specialties' %}
+                            <i class="fas fa-stethoscope me-2"></i>Especialidades Médicas
+                        {% elif category == 'surgery' %}
+                            <i class="fas fa-cut me-2"></i>Cirugía y Operaciones
+                        {% elif category == 'diagnostics' %}
+                            <i class="fas fa-microscope me-2"></i>Diagnósticos
+                        {% elif category == 'emergency' %}
+                            <i class="fas fa-ambulance me-2"></i>Emergencias
+                        {% elif category == 'patient_services' %}
+                            <i class="fas fa-user-injured me-2"></i>Servicios al Paciente
+                        {% elif category == 'digital_health' %}
+                            <i class="fas fa-laptop-medical me-2"></i>Salud Digital
+                        {% elif category == 'business' %}
+                            <i class="fas fa-briefcase me-2"></i>Administración
+                        {% elif category == 'user_experience' %}
+                            <i class="fas fa-tv me-2"></i>Experiencia del Usuario
+                        {% endif %}
+                    </h5>
+                    <div class="module-grid">
+                        {% for module in modules %}
+                            <a href="{{ module.url }}" class="module-card hms-module" data-category="hms">
+                                <div class="badge-category hms-badge">HMS</div>
+                                <div class="module-icon">
+                                    <i class="fas {{ module.icon }}"></i>
+                                </div>
+                                <div class="module-name">{{ module.name }}</div>
+                                <div class="module-description">{{ module.description }}</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Módulos ERP -->
+        <div class="module-category">
+            <h3><i class="fas fa-building me-2"></i>Módulos ERP (Enterprise Resource Planning)</h3>
+            
+            {% for category, modules in erp_modules.items %}
+                <div class="mb-4">
+                    <h5 class="mb-3">
+                        {% if category == 'core_business' %}
+                            <i class="fas fa-heart me-2"></i>Core Hospitalario
+                        {% elif category == 'financial' %}
+                            <i class="fas fa-chart-line me-2"></i>Financiero
+                        {% elif category == 'inventory' %}
+                            <i class="fas fa-boxes me-2"></i>Inventarios
+                        {% elif category == 'hr_quality' %}
+                            <i class="fas fa-users me-2"></i>RRHH y Calidad
+                        {% elif category == 'commerce' %}
+                            <i class="fas fa-shopping-cart me-2"></i>Comercio
+                        {% elif category == 'digital' %}
+                            <i class="fas fa-globe me-2"></i>Digital
+                        {% endif %}
+                    </h5>
+                    <div class="module-grid">
+                        {% for module in modules %}
+                            <a href="{{ module.url }}" class="module-card erp-module" data-category="erp">
+                                <div class="badge-category erp-badge">ERP</div>
+                                <div class="module-icon">
+                                    <i class="fas {{ module.icon }}"></i>
+                                </div>
+                                <div class="module-name">{{ module.name }}</div>
+                                <div class="module-description">{{ module.description }}</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Módulos ESG -->
+        <div class="module-category">
+            <h3><i class="fas fa-leaf me-2"></i>Módulos ESG (Environmental, Social & Governance)</h3>
+            <div class="module-grid">
+                {% for module in esg_modules %}
+                    <a href="{{ module.url }}" class="module-card esg-module" data-category="esg">
+                        <div class="badge-category esg-badge">ESG</div>
+                        <div class="module-icon">
+                            <i class="fas {{ module.icon }}"></i>
+                        </div>
+                        <div class="module-name">{{ module.name }}</div>
+                        <div class="module-description">{{ module.description }}</div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>HMetaHIS</h5>
+                    <p>Sistema ERP Hospitalario Completo<br>Superior a Odoo Enterprise</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>
+                        <strong>75+ Módulos Integrados</strong><br>
+                        24 HMS + 27 ERP + 3 ESG + 21 Adicionales
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Funcionalidad de búsqueda
+        document.getElementById('moduleSearch').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const moduleCards = document.querySelectorAll('.module-card');
+            
+            moduleCards.forEach(card => {
+                const name = card.querySelector('.module-name').textContent.toLowerCase();
+                const description = card.querySelector('.module-description').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Filtro por categoría
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            const selectedCategory = this.value;
+            const moduleCards = document.querySelectorAll('.module-card');
+            
+            moduleCards.forEach(card => {
+                if (selectedCategory === '' || card.dataset.category === selectedCategory) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Actualizar estadísticas
+        document.getElementById('refreshStats').addEventListener('click', function() {
+            const btn = this;
+            const icon = btn.querySelector('i');
+            
+            // Animación de carga
+            icon.classList.add('fa-spin');
+            btn.disabled = true;
+            
+            // Simular actualización
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                btn.disabled = false;
+                
+                // Aquí podrías hacer una petición AJAX para actualizar las estadísticas
+                console.log('Estadísticas actualizadas');
+            }, 2000);
+        });
+
+        // Animación de entrada para las cards
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.module-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html> 

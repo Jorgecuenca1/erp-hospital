@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Especialidad{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3>{{ especialidad.nombre }}</h3>
+            <div>
+                <a href="{% url 'especialidad_update' especialidad.pk %}" class="btn btn-primary">Editar</a>
+                <a href="{% url 'especialidad_delete' especialidad.pk %}" class="btn btn-danger">Eliminar</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <p>{{ especialidad.descripcion|default:"No hay descripción para esta especialidad." }}</p>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4>Profesionales en esta Especialidad</h4>
+        <div class="list-group">
+            {% for profesional in especialidad.profesionalsalud_set.all %}
+                <a href="{% url 'profesional_detail' profesional.pk %}" class="list-group-item list-group-item-action">
+                    {{ profesional.nombres }} {{ profesional.apellidos }}
+                </a>
+            {% empty %}
+                <div class="list-group-item">No hay profesionales registrados en esta especialidad.</div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'especialidad_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+    </div>
+</div>
+{% endblock %} 

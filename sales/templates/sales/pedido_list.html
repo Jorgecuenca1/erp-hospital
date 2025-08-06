@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Pedidos</h1>
+        </div>
+        <div class="card-body">
+            <a href="{% url 'sales:pedido_create' %}" class="btn btn-success mb-3">Add New Pedido</a>
+            {% if pedidos %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Client</th>
+                            <th>Date Ordered</th>
+                            <th>Status</th>
+                            <th>Total Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pedido in pedidos %}
+                        <tr>
+                            <td><a href="{% url 'sales:pedido_detail' pedido.pk %}">{{ pedido.client.full_name|default:"N/A" }}</a></td>
+                            <td>{{ pedido.date_ordered }}</td>
+                            <td>{{ pedido.status }}</td>
+                            <td>{{ pedido.total_amount }}</td>
+                            <td>
+                                <a href="{% url 'sales:pedido_update' pedido.pk %}" class="btn btn-sm btn-info">Edit</a>
+                                <a href="{% url 'sales:pedido_delete' pedido.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                No pedidos available.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
