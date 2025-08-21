@@ -1,3 +1,204 @@
-{% extends 'base.html' %}\n{% load crispy_forms_tags %}\n\n{% block content %}\n<div class=\"container mt-4\">\n    <div class=\"card shadow-sm\">\n        <div class=\"card-header bg-primary text-white\">\n            <h1 class=\"mb-0\">Proveedores</h1>\n        </div>\n        <div class=\"card-body\">\n            <a href=\"{% url 'purchases:proveedor_create' %}\" class=\"btn btn-success mb-3\">Add New Proveedor</a>\n            {% if proveedores %}\n            <div class=\"table-responsive\">\n                <table class=\"table table-hover table-striped\">\n                    <thead class=\"thead-dark\">\n                        <tr>\n                            <th>Name</th>\n                            <th>Contact Person</th>\n                            <th>Email</th>\n                            <th>Phone</th>\n                            <th>Actions</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        {% for proveedor in proveedores %}\n                        <tr>\n                            <td><a href=\"{% url 'purchases:proveedor_detail' proveedor.pk %}\">{{ proveedor.name }}</a></td>\n                            <td>{{ proveedor.contact_person }}</td>\
-                            <td>{{ proveedor.email }}</td>\n                            <td>{{ proveedor.phone }}</td>\n                            <td>\n                                <a href=\"{% url 'purchases:proveedor_update' proveedor.pk %}\" class=\"btn btn-sm btn-info\">Edit</a>\n                                <a href=\"{% url 'purchases:proveedor_delete' proveedor.pk %}\" class=\"btn btn-sm btn-danger\">Delete</a>\n                            </td>\n                        </tr>\n                        {% endfor %}\
-                    </tbody>\n                </table>\n            </div>\n            {% else %}\n            <div class=\"alert alert-info\" role=\"alert\">\n                No proveedores available.\n            </div>\n            {% endif %}\n        </div>\n    </div>\n</div>\n{% endblock %} 
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Proveedores - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+        <div class="row">
+                <div class="col-12">
+                        <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="mb-0">
+                                                <i class="fas fa-truck me-2 text-warning"></i>
+                                                Lista de Proveedores
+                                        </h4>
+                                        <div>
+                                                <a href="{% url 'purchases:proveedor_create' %}"
+                                                        class="btn btn-warning">
+                                                        <i class="fas fa-plus me-2"></i>Nuevo Proveedor
+                                                </a>
+                                                <a href="{% url 'purchases:dashboard' %}" class="btn btn-secondary">
+                                                        <i class="fas fa-arrow-left me-2"></i>Volver
+                                                </a>
+                                        </div>
+                                </div>
+                                <div class="card-body">
+                                        <!-- Búsqueda -->
+                                        <form method="get" class="mb-4">
+                                                <div class="row">
+                                                        <div class="col-md-10">
+                                                                <input type="text" name="search" class="form-control"
+                                                                        placeholder="Buscar por nombre, identificación o email..."
+                                                                        value="{{ request.GET.search }}">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                                <button type="submit" class="btn btn-primary w-100">
+                                                                        <i class="fas fa-search"></i> Buscar
+                                                                </button>
+                                                        </div>
+                                                </div>
+                                        </form>
+
+                                        <!-- Tabla de proveedores -->
+                                        <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                        <thead class="table-light">
+                                                                <tr>
+                                                                        <th>Proveedor</th>
+                                                                        <th>Identificación</th>
+                                                                        <th>Tipo</th>
+                                                                        <th>Contacto</th>
+                                                                        <th>Estado</th>
+                                                                        <th>Calificación</th>
+                                                                        <th>Acciones</th>
+                                                                </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                                {% for proveedor in proveedores %}
+                                                                <tr>
+                                                                        <td>
+                                                                                <div>
+                                                                                        <strong>{{ proveedor.nombre
+                                                                                                }}</strong>
+                                                                                </div>
+                                                                                <small class="text-muted">{{
+                                                                                        proveedor.contacto_principal|default:"Sin
+                                                                                        contacto" }}</small>
+                                                                        </td>
+                                                                        <td>{{ proveedor.identificacion|default:"--" }}
+                                                                        </td>
+                                                                        <td>
+                                                                                <span class="badge bg-info">{{
+                                                                                        proveedor.get_tipo_proveedor_display
+                                                                                        }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                                <div>{{ proveedor.telefono|default:"--"
+                                                                                        }}</div>
+                                                                                <small class="text-muted">{{
+                                                                                        proveedor.email|default:"Sin
+                                                                                        email" }}</small>
+                                                                        </td>
+                                                                        <td>
+                                                                                {% if proveedor.estado == 'ACTIVO' %}
+                                                                                <span
+                                                                                        class="badge bg-success">Activo</span>
+                                                                                {% elif proveedor.estado == 'INACTIVO'
+                                                                                %}
+                                                                                <span
+                                                                                        class="badge bg-secondary">Inactivo</span>
+                                                                                {% else %}
+                                                                                <span
+                                                                                        class="badge bg-warning">Suspendido</span>
+                                                                                {% endif %}
+                                                                        </td>
+                                                                        <td>
+                                                                                <div class="text-warning">
+                                                                                        {% for i in "12345" %}
+                                                                                        {% if forloop.counter <=
+                                                                                                proveedor.calificacion
+                                                                                                %} <i
+                                                                                                class="fas fa-star"></i>
+                                                                                                {% else %}
+                                                                                                <i
+                                                                                                        class="far fa-star"></i>
+                                                                                                {% endif %}
+                                                                                                {% endfor %}
+                                                                                </div>
+                                                                                <small class="text-muted">{{
+                                                                                        proveedor.calificacion
+                                                                                        }}/5</small>
+                                                                        </td>
+                                                                        <td>
+                                                                                <div class="btn-group" role="group">
+                                                                                        <a href="{% url 'purchases:proveedor_detail' proveedor.pk %}"
+                                                                                                class="btn btn-sm btn-outline-primary"
+                                                                                                title="Ver">
+                                                                                                <i
+                                                                                                        class="fas fa-eye"></i>
+                                                                                        </a>
+                                                                                        <a href="{% url 'purchases:proveedor_update' proveedor.pk %}"
+                                                                                                class="btn btn-sm btn-outline-warning"
+                                                                                                title="Editar">
+                                                                                                <i
+                                                                                                        class="fas fa-edit"></i>
+                                                                                        </a>
+                                                                                        <a href="{% url 'purchases:proveedor_delete' proveedor.pk %}"
+                                                                                                class="btn btn-sm btn-outline-danger"
+                                                                                                title="Eliminar"
+                                                                                                onclick="return confirm('¿Está seguro?')">
+                                                                                                <i
+                                                                                                        class="fas fa-trash"></i>
+                                                                                        </a>
+                                                                                </div>
+                                                                        </td>
+                                                                </tr>
+                                                                {% empty %}
+                                                                <tr>
+                                                                        <td colspan="7" class="text-center py-4">
+                                                                                <div class="text-muted">
+                                                                                        <i
+                                                                                                class="fas fa-truck fa-3x mb-3"></i>
+                                                                                        <h5>No hay proveedores
+                                                                                                registrados</h5>
+                                                                                        <p>Haga clic en "Nuevo
+                                                                                                Proveedor" para agregar
+                                                                                                el primer proveedor.</p>
+                                                                                </div>
+                                                                        </td>
+                                                                </tr>
+                                                                {% endfor %}
+                                                        </tbody>
+                                                </table>
+                                        </div>
+
+                                        <!-- Paginación -->
+                                        {% if is_paginated %}
+                                        <nav aria-label="Paginación">
+                                                <ul class="pagination justify-content-center">
+                                                        {% if page_obj.has_previous %}
+                                                        <li class="page-item">
+                                                                <a class="page-link"
+                                                                        href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Primera</a>
+                                                        </li>
+                                                        <li class="page-item">
+                                                                <a class="page-link"
+                                                                        href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                                                        </li>
+                                                        {% endif %}
+
+                                                        <li class="page-item active">
+                                                                <span class="page-link">
+                                                                        Página {{ page_obj.number }} de {{
+                                                                        page_obj.paginator.num_pages }}
+                                                                </span>
+                                                        </li>
+
+                                                        {% if page_obj.has_next %}
+                                                        <li class="page-item">
+                                                                <a class="page-link"
+                                                                        href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Siguiente</a>
+                                                        </li>
+                                                        <li class="page-item">
+                                                                <a class="page-link"
+                                                                        href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última</a>
+                                                        </li>
+                                                        {% endif %}
+                                                </ul>
+                                        </nav>
+                                        {% endif %}
+                                </div>
+                        </div>
+                </div>
+        </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+        $(document).ready(function () {
+                console.log('✅ Lista de proveedores cargada');
+        });
+</script>
+{% endblock %}

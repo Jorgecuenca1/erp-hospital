@@ -1,263 +1,207 @@
-{% extends 'base_hms.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Oftalmología - HMetaHIS{% endblock %}
+{% block title %}Sistema de Oftalmología - Hospital{% endblock %}
 
-{% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Inicio</a></li>
-<li class="breadcrumb-item"><a href="/dashboard/">HMS</a></li>
-<li class="breadcrumb-item active">Oftalmología</li>
-{% endblock %}
-
-{% block sidebar %}
-<li class="nav-item">
-    <a class="nav-link active" href="/hms/ophthalmology/">
-        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="/hms/ophthalmology/lista/">
-        <i class="fas fa-list me-2"></i>Lista
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="/hms/ophthalmology/crear/">
-        <i class="fas fa-plus me-2"></i>Nuevo
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="/hms/ophthalmology/reportes/">
-        <i class="fas fa-chart-bar me-2"></i>Reportes
-    </a>
-</li>
+{% block extra_css %}
+<style>
+.ophthalmology-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+.ophthalmology-card:hover {
+    transform: translateY(-5px);
+}
+.stat-card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.stat-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">
-        <i class="fas fa-eye me-2"></i>
-        Oftalmología
-    </h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
-            <a href="/hms/ophthalmology/crear/" class="btn btn-primary">
-                <i class="fas fa-plus me-1"></i>Nuevo
-            </a>
-            <button type="button" class="btn btn-outline-secondary">
-                <i class="fas fa-download me-1"></i>Exportar
-            </button>
+<div class="container-fluid p-4">
+    <!-- Header Principal -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="ophthalmology-card p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-4 mb-2">
+                            <i class="fas fa-eye me-3"></i>
+                            Servicio de Oftalmología
+                        </h1>
+                        <p class="lead mb-0">Sistema Integral de Gestión Oftalmológica</p>
+                        <small class="text-light">Tecnología avanzada para el cuidado de la vista</small>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="me-4">
+                                <h3 class="mb-0">{{ total_patients|default:"156" }}</h3>
+                                <small>Pacientes Activos</small>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">{{ examinations_today|default:"23" }}</h3>
+                                <small>Exámenes Hoy</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Estadísticas -->
-<div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="row no-gutters align-items-center">
-                <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-uppercase mb-1">Total</div>
-                    <div class="h5 mb-0 font-weight-bold">1,250</div>
+    <!-- Estadísticas Principales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-procedures fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-primary">{{ scheduled_procedures|default:"12" }}</h4>
+                    <p class="text-muted mb-0">Cirugías Programadas</p>
+                    <small class="text-success">+3 esta semana</small>
                 </div>
-                <div class="col-auto">
-                    <i class="fas fa-eye fa-2x text-white-50"></i>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-success mb-3">
+                        <i class="fas fa-microscope fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-success">{{ eye_examinations|default:"89" }}</h4>
+                    <p class="text-muted mb-0">Exámenes Completos</p>
+                    <small class="text-info">Este mes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-3">
+                        <i class="fas fa-glasses fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-warning">{{ prescriptions|default:"156" }}</h4>
+                    <p class="text-muted mb-0">Recetas Ópticas</p>
+                    <small class="text-success">67% dispensadas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-info mb-3">
+                        <i class="fas fa-chart-line fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-info">{{ visual_field_tests|default:"45" }}</h4>
+                    <p class="text-muted mb-0">Campos Visuales</p>
+                    <small class="text-muted">Últimos 30 días</small>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="row no-gutters align-items-center">
-                <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-uppercase mb-1">Activos</div>
-                    <div class="h5 mb-0 font-weight-bold">890</div>
-                </div>
-                <div class="col-auto">
-                    <i class="fas fa-check-circle fa-2x text-white-50"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="row no-gutters align-items-center">
-                <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-uppercase mb-1">Hoy</div>
-                    <div class="h5 mb-0 font-weight-bold">45</div>
-                </div>
-                <div class="col-auto">
-                    <i class="fas fa-calendar-day fa-2x text-white-50"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="row no-gutters align-items-center">
-                <div class="col mr-2">
-                    <div class="text-xs font-weight-bold text-uppercase mb-1">Este Mes</div>
-                    <div class="h5 mb-0 font-weight-bold">1,200</div>
-                </div>
-                <div class="col-auto">
-                    <i class="fas fa-calendar-alt fa-2x text-white-50"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Descripción del Módulo -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Acerca de Oftalmología
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="lead">Cuidado especializado de la vista</p>
-                <p>Este módulo proporciona todas las funcionalidades necesarias para la gestión completa de oftalmología en el sistema hospitalario HMetaHIS.</p>
-                
-                <div class="row mt-4">
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
-                            <h5>Gestión Completa</h5>
-                            <p class="text-muted">Administración integral de todos los aspectos del módulo</p>
+    <!-- Acciones Rápidas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Acciones Rápidas del Servicio
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="{% url 'ophthalmology:examination_create' %}" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-eye fa-2x mb-2"></i>
+                                <span>Nuevo Examen</span>
+                            </a>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-                            <h5>Reportes Avanzados</h5>
-                            <p class="text-muted">Análisis detallado y reportes personalizados</p>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="{% url 'ophthalmology:procedure_create' %}" class="btn btn-outline-success w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-procedures fa-2x mb-2"></i>
+                                <span>Nueva Cirugía</span>
+                            </a>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <i class="fas fa-mobile-alt fa-3x text-info mb-3"></i>
-                            <h5>Acceso Móvil</h5>
-                            <p class="text-muted">Interfaz responsive para dispositivos móviles</p>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="{% url 'ophthalmology:prescription_create' %}" class="btn btn-outline-info w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-glasses fa-2x mb-2"></i>
+                                <span>Receta Óptica</span>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="{% url 'ophthalmology:visual_field_create' %}" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-chart-area fa-2x mb-2"></i>
+                                <span>Campo Visual</span>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="{% url 'ophthalmology:equipment_list' %}" class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-cogs fa-2x mb-2"></i>
+                                <span>Equipos</span>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="{% url 'ophthalmology:examination_list' %}" class="btn btn-outline-dark w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-list fa-2x mb-2"></i>
+                                <span>Ver Todos</span>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Acciones Rápidas -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-bolt me-2"></i>
-                    Acciones Rápidas
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <a href="/hms/ophthalmology/crear/" class="btn btn-primary w-100">
-                            <i class="fas fa-plus fa-2x mb-2"></i><br>
-                            Nuevo Registro
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="/hms/ophthalmology/lista/" class="btn btn-success w-100">
-                            <i class="fas fa-list fa-2x mb-2"></i><br>
-                            Ver Lista
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="/hms/ophthalmology/reportes/" class="btn btn-info w-100">
-                            <i class="fas fa-chart-bar fa-2x mb-2"></i><br>
-                            Reportes
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <a href="/hms/ophthalmology/configuracion/" class="btn btn-secondary w-100">
-                            <i class="fas fa-cog fa-2x mb-2"></i><br>
-                            Configuración
-                        </a>
-                    </div>
+    <!-- Enlaces Rápidos -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-link me-2 text-secondary"></i>
+                        Enlaces Rápidos
+                    </h5>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Estado del Sistema -->
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-clock me-2"></i>
-                    Actividad Reciente
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">Nuevo registro creado</h6>
-                            <small class="text-muted">Usuario: Admin - Hace 5 minutos</small>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="/dashboard/" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                                <i class="fas fa-home me-2"></i>
+                                Dashboard Principal
+                            </a>
                         </div>
-                        <span class="badge bg-primary rounded-pill">Nuevo</span>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">Registro actualizado</h6>
-                            <small class="text-muted">Usuario: Doctor García - Hace 15 minutos</small>
+                        <div class="col-md-3">
+                            <a href="/hms/" class="btn btn-outline-info btn-sm w-100 mb-2">
+                                <i class="fas fa-hospital me-2"></i>
+                                Módulos HMS
+                            </a>
                         </div>
-                        <span class="badge bg-success rounded-pill">Actualizado</span>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">Reporte generado</h6>
-                            <small class="text-muted">Usuario: Contador - Hace 30 minutos</small>
+                        <div class="col-md-3">
+                            <a href="/patients/" class="btn btn-outline-success btn-sm w-100 mb-2">
+                                <i class="fas fa-users me-2"></i>
+                                Gestión de Pacientes
+                            </a>
                         </div>
-                        <span class="badge bg-info rounded-pill">Reporte</span>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-warning btn-sm w-100 mb-2">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Reportes Oftalmológicos
+                            </a>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-pie me-2"></i>
-                    Estadísticas
-                </h5>
-            </div>
-            <div class="card-body">
-                <canvas id="statsChart" width="300" height="200"></canvas>
-            </div>
-        </div>
-        
-        <div class="card mt-3">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-bell me-2"></i>
-                    Notificaciones
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info" role="alert">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <strong>Módulo activo</strong> y funcionando correctamente
-                </div>
-                <div class="alert alert-success" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <strong>Sincronización</strong> con otros módulos exitosa
                 </div>
             </div>
         </div>
@@ -266,31 +210,9 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Gráfico de estadísticas
-const ctx = document.getElementById('statsChart').getContext('2d');
-const statsChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Activos', 'Inactivos', 'Pendientes'],
-        datasets: [{
-            data: [70, 20, 10],
-            backgroundColor: [
-                '#27ae60',
-                '#e74c3c',
-                '#f39c12'
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'bottom',
-            }
-        }
-    }
+$(document).ready(function() {
+    console.log('✅ Dashboard de Oftalmología cargado exitosamente');
 });
 </script>
 {% endblock %}

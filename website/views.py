@@ -1,10 +1,21 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import PaginaWeb, Seccion, Menu, Banner
 from .forms import PaginaWebForm, SeccionForm, MenuForm, BannerForm
 
 # Create your views here.
+
+class WebsiteDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal del sitio web"""
+    template_name = 'website/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'Sitio Web'
+        context['paginas_total'] = PaginaWeb.objects.count()
+        return context
 
 # PaginaWeb
 class PaginaWebListView(ListView):

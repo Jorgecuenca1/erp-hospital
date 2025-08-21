@@ -6,12 +6,12 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Órdenes de Dispensación</h1>
-        <a href="{% url 'orden_create' %}" class="btn btn-primary">Crear Nueva Orden</a>
+        <a href="{% url 'admision_recepcion:orden_create' %}" class="btn btn-primary">Crear Nueva Orden</a>
     </div>
 
     <div class="list-group">
         {% for orden in ordenes %}
-        <a href="{% url 'orden_detail' orden.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">
+        <a href="{% url 'admision_recepcion:orden_detail' orden.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">Orden #{{ orden.pk }} para {{ orden.paciente.nombres }} {{ orden.paciente.apellidos }}</h5>
                 <small class="text-muted">{{ orden.fecha_dispensacion|date:"d M, Y H:i" }}</small>

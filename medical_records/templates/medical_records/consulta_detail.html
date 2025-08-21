@@ -8,7 +8,7 @@
     <div class="card shadow-sm">
         <div class="card-header">
             <h3>Consulta del {{ consulta.fecha_hora|date:"d M, Y" }}</h3>
-            <p class="mb-0"><strong>Paciente:</strong> <a href="{% url 'paciente_detail' consulta.historia_clinica.paciente.pk %}">{{ consulta.historia_clinica.paciente.nombres }} {{ consulta.historia_clinica.paciente.apellidos }}</a></p>
+            <p class="mb-0"><strong>Paciente:</strong> <a href="{% url 'patients:paciente_detail' consulta.historia_clinica.paciente.pk %}">{{ consulta.historia_clinica.paciente.nombres }} {{ consulta.historia_clinica.paciente.apellidos }}</a></p>
             <p class="mb-0"><strong>Profesional:</strong> {{ consulta.profesional.nombres }} {{ consulta.profesional.apellidos }}</p>
         </div>
         <div class="card-body">

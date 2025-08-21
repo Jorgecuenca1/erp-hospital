@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Equipos Oftalmológicos - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-cogs me-2 text-primary"></i>
+                        Equipos Oftalmológicos
+                    </h4>
+                    <div>
+                        <a href="{% url 'ophthalmology:equipment_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Equipo
+                        </a>
+                        <a href="{% url 'ophthalmology:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros por estado -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="btn-group" role="group">
+                                <a href="?status=ACTIVE" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-check-circle"></i> Activos
+                                </a>
+                                <a href="?status=MAINTENANCE" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-wrench"></i> Mantenimiento
+                                </a>
+                                <a href="?status=REPAIR" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-tools"></i> Reparación
+                                </a>
+                                <a href="{% url 'ophthalmology:equipment_list' %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-list"></i> Todos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de equipos -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Equipo</th>
+                                    <th>Tipo</th>
+                                    <th>Modelo</th>
+                                    <th>Ubicación</th>
+                                    <th>Estado</th>
+                                    <th>Último Mantenimiento</th>
+                                    <th>Próximo Mantenimiento</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for equipment in equipment %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ equipment.equipment_name }}</strong>
+                                        </div>
+                                        <small class="text-muted">{{ equipment.manufacturer }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ equipment.get_equipment_type_display }}</span>
+                                    </td>
+                                    <td>
+                                        <div>{{ equipment.model }}</div>
+                                        <small class="text-muted">SN: {{ equipment.serial_number }}</small>
+                                    </td>
+                                    <td>{{ equipment.location }}</td>
+                                    <td>
+                                        {% if equipment.status == 'ACTIVE' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check"></i> Activo
+                                        </span>
+                                        {% elif equipment.status == 'MAINTENANCE' %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-wrench"></i> Mantenimiento
+                                        </span>
+                                        {% elif equipment.status == 'REPAIR' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-tools"></i> Reparación
+                                        </span>
+                                        {% elif equipment.status == 'RETIRED' %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-archive"></i> Retirado
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if equipment.last_maintenance %}
+                                        <div>{{ equipment.last_maintenance|date:"d/m/Y" }}</div>
+                                        {% else %}
+                                        <span class="text-muted">--</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if equipment.next_maintenance %}
+                                        <div class="{% if equipment.next_maintenance|date:'Y-m-d' <= today|date:'Y-m-d' %}text-danger{% elif equipment.next_maintenance|date:'Y-m-d' <= next_week|date:'Y-m-d' %}text-warning{% endif %}">
+                                            {{ equipment.next_maintenance|date:"d/m/Y" }}
+                                        </div>
+                                        {% else %}
+                                        <span class="text-muted">--</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    onclick="viewEquipment({{ equipment.pk }})" title="Ver Detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <a href="{% url 'ophthalmology:equipment_create' %}?edit={{ equipment.pk }}" 
+                                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-info" 
+                                                    onclick="maintenanceHistory({{ equipment.pk }})" title="Historial">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-cogs fa-3x mb-3"></i>
+                                            <h5>No hay equipos registrados</h5>
+                                            <p>Haga clic en "Nuevo Equipo" para agregar el primer equipo oftalmológico.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Resumen de equipos por estado -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Resumen de Equipos</h6>
+                                    <div class="row text-center">
+                                        <div class="col-3">
+                                            <h4 class="text-success">12</h4>
+                                            <small>Activos</small>
+                                        </div>
+                                        <div class="col-3">
+                                            <h4 class="text-warning">2</h4>
+                                            <small>Mantenimiento</small>
+                                        </div>
+                                        <div class="col-3">
+                                            <h4 class="text-danger">1</h4>
+                                            <small>Reparación</small>
+                                        </div>
+                                        <div class="col-3">
+                                            <h4 class="text-secondary">0</h4>
+                                            <small>Retirados</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewEquipment(equipmentId) {
+    alert('Ver detalles del equipo #' + equipmentId);
+}
+
+function maintenanceHistory(equipmentId) {
+    alert('Historial de mantenimiento del equipo #' + equipmentId);
+}
+
+$(document).ready(function() {
+    console.log('✅ Lista de equipos oftalmológicos cargada');
+});
+</script>
+{% endblock %}
+
+
+

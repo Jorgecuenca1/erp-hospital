@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tests de Campo Visual - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-chart-area me-2 text-primary"></i>
+                        Tests de Campo Visual
+                    </h4>
+                    <div>
+                        <a href="{% url 'ophthalmology:visual_field_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Test
+                        </a>
+                        <a href="{% url 'ophthalmology:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Tabla de tests -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Paciente</th>
+                                    <th>Fecha</th>
+                                    <th>Tipo de Test</th>
+                                    <th>Ojo</th>
+                                    <th>Resultados</th>
+                                    <th>Realizado por</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for test in tests %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">{{ test.test_number }}</strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ test.patient.first_name }} {{ test.patient.last_name }}</strong>
+                                        </div>
+                                        <small class="text-muted">ID: {{ test.patient.id }}</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ test.test_date|date:"d/m/Y" }}</div>
+                                        <small class="text-muted">{{ test.test_date|time:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ test.get_test_type_display }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if test.eye_tested == 'RIGHT' %}primary{% else %}success{% endif %}">
+                                            {% if test.eye_tested == 'RIGHT' %}
+                                                <i class="fas fa-eye"></i> OD
+                                            {% else %}
+                                                <i class="fas fa-eye"></i> OI
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="small">
+                                            {% if test.mean_deviation %}
+                                            <div><strong>MD:</strong> {{ test.mean_deviation }} dB</div>
+                                            {% endif %}
+                                            {% if test.pattern_standard_deviation %}
+                                            <div><strong>PSD:</strong> {{ test.pattern_standard_deviation }} dB</div>
+                                            {% endif %}
+                                            {% if test.visual_field_index %}
+                                            <div><strong>VFI:</strong> {{ test.visual_field_index }}%</div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>{{ test.performed_by.first_name }} {{ test.performed_by.last_name }}</div>
+                                        <small class="text-muted">Técnico</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    onclick="viewTest({{ test.pk }})" title="Ver Detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info" 
+                                                    onclick="printTest({{ test.pk }})" title="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success" 
+                                                    onclick="exportTest({{ test.pk }})" title="Exportar">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-chart-area fa-3x mb-3"></i>
+                                            <h5>No hay tests de campo visual registrados</h5>
+                                            <p>Haga clic en "Nuevo Test" para agregar el primer test de campo visual.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewTest(testId) {
+    alert('Ver detalles del test #' + testId);
+}
+
+function printTest(testId) {
+    alert('Imprimir test #' + testId);
+}
+
+function exportTest(testId) {
+    alert('Exportar test #' + testId);
+}
+
+$(document).ready(function() {
+    console.log('✅ Lista de tests de campo visual cargada');
+});
+</script>
+{% endblock %}
+
+
+

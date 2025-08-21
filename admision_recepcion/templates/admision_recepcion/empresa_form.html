@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Editar Empresa{% else %}Nueva Empresa{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-building me-2"></i>{% if object %}Editar Empresa{% else %}Nueva Empresa{% endif
+                        %}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Información Básica -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Razón Social *</label>
+                                    {{ form.razon_social }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre Comercial</label>
+                                    {{ form.nombre_comercial }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo Identificación *</label>
+                                    {{ form.tipo_identificacion }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Número Identificación *</label>
+                                    {{ form.numero_identificacion }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">DV</label>
+                                    {{ form.digito_verificacion }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo Empresa *</label>
+                                    {{ form.tipo_empresa }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Sector Económico</label>
+                                    {{ form.sector_economico }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información de Contacto -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Información de Contacto</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Teléfono Principal</label>
+                                            {{ form.telefono_principal }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Teléfono Secundario</label>
+                                            {{ form.telefono_secundario }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Email Principal</label>
+                                            {{ form.email_principal }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Sitio Web</label>
+                                            {{ form.sitio_web }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Dirección</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label class="form-label">Dirección</label>
+                                            {{ form.direccion }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Código Postal</label>
+                                            {{ form.codigo_postal }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Ciudad</label>
+                                            {{ form.ciudad }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Departamento</label>
+                                            {{ form.departamento }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información Legal/Fiscal -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Información Legal y Fiscal</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Régimen Tributario</label>
+                                            {{ form.regimen_tributario }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Actividad Económica Principal</label>
+                                            {{ form.actividad_economica }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Representante Legal</label>
+                                            {{ form.representante_legal }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Estado</label>
+                                            {{ form.estado }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Observaciones</label>
+                                    {{ form.observaciones }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admision_recepcion:empresa_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{% if object %}Actualizar{% else %}Crear{% endif %}
+                                Empresa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

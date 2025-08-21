@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Lista de Pacientes</h1>
-        <a href="{% url 'paciente_create' %}" class="btn btn-primary">Registrar Nuevo Paciente</a>
+        <a href="{% url 'patients:paciente_create' %}" class="btn btn-primary">Registrar Nuevo Paciente</a>
     </div>
 
     <div class="row">
@@ -14,7 +14,8 @@
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title"><a href="{% url 'paciente_detail' paciente.pk %}">{{ paciente.nombres }} {{ paciente.apellidos }}</a></h5>
+                    <h5 class="card-title"><a href="{% url 'patients:paciente_detail' paciente.pk %}">{{
+                            paciente.nombres }} {{ paciente.apellidos }}</a></h5>
                     <p class="card-text">
                         <strong>ID:</strong> {{ paciente.numero_identificacion }}<br>
                         <strong>Email:</strong> {{ paciente.email|default:"No especificado" }}<br>
@@ -22,8 +23,10 @@
                     </p>
                 </div>
                 <div class="card-footer bg-transparent border-top-0">
-                    <a href="{% url 'paciente_detail' paciente.pk %}" class="btn btn-sm btn-outline-primary">Ver Detalles</a>
-                    <a href="{% url 'paciente_update' paciente.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <a href="{% url 'patients:paciente_detail' paciente.pk %}"
+                        class="btn btn-sm btn-outline-primary">Ver Detalles</a>
+                    <a href="{% url 'patients:paciente_update' paciente.pk %}"
+                        class="btn btn-sm btn-outline-secondary">Editar</a>
                 </div>
             </div>
         </div>
@@ -39,20 +42,22 @@
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             {% if page_obj.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
             {% else %}
-                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
             {% endif %}
-            
-            <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
-            
+
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{
+                    page_obj.paginator.num_pages }}</span></li>
+
             {% if page_obj.has_next %}
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a></li>
             {% else %}
-                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
             {% endif %}
         </ul>
     </nav>
     {% endif %}
 </div>
-{% endblock %} 
+{% endblock %}

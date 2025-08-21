@@ -1,8 +1,20 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from .models import CategoriaProducto, Producto, Cliente, Carrito, LineaCarrito, Pedido, LineaPedido, Pago
 from .forms import CategoriaProductoForm, ProductoForm, ClienteForm, CarritoForm, LineaCarritoForm, PedidoForm, LineaPedidoForm, PagoForm
+
+
+class EcommerceDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal de ecommerce"""
+    template_name = 'ecommerce/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'Ecommerce'
+        context['productos_total'] = 0  # Placeholder
+        return context
 
 # Create your views here.
 

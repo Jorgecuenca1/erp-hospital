@@ -1,11 +1,16 @@
 from django.urls import path
 from .views import (
+    ForumDashboardView,
     TemaListView, TemaDetailView, TemaCreateView, TemaUpdateView, TemaDeleteView,
     PreguntaListView, PreguntaDetailView, PreguntaCreateView, PreguntaUpdateView, PreguntaDeleteView,
     RespuestaListView, RespuestaDetailView, RespuestaCreateView, RespuestaUpdateView, RespuestaDeleteView
 )
 
+app_name = 'forum'
+
 urlpatterns = [
+    # Dashboard principal
+    path('', ForumDashboardView.as_view(), name='dashboard'),
     # URLs para Tema
     path('temas/', TemaListView.as_view(), name='tema_list'),
     path('temas/<int:pk>/', TemaDetailView.as_view(), name='tema_detail'),

@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recetas Ópticas - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-glasses me-2 text-primary"></i>
+                        Recetas Ópticas
+                    </h4>
+                    <div>
+                        <a href="{% url 'ophthalmology:prescription_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nueva Receta
+                        </a>
+                        <a href="{% url 'ophthalmology:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Tabla de recetas -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Paciente</th>
+                                    <th>Fecha</th>
+                                    <th>Prescrito por</th>
+                                    <th>Prescripción</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prescription in prescriptions %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">{{ prescription.prescription_number }}</strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ prescription.patient.first_name }} {{ prescription.patient.last_name }}</strong>
+                                        </div>
+                                        <small class="text-muted">ID: {{ prescription.patient.id }}</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ prescription.prescription_date|date:"d/m/Y" }}</div>
+                                        <small class="text-muted">
+                                            Válida hasta: {{ prescription.valid_until|date:"d/m/Y" }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div>{{ prescription.prescribed_by.first_name }} {{ prescription.prescribed_by.last_name }}</div>
+                                        <small class="text-muted">Oftalmólogo</small>
+                                    </td>
+                                    <td>
+                                        <div class="row text-center">
+                                            <div class="col-6">
+                                                <small class="text-primary">OD</small>
+                                                <div>
+                                                    {% if prescription.sphere_right %}
+                                                        {{ prescription.sphere_right }}
+                                                        {% if prescription.cylinder_right %} / {{ prescription.cylinder_right }}{% endif %}
+                                                        {% if prescription.axis_right %} x {{ prescription.axis_right }}°{% endif %}
+                                                    {% else %}
+                                                        --
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-success">OI</small>
+                                                <div>
+                                                    {% if prescription.sphere_left %}
+                                                        {{ prescription.sphere_left }}
+                                                        {% if prescription.cylinder_left %} / {{ prescription.cylinder_left }}{% endif %}
+                                                        {% if prescription.axis_left %} x {{ prescription.axis_left }}°{% endif %}
+                                                    {% else %}
+                                                        --
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">{{ prescription.get_lens_type_display }}</small>
+                                    </td>
+                                    <td>
+                                        {% if prescription.dispensed %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check"></i> Dispensada
+                                        </span>
+                                        {% if prescription.dispensed_date %}
+                                        <br><small class="text-muted">{{ prescription.dispensed_date|date:"d/m/Y" }}</small>
+                                        {% endif %}
+                                        {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-clock"></i> Pendiente
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    onclick="viewPrescription({{ prescription.pk }})" 
+                                                    title="Ver Receta">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info" 
+                                                    onclick="printPrescription({{ prescription.pk }})" 
+                                                    title="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            {% if not prescription.dispensed %}
+                                            <button class="btn btn-sm btn-outline-success" 
+                                                    onclick="markAsDispensed({{ prescription.pk }})" 
+                                                    title="Marcar como Dispensada">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-glasses fa-3x mb-3"></i>
+                                            <h5>No hay recetas ópticas registradas</h5>
+                                            <p>Haga clic en "Nueva Receta" para agregar la primera receta óptica.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver receta -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-glasses me-2"></i>
+                    Receta Óptica
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="prescriptionDetails">
+                <!-- Contenido de la receta se carga aquí -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="printModal()">
+                    <i class="fas fa-print me-2"></i>Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewPrescription(prescriptionId) {
+    // Simular datos de la receta (en una implementación real, esto vendría de una API)
+    const prescriptionDetails = `
+        <div class="prescription-header text-center mb-4">
+            <h4>HOSPITAL - SERVICIO DE OFTALMOLOGÍA</h4>
+            <h5>RECETA ÓPTICA</h5>
+            <hr>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <strong>Paciente:</strong> [Nombre del Paciente]<br>
+                <strong>Fecha:</strong> [Fecha]<br>
+                <strong>N° Receta:</strong> RX-${String(prescriptionId).padStart(6, '0')}
+            </div>
+            <div class="col-md-6">
+                <strong>Oftalmólogo:</strong> [Nombre del Médico]<br>
+                <strong>Registro:</strong> [Número de Registro]<br>
+                <strong>Válida hasta:</strong> [Fecha de Vencimiento]
+            </div>
+        </div>
+        
+        <div class="prescription-grid">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th></th>
+                        <th>Esfera</th>
+                        <th>Cilindro</th>
+                        <th>Eje</th>
+                        <th>Adición</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>OD (Ojo Derecho)</strong></td>
+                        <td>[Esfera]</td>
+                        <td>[Cilindro]</td>
+                        <td>[Eje]</td>
+                        <td>[Adición]</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OI (Ojo Izquierdo)</strong></td>
+                        <td>[Esfera]</td>
+                        <td>[Cilindro]</td>
+                        <td>[Eje]</td>
+                        <td>[Adición]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-3">
+            <strong>Tipo de Lente:</strong> [Tipo de Lente]<br>
+            <strong>Distancia Pupilar:</strong> [DP] mm<br>
+        </div>
+        
+        <div class="mt-4">
+            <strong>Observaciones:</strong><br>
+            [Instrucciones especiales]
+        </div>
+        
+        <div class="mt-4 text-center">
+            <p>_________________________________</p>
+            <p>Firma del Oftalmólogo</p>
+        </div>
+    `;
+    
+    $('#prescriptionDetails').html(prescriptionDetails);
+    $('#prescriptionModal').modal('show');
+}
+
+function printPrescription(prescriptionId) {
+    // Abrir modal primero, luego imprimir
+    viewPrescription(prescriptionId);
+    setTimeout(() => {
+        printModal();
+    }, 500);
+}
+
+function printModal() {
+    const modalContent = document.getElementById('prescriptionDetails').innerHTML;
+    const printWindow = window.open('', '', 'height=600,width=800');
+    
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Receta Óptica</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                .prescription-header { text-align: center; margin-bottom: 30px; }
+                .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                .table-light { background-color: #f8f9fa; }
+                .row { display: flex; margin-bottom: 15px; }
+                .col-md-6 { flex: 1; padding: 0 10px; }
+                hr { margin: 20px 0; }
+            </style>
+        </head>
+        <body>
+            ${modalContent}
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+}
+
+function markAsDispensed(prescriptionId) {
+    if (confirm('¿Confirma que esta receta ha sido dispensada?')) {
+        // En una implementación real, esto haría una llamada AJAX
+        alert('Receta marcada como dispensada');
+        location.reload();
+    }
+}
+
+$(document).ready(function() {
+    // Tooltip para botones
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    console.log('✅ Lista de recetas ópticas cargada');
+});
+</script>
+
+<style>
+@media print {
+    .modal-header, .modal-footer {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}
+
+
+

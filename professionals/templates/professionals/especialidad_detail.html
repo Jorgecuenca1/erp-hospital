@@ -21,7 +21,7 @@
         <h4>Profesionales en esta Especialidad</h4>
         <div class="list-group">
             {% for profesional in especialidad.profesionalsalud_set.all %}
-                <a href="{% url 'profesional_detail' profesional.pk %}" class="list-group-item list-group-item-action">
+                <a href="{% url 'professionals:profesional_detail' profesional.pk %}" class="list-group-item list-group-item-action">
                     {{ profesional.nombres }} {{ profesional.apellidos }}
                 </a>
             {% empty %}

@@ -15,7 +15,8 @@
             </div>
             <div class="list-group">
                 {% for producto in object_list %}
-                <a href="{% url 'ecommerce:producto_detail' producto.pk %}" class="list-group-item list-group-item-action">
+                <a href="{% url 'ecommerce:producto_detail' producto.pk %}"
+                    class="list-group-item list-group-item-action">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ producto.nombre }}</h5>
                         <small class="text-muted">Categoría: {{ producto.categoria.nombre }}</small>
@@ -25,14 +26,14 @@
                 </a>
                 {% empty %}
                 <p class="text-center">No hay productos registrados.</p>
-                {% endfor %
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    document.getElementById('searchInput').addEventListener('keyup', function() {
+    document.getElementById('searchInput').addEventListener('keyup', function () {
         let filter = this.value.toLowerCase();
         let items = document.querySelectorAll('.list-group-item');
 

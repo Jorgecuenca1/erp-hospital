@@ -1,0 +1,166 @@
+{% extends "accounting/base.html" %}
+
+{% block title %}Estado de Resultados{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1><i class="fas fa-chart-line"></i> Estado de Resultados</h1>
+        <p class="text-muted">Período: {{ fecha_inicio|date:"d/m/Y" }} - {{ fecha_fin|date:"d/m/Y" }}</p>
+    </div>
+    <div class="col-md-4 text-right">
+        <form method="get" class="form-inline">
+            <div class="form-group mr-2">
+                <label for="fecha_inicio" class="mr-1">Desde:</label>
+                <input type="date" name="fecha_inicio" value="{{ fecha_inicio|date:'Y-m-d' }}"
+                    class="form-control form-control-sm">
+            </div>
+            <div class="form-group mr-2">
+                <label for="fecha_fin" class="mr-1">Hasta:</label>
+                <input type="date" name="fecha_fin" value="{{ fecha_fin|date:'Y-m-d' }}"
+                    class="form-control form-control-sm">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-search"></i> Filtrar
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-calculator"></i> Estado de Resultados</h5>
+            </div>
+            <div class="card-body">
+                <!-- INGRESOS -->
+                <div class="mb-4">
+                    <h6 class="text-success border-bottom pb-2">
+                        <i class="fas fa-plus-circle"></i> INGRESOS
+                    </h6>
+                    {% if ingresos %}
+                    {% for ingreso in ingresos %}
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="ml-3">{{ ingreso.cuenta.codigo }} - {{ ingreso.cuenta.nombre }}</span>
+                        <span class="font-weight-bold text-success">${{ ingreso.saldo|floatformat:2 }}</span>
+                    </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total Ingresos:</strong>
+                        <strong class="text-success">${{ total_ingresos|floatformat:2 }}</strong>
+                    </div>
+                    {% else %}
+                    <p class="text-muted ml-3">No hay ingresos en el período</p>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total Ingresos:</strong>
+                        <strong class="text-success">$0.00</strong>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- COSTOS Y GASTOS -->
+                <div class="mb-4">
+                    <h6 class="text-danger border-bottom pb-2">
+                        <i class="fas fa-minus-circle"></i> COSTOS Y GASTOS
+                    </h6>
+                    {% if costos_gastos %}
+                    {% for costo_gasto in costos_gastos %}
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="ml-3">{{ costo_gasto.cuenta.codigo }} - {{ costo_gasto.cuenta.nombre }}</span>
+                        <span class="font-weight-bold text-danger">${{ costo_gasto.saldo|floatformat:2 }}</span>
+                    </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total Costos y Gastos:</strong>
+                        <strong class="text-danger">${{ total_costos_gastos|floatformat:2 }}</strong>
+                    </div>
+                    {% else %}
+                    <p class="text-muted ml-3">No hay costos ni gastos en el período</p>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total Costos y Gastos:</strong>
+                        <strong class="text-danger">$0.00</strong>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- UTILIDAD -->
+                <hr class="my-4">
+                <div class="bg-light p-3 rounded">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>UTILIDAD BRUTA:</h5>
+                        <h5 class="{% if utilidad_bruta >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            ${{ utilidad_bruta|floatformat:2 }}
+                        </h5>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Margen de Utilidad:</span>
+                        <span
+                            class="font-weight-bold {% if margen_utilidad >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ margen_utilidad|floatformat:2 }}%
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Análisis Rápido -->
+                <div class="mt-4">
+                    <h6 class="border-bottom pb-2">Análisis Rápido</h6>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h6>Ingresos</h6>
+                                    <h4>${{ total_ingresos|floatformat:0 }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body">
+                                    <h6>Gastos</h6>
+                                    <h4>${{ total_costos_gastos|floatformat:0 }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div
+                                class="card {% if utilidad_bruta >= 0 %}bg-primary{% else %}bg-warning{% endif %} text-white">
+                                <div class="card-body">
+                                    <h6>Utilidad</h6>
+                                    <h4>${{ utilidad_bruta|floatformat:0 }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botones de Acción -->
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'accounting:reportes' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver a Reportes
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+        <button onclick="exportarExcel()" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function exportarExcel() {
+        alert('Función de exportación a Excel - Por implementar');
+    }
+</script>
+{% endblock %}
+

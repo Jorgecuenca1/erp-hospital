@@ -1,0 +1,492 @@
+{% extends 'base_hms.html' %}
+
+{% block title %}Crear Disponibilidad - Agenda Electrónica{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'landing_page' %}">Inicio</a></li>
+<li class="breadcrumb-item"><a href="/dashboard/">HMS</a></li>
+<li class="breadcrumb-item"><a href="{% url 'acs_hms_online_appointment:agenda_list' %}">Agenda Electrónica</a></li>
+<li class="breadcrumb-item active">Crear Disponibilidad</li>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'acs_hms_online_appointment:dashboard' %}">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'acs_hms_online_appointment:agenda_list' %}">
+        <i class="fas fa-calendar-alt me-2"></i>Agenda Electrónica
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'acs_hms_online_appointment:agenda_create' %}">
+        <i class="fas fa-plus me-2"></i>Nueva Disponibilidad
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'acs_hms_online_appointment:availability_list' %}">
+        <i class="fas fa-clock me-2"></i>Gestión de Horarios
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-calendar-plus me-2"></i>
+        Crear Disponibilidad en Agenda Electrónica
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'acs_hms_online_appointment:agenda_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Información de ayuda -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-info" role="alert">
+            <h5 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>
+                Agenda Electrónica - Instrucciones
+            </h5>
+            <p>👉🏼 <strong>De clic aquí para aprender o ver los instructivos</strong></p>
+            <hr>
+            <p class="mb-0">Complete el siguiente formulario para generar automáticamente los espacios de disponibilidad
+                en la agenda del profesional seleccionado.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario principal -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    Configuración de Disponibilidad
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Profesional -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-user-md me-2"></i>
+                                        Selección de Profesional
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="{{ form.profesional.id_for_label }}" class="form-label">
+                                            {{ form.profesional.label }}
+                                        </label>
+                                        {{ form.profesional }}
+                                        {% if form.profesional.help_text %}
+                                        <div class="form-text">{{ form.profesional.help_text }}</div>
+                                        {% endif %}
+                                        {% if form.profesional.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.profesional.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rango de fechas -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-calendar me-2"></i>
+                                        Rango de Fechas
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.fecha_desde.id_for_label }}" class="form-label">
+                                                    {{ form.fecha_desde.label }}
+                                                </label>
+                                                {{ form.fecha_desde }}
+                                                {% if form.fecha_desde.help_text %}
+                                                <div class="form-text">{{ form.fecha_desde.help_text }}</div>
+                                                {% endif %}
+                                                {% if form.fecha_desde.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.fecha_desde.errors }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.fecha_hasta.id_for_label }}" class="form-label">
+                                                    {{ form.fecha_hasta.label }}
+                                                </label>
+                                                {{ form.fecha_hasta }}
+                                                {% if form.fecha_hasta.help_text %}
+                                                <div class="form-text">{{ form.fecha_hasta.help_text }}</div>
+                                                {% endif %}
+                                                {% if form.fecha_hasta.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.fecha_hasta.errors }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Horarios -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-clock me-2"></i>
+                                        Configuración de Horarios
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Horarios de mañana -->
+                                    <div class="row mb-3">
+                                        <div class="col-12">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-sun me-2"></i>
+                                                Horario de Mañana
+                                            </h6>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.hora_inicio_am.id_for_label }}" class="form-label">
+                                                    {{ form.hora_inicio_am.label }}
+                                                </label>
+                                                {{ form.hora_inicio_am }}
+                                                {% if form.hora_inicio_am.help_text %}
+                                                <div class="form-text">{{ form.hora_inicio_am.help_text }}</div>
+                                                {% endif %}
+                                                {% if form.hora_inicio_am.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.hora_inicio_am.errors }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.hora_fin_am.id_for_label }}" class="form-label">
+                                                    {{ form.hora_fin_am.label }}
+                                                </label>
+                                                {{ form.hora_fin_am }}
+                                                {% if form.hora_fin_am.help_text %}
+                                                <div class="form-text">{{ form.hora_fin_am.help_text }}</div>
+                                                {% endif %}
+                                                {% if form.hora_fin_am.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.hora_fin_am.errors }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <!-- Horarios de tarde -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="text-info mb-3">
+                                                <i class="fas fa-moon me-2"></i>
+                                                Horario de Tarde
+                                            </h6>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.hora_inicio_pm.id_for_label }}" class="form-label">
+                                                    {{ form.hora_inicio_pm.label }}
+                                                </label>
+                                                {{ form.hora_inicio_pm }}
+                                                {% if form.hora_inicio_pm.help_text %}
+                                                <div class="form-text">{{ form.hora_inicio_pm.help_text }}</div>
+                                                {% endif %}
+                                                {% if form.hora_inicio_pm.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.hora_inicio_pm.errors }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.hora_fin_pm.id_for_label }}" class="form-label">
+                                                    {{ form.hora_fin_pm.label }}
+                                                </label>
+                                                {{ form.hora_fin_pm }}
+                                                {% if form.hora_fin_pm.help_text %}
+                                                <div class="form-text">{{ form.hora_fin_pm.help_text }}</div>
+                                                {% endif %}
+                                                {% if form.hora_fin_pm.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.hora_fin_pm.errors }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuración adicional -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-cogs me-2"></i>
+                                        Configuración de Citas
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ form.dividir_en.id_for_label }}" class="form-label">
+                                            {{ form.dividir_en.label }}
+                                        </label>
+                                        {{ form.dividir_en }}
+                                        {% if form.dividir_en.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.dividir_en.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="{{ form.sede.id_for_label }}" class="form-label">
+                                            {{ form.sede.label }}
+                                        </label>
+                                        {{ form.sede }}
+                                        {% if form.sede.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.sede.errors }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-secondary text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-calendar-week me-2"></i>
+                                        Días de la Semana
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted mb-3">Seleccione los días de la semana que desea crear la
+                                        disponibilidad en la agenda:</p>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check mb-2">
+                                                {{ form.lunes }}
+                                                <label class="form-check-label" for="{{ form.lunes.id_for_label }}">
+                                                    {{ form.lunes.label }}
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                {{ form.martes }}
+                                                <label class="form-check-label" for="{{ form.martes.id_for_label }}">
+                                                    {{ form.martes.label }}
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                {{ form.miercoles }}
+                                                <label class="form-check-label" for="{{ form.miercoles.id_for_label }}">
+                                                    {{ form.miercoles.label }}
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                {{ form.jueves }}
+                                                <label class="form-check-label" for="{{ form.jueves.id_for_label }}">
+                                                    {{ form.jueves.label }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check mb-2">
+                                                {{ form.viernes }}
+                                                <label class="form-check-label" for="{{ form.viernes.id_for_label }}">
+                                                    {{ form.viernes.label }}
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                {{ form.sabado }}
+                                                <label class="form-check-label" for="{{ form.sabado.id_for_label }}">
+                                                    {{ form.sabado.label }}
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                {{ form.domingo }}
+                                                <label class="form-check-label" for="{{ form.domingo.id_for_label }}">
+                                                    {{ form.domingo.label }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% if form.lunes.errors or form.martes.errors or form.miercoles.errors or
+                                    form.jueves.errors or form.viernes.errors or form.sabado.errors or
+                                    form.domingo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        Debe seleccionar al menos un día de la semana
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integraciones externas -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-dark text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-link me-2"></i>
+                                        Integraciones Externas
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                {{ form.habilitar_agenda_tus_citas }}
+                                                <label class="form-check-label"
+                                                    for="{{ form.habilitar_agenda_tus_citas.id_for_label }}">
+                                                    <strong>{{ form.habilitar_agenda_tus_citas.label }}</strong>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                {{ form.habilitar_doctoralia }}
+                                                <label class="form-check-label"
+                                                    for="{{ form.habilitar_doctoralia.id_for_label }}">
+                                                    <strong>{{ form.habilitar_doctoralia.label }}</strong>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Errores del formulario -->
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Errores en el formulario
+                        </h6>
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Botones de acción -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'acs_hms_online_appointment:agenda_list' %}"
+                                    class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-1"></i>Crear Disponibilidad
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Inicializar Select2 para selección de profesional
+        $('.select2').select2({
+            placeholder: 'Escriba el nombre o apellido del profesional...',
+            allowClear: true
+        });
+
+        // Validación de días de la semana
+        $('input[type="checkbox"]').change(function () {
+            var anyChecked = $('input[type="checkbox"]').is(':checked');
+            if (!anyChecked) {
+                $('.invalid-feedback').show();
+            } else {
+                $('.invalid-feedback').hide();
+            }
+        });
+
+        // Validación de horarios
+        $('#id_hora_fin_am').change(function () {
+            var inicio = $('#id_hora_inicio_am').val();
+            var fin = $(this).val();
+
+            if (inicio && fin && fin <= inicio) {
+                alert('La hora de fin debe ser posterior a la hora de inicio');
+                $(this).focus();
+            }
+        });
+
+        $('#id_hora_fin_pm').change(function () {
+            var inicio = $('#id_hora_inicio_pm').val();
+            var fin = $(this).val();
+
+            if (inicio && fin && fin <= inicio) {
+                alert('La hora de fin debe ser posterior a la hora de inicio');
+                $(this).focus();
+            }
+        });
+
+        // Validación de solapamiento entre mañana y tarde
+        $('#id_hora_inicio_pm').change(function () {
+            var finAm = $('#id_hora_fin_am').val();
+            var inicioPm = $(this).val();
+
+            if (finAm && inicioPm && inicioPm <= finAm) {
+                alert('El horario de la tarde no puede solaparse con el de la mañana');
+                $(this).focus();
+            }
+        });
+    });
+</script>
+{% endblock %}

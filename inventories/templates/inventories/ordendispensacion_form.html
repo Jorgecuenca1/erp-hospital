@@ -27,7 +27,7 @@
                 {{ form|crispy }}
                 <div class="mt-3">
                     <button type="submit" class="btn btn-success">Guardar Orden</button>
-                    <a href="{% if form.instance.pk %}{% url 'orden_detail' form.instance.pk %}{% else %}{% url 'orden_list' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
+                    <a href="{% if form.instance.pk %}{% url 'admision_recepcion:orden_detail' form.instance.pk %}{% else %}{% url 'admision_recepcion:orden_list' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
                 </div>
             </form>
         </div>

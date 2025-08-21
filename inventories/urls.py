@@ -42,6 +42,27 @@ urlpatterns = [
     path('ordenes-dispensacion/<int:pk>/edit/', views.OrdenDispensacionUpdateView.as_view(), name='orden_edit'),
     path('ordenes-dispensacion/<int:pk>/delete/', views.OrdenDispensacionDeleteView.as_view(), name='orden_delete'),
     
+    # URLs para Órdenes de Compra
+    path('ordenes-compra/', views.OrdenCompraListView.as_view(), name='ordencompra_list'),
+    path('ordenes-compra/new/', views.OrdenCompraCreateView.as_view(), name='ordencompra_create'),
+    path('ordenes-compra/<int:pk>/', views.OrdenCompraDetailView.as_view(), name='ordencompra_detail'),
+    path('ordenes-compra/<int:pk>/edit/', views.OrdenCompraUpdateView.as_view(), name='ordencompra_edit'),
+    path('ordenes-compra/<int:pk>/delete/', views.OrdenCompraDeleteView.as_view(), name='ordencompra_delete'),
+
+    # URLs para Recepción de Mercancía
+    path('recepciones/', views.RecepcionMercanciaListView.as_view(), name='recepcionmercancia_list'),
+    path('recepciones/new/', views.RecepcionMercanciaCreateView.as_view(), name='recepcionmercancia_create'),
+    path('recepciones/<int:pk>/', views.RecepcionMercanciaDetailView.as_view(), name='recepcionmercancia_detail'),
+    path('recepciones/<int:pk>/edit/', views.RecepcionMercanciaUpdateView.as_view(), name='recepcionmercancia_edit'),
+    path('recepciones/<int:pk>/delete/', views.RecepcionMercanciaDeleteView.as_view(), name='recepcionmercancia_delete'),
+
+    # URLs para Inventario Físico
+    path('inventarios-fisicos/', views.InventarioFisicoListView.as_view(), name='inventariofisico_list'),
+    path('inventarios-fisicos/new/', views.InventarioFisicoCreateView.as_view(), name='inventariofisico_create'),
+    path('inventarios-fisicos/<int:pk>/', views.InventarioFisicoDetailView.as_view(), name='inventariofisico_detail'),
+    path('inventarios-fisicos/<int:pk>/edit/', views.InventarioFisicoUpdateView.as_view(), name='inventariofisico_edit'),
+    path('inventarios-fisicos/<int:pk>/delete/', views.InventarioFisicoDeleteView.as_view(), name='inventariofisico_delete'),
+    
     # URLs para Reportes
     path('reportes/', views.InventoryReportsView.as_view(), name='reports'),
     path('stock-bajo/', views.LowStockView.as_view(), name='low_stock'),

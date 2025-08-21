@@ -8,8 +8,8 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3>{{ paciente.nombres }} {{ paciente.apellidos }}</h3>
             <div>
-                <a href="{% url 'paciente_update' paciente.pk %}" class="btn btn-primary">Editar Paciente</a>
-                <a href="{% url 'paciente_delete' paciente.pk %}" class="btn btn-danger">Eliminar Paciente</a>
+                <a href="{% url 'patients:paciente_update' paciente.pk %}" class="btn btn-primary">Editar Paciente</a>
+                <a href="{% url 'patients:paciente_delete' paciente.pk %}" class="btn btn-danger">Eliminar Paciente</a>
             </div>
         </div>
         <div class="card-body">
@@ -30,7 +30,7 @@
             </div>
         </div>
         <div class="card-footer text-muted">
-            <a href="{% url 'paciente_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+            <a href="{% url 'patients:paciente_list' %}" class="btn btn-secondary">Volver a la Lista</a>
         </div>
     </div>
 

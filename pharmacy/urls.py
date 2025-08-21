@@ -4,6 +4,8 @@ from . import views
 app_name = 'pharmacy'
 
 urlpatterns = [
+    # Dashboard principal
+    path('', views.PharmacyDashboardView.as_view(), name='dashboard'),
     # URLs for Medicamento
     path('medicamentos/', views.MedicamentoListView.as_view(), name='medicamento_list'),
     path('medicamentos/add/', views.MedicamentoCreateView.as_view(), name='medicamento_create'),

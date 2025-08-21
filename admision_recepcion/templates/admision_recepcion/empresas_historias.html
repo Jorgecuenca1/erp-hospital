@@ -1,0 +1,587 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Empresas Historias Clínicas - Admisión{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-section {
+        background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #e3e6f0;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-title {
+        color: #5a5c69;
+        margin-bottom: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .empresas-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+    }
+
+    .empresas-table table {
+        margin-bottom: 0;
+    }
+
+    .empresas-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .empresas-table thead th {
+        border: none;
+        padding: 15px 12px;
+        font-weight: 600;
+        text-align: center;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    .empresas-table tbody td {
+        padding: 12px;
+        border-bottom: 1px solid #f8f9fa;
+        vertical-align: middle;
+    }
+
+    .empresas-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .hc-numero {
+        font-weight: bold;
+        color: #667eea;
+        font-family: monospace;
+        font-size: 1.1rem;
+    }
+
+    .fecha-creacion {
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    .identificacion {
+        color: #6c757d;
+        font-family: monospace;
+        font-weight: 500;
+    }
+
+    .nombre-paciente {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .tipo-examen {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .profesional {
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    .estado-badge {
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .estado-abierta {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .estado-cerrada {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .estado-anulada {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .print-icon {
+        color: #28a745;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .print-icon:hover {
+        color: #20c997;
+        transform: scale(1.2);
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e3e6f0;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 15px;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.3;
+    }
+
+    .fecha-input {
+        border-radius: 8px;
+        border: 2px solid #e3e6f0;
+        padding: 8px 12px;
+    }
+
+    .fecha-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Empresas Historias Clínicas</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:dashboard' %}">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_create' %}">
+        <i class="fas fa-plus-circle me-2"></i>Nueva Orden
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_list' %}">
+        <i class="fas fa-file-medical-alt me-2"></i>Órdenes de Servicios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:lista_precios' %}">
+        <i class="fas fa-tags me-2"></i>Lista de Precios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:imprimir_historias' %}">
+        <i class="fas fa-print me-2"></i>Imprimir Historias
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'admision_recepcion:empresas_historias' %}">
+        <i class="fas fa-building me-2"></i>Empresas Historias
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">🏢 Empresas Historias Clínicas</h1>
+            <p class="mb-0 text-muted">de la sección Admisión - Recepción
+                <a href="#" class="text-primary ms-2" data-bs-toggle="modal" data-bs-target="#instructionsModal">
+                    👉🏼 De clic aquí para aprender o ver los instructivos <i class="fas fa-info-circle"></i>
+                </a>
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-outline-success me-2" id="refreshBtn">
+                <i class="fas fa-sync-alt me-1"></i>Actualizar
+            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-download me-1"></i>Exportar
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="exportarExcel()">
+                            <i class="fas fa-file-excel text-success me-2"></i>Excel
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="exportarPDF()">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>PDF
+                        </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="filter-section">
+        <div class="filter-title">
+            <i class="fas fa-filter me-2"></i>Filtros de Búsqueda
+        </div>
+        <form method="get" id="filterForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Empresa:</label>
+                    <select name="empresa" class="form-control" id="empresaFilter">
+                        <option value="">Todas las empresas</option>
+                        {% for empresa in empresas %}
+                        <option value="{{ empresa.id }}" {% if filtros_actuales.empresa == empresa.id|stringformat:"s"
+                            %}selected{% endif %}>
+                            {{ empresa.razon_social }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Desde:</label>
+                    <input type="date" name="desde" class="fecha-input form-control"
+                        value="{{ filtros_actuales.desde }}" id="fechaDesde">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Hasta:</label>
+                    <input type="date" name="hasta" class="fecha-input form-control"
+                        value="{{ filtros_actuales.hasta }}" id="fechaHasta">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Tipo:</label>
+                    <select name="tipo" class="form-control" id="tipoFilter">
+                        <option value="">Todos</option>
+                        {% for tipo_code, tipo_name in tipos_examen_choices %}
+                        <option value="{{ tipo_code }}" {% if filtros_actuales.tipo == tipo_code %}selected{% endfor %}>
+                            {{ tipo_name|truncatechars:30 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Estado:</label>
+                    <select name="estado" class="form-control" id="estadoFilter">
+                        <option value="">Todos</option>
+                        {% for estado_code, estado_name in estados_choices %}
+                        <option value="{{ estado_code }}" {% if filtros_actuales.estado == estado_code %}selected{% endif
+                            %}>
+                            {{ estado_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i>Buscar
+                    </button>
+                    <a href="{% url 'admision_recepcion:empresas_historias' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-eraser me-1"></i>Limpiar Filtros
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-card">
+        <div class="row">
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-primary">{{ stats.total }}</span>
+                <div class="stat-label">Total Historias</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-success">{{ stats.abiertas }}</span>
+                <div class="stat-label">Abiertas</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-info">{{ stats.cerradas }}</span>
+                <div class="stat-label">Cerradas</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-warning">{{ stats.por_empresa|length }}</span>
+                <div class="stat-label">Empresas Activas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Historias por Empresa -->
+    <div class="empresas-table">
+        {% if historias %}
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 8%;">H.C.</th>
+                    <th style="width: 15%;">Fecha Creación</th>
+                    <th style="width: 12%;">N°. Identificación</th>
+                    <th style="width: 20%;">Nombre</th>
+                    <th style="width: 20%;">Tipo Examen</th>
+                    <th style="width: 15%;">Profesional</th>
+                    <th style="width: 8%;">Estado</th>
+                    <th style="width: 2%;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for historia in historias %}
+                <tr>
+                    <td>
+                        <span class="hc-numero">{{ historia.numero_hc }}</span>
+                    </td>
+                    <td>
+                        <div class="fecha-creacion">{{ historia.fecha_creacion|date:"d/m/Y H:i:s" }} a. m.</div>
+                    </td>
+                    <td>
+                        <div class="identificacion">{{ historia.numero_identificacion }}</div>
+                    </td>
+                    <td>
+                        <div class="nombre-paciente">{{ historia.nombre_paciente|upper }}</div>
+                    </td>
+                    <td>
+                        <div class="tipo-examen">{{ historia.get_tipo_examen_display|upper }}</div>
+                    </td>
+                    <td>
+                        <div class="profesional">{{ historia.nombre_completo_profesional|upper }}</div>
+                    </td>
+                    <td class="text-center">
+                        <span class="estado-badge estado-{{ historia.estado|lower }}">
+                            {{ historia.get_estado_display|upper }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <i class="fas fa-print print-icon" onclick="imprimirHistoria({{ historia.id }})"
+                            title="Imprimir Historia"></i>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-building"></i>
+            <h5>No se encontraron historias clínicas empresariales</h5>
+            <p>No hay historias de empresas que coincidan con los criterios de búsqueda.</p>
+            <a href="{% url 'admision_recepcion:empresas_historias' %}" class="btn btn-primary">
+                <i class="fas fa-refresh me-1"></i>Ver Todas las Historias
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Paginación">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    <!-- Resumen por empresas -->
+    {% if stats.por_empresa %}
+    <div class="mt-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Resumen por Empresas</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for empresa, count in stats.por_empresa.items %}
+                    <div class="col-md-4 mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">{{ empresa|truncatechars:25 }}:</span>
+                            <span class="fw-bold text-primary">{{ count }} historia{{ count|pluralize:"s" }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Instrucciones -->
+<div class="modal fade" id="instructionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Instrucciones - Empresas Historias Clínicas
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="fw-bold mb-3">🎯 Objetivo del Módulo</h6>
+                        <p>Gestionar y consultar las historias clínicas específicamente de trabajadores de empresas con
+                            filtros por empresa y fechas.</p>
+
+                        <h6 class="fw-bold mb-3">🔍 Filtros Disponibles</h6>
+                        <ul>
+                            <li><strong>Empresa:</strong> Seleccionar empresa específica o ver todas</li>
+                            <li><strong>Rango de Fechas:</strong> Desde y hasta fecha (por defecto últimos 10 días)</li>
+                            <li><strong>Tipo de Examen:</strong> Filtrar por tipo de evaluación médica</li>
+                            <li><strong>Estado:</strong> Abiertas, Cerradas, Anuladas o todas</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">📋 Información Mostrada</h6>
+                        <ul>
+                            <li><strong>H.C.:</strong> Número único de historia clínica</li>
+                            <li><strong>Fecha Creación:</strong> Cuándo se creó la historia</li>
+                            <li><strong>N° Identificación:</strong> Documento del trabajador</li>
+                            <li><strong>Nombre:</strong> Nombre completo del trabajador</li>
+                            <li><strong>Tipo Examen:</strong> Tipo de evaluación realizada</li>
+                            <li><strong>Profesional:</strong> Médico o profesional responsable</li>
+                            <li><strong>Estado:</strong> Estado actual de la historia</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">🏢 Tipos de Exámenes Empresariales</h6>
+                        <ul>
+                            <li>Evaluación Médico Ocupacional de Ingreso</li>
+                            <li>Evaluación Médico Ocupacional Periódico</li>
+                            <li>Evaluación Médico Ocupacional de Retiro</li>
+                            <li>Examen Trabajo en Alturas</li>
+                            <li>Examen Espacios Confinados</li>
+                            <li>Y otros tipos de evaluaciones ocupacionales</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">📊 Estadísticas</h6>
+                        <p>El módulo muestra estadísticas en tiempo real de:</p>
+                        <ul>
+                            <li>Total de historias filtradas</li>
+                            <li>Historias abiertas y cerradas</li>
+                            <li>Número de empresas con historias activas</li>
+                            <li>Resumen detallado por empresa</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">🖨️ Impresión</h6>
+                        <p>Click en el ícono de impresión <i class="fas fa-print text-success"></i> para imprimir cada
+                            historia individual.</p>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Tip:</strong> Use el filtro por empresa para generar reportes específicos por
+                            compañía. Las fechas por defecto muestran los últimos 10 días.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Auto-submit en cambio de filtros
+        $('#empresaFilter, #tipoFilter, #estadoFilter').change(function () {
+            $('#filterForm').submit();
+        });
+
+        // Auto-submit en cambio de fechas
+        $('#fechaDesde, #fechaHasta').change(function () {
+            $('#filterForm').submit();
+        });
+
+        // Actualizar página
+        $('#refreshBtn').click(function () {
+            window.location.reload();
+        });
+    });
+
+    // Imprimir historia individual
+    function imprimirHistoria(historiaId) {
+        const url = `/admision/empresas-historias/${historiaId}/print/`;
+        window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    }
+
+    // Exportar a Excel
+    function exportarExcel() {
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', 'excel');
+        window.open(`${window.location.pathname}?${params.toString()}`);
+    }
+
+    // Exportar a PDF
+    function exportarPDF() {
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', 'pdf');
+        window.open(`${window.location.pathname}?${params.toString()}`);
+    }
+</script>

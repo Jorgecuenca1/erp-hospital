@@ -4,6 +4,8 @@ from . import views
 app_name = 'website'
 
 urlpatterns = [
+    # Dashboard principal
+    path('', views.WebsiteDashboardView.as_view(), name='dashboard'),
     # PaginaWeb
     path('paginas/', views.PaginaWebListView.as_view(), name='paginaweb_list'),
     path('paginas/<int:pk>/', views.PaginaWebDetailView.as_view(), name='paginaweb_detail'),

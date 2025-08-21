@@ -1,0 +1,847 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Historias Clínicas Cerradas{% endblock %}
+
+{% block extra_css %}
+<style>
+    .historias-cerradas-header {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+        margin-bottom: 0;
+    }
+
+    .hc-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+        padding: 15px 20px;
+        border-bottom: 1px solid #e3e6f0;
+        font-weight: 600;
+        color: #5a5c69;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .section-content {
+        padding: 20px;
+    }
+
+    .filtros-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .filtro-field {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 4px solid #6c757d;
+    }
+
+    .filtro-field label {
+        font-weight: 600;
+        color: #5a5c69;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .filtro-field input,
+    .filtro-field select {
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        padding: 8px 10px;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .btn-buscar {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-buscar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-limpiar {
+        background: #6c757d;
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+    }
+
+    .btn-limpiar:hover {
+        background: #5a6268;
+    }
+
+    .resultados-header {
+        background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+        color: white;
+        padding: 15px 20px;
+        margin: 0;
+        font-weight: 600;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+
+    .estadisticas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #6c757d;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.8rem;
+    }
+
+    .historias-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .historias-table th {
+        background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+        color: white;
+        padding: 15px 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .historias-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e3e6f0;
+        vertical-align: middle;
+    }
+
+    .historias-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .historia-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #6c757d;
+        transition: all 0.3s ease;
+    }
+
+    .historia-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .historia-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .historia-numero {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #495057;
+    }
+
+    .historia-fecha {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .historia-paciente {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .historia-empresa {
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+
+    .historia-tipo {
+        background: #e9ecef;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #495057;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .historia-diagnosticos {
+        margin: 10px 0;
+    }
+
+    .diagnostico-item {
+        background: #f8d7da;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin: 2px;
+        display: inline-block;
+        color: #721c24;
+    }
+
+    .historia-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn-ver {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-ver:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+    }
+
+    .btn-imprimir {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-imprimir:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+    }
+
+    .estado-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .estado-completada {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .estado-cerrada {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .no-resultados {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+
+    .no-resultados i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .instructivo-alert {
+        background: #e3f2fd;
+        border: 1px solid #90caf9;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .instructivo-alert i {
+        color: #1976d2;
+        margin-right: 10px;
+    }
+
+    .instructivo-alert a {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .worker-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-right: 15px;
+    }
+
+    .header-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .worker-details h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .worker-details p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+    }
+
+    .filtros-activos {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+    }
+
+    .filtros-activos strong {
+        color: #856404;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #6c757d;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .pagination-info {
+        text-align: center;
+        color: #6c757d;
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:fichas_clinicas' %}">Fichas Clínicas</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Historias Clínicas Cerradas</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header de historias clínicas cerradas -->
+    <div class="historias-cerradas-header">
+        <div class="header-info">
+            <div class="worker-avatar">
+                📋
+            </div>
+            <div class="worker-details">
+                <h3>Historias Clínicas Cerradas</h3>
+                <p>Consulta y revisión de historias clínicas completadas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructivo -->
+    <div class="instructivo-alert">
+        <i class="fas fa-info-circle"></i>
+        <span>👉🏼 <a href="#" onclick="alert('Instructivo de Historias Clínicas Cerradas - En desarrollo')">De clic
+                aquí para aprender o ver los instructivos</a></span>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="hc-section">
+        <div class="section-header">
+            <span>🔍 Filtros de Búsqueda</span>
+        </div>
+        <div class="section-content">
+            <form method="get" id="filtrosForm">
+                <div class="filtros-grid">
+                    <div class="filtro-field">
+                        <label>N°. de Identificación:</label>
+                        <input type="text" name="numero_identificacion" value="{{ filtros.numero_identificacion }}"
+                            placeholder="Ingrese número de identificación">
+                    </div>
+
+                    <div class="filtro-field">
+                        <label>Nombre del Paciente:</label>
+                        <input type="text" name="nombre_paciente" value="{{ filtros.nombre_paciente }}"
+                            placeholder="Ingrese nombre del paciente">
+                    </div>
+
+                    <div class="filtro-field">
+                        <label>Nombre de la Empresa:</label>
+                        <input type="text" name="nombre_empresa" value="{{ filtros.nombre_empresa }}"
+                            placeholder="Ingrese nombre de la empresa">
+                    </div>
+
+                    <div class="filtro-field">
+                        <label>Desde:</label>
+                        <input type="date" name="fecha_desde" value="{{ filtros.fecha_desde }}" required>
+                    </div>
+
+                    <div class="filtro-field">
+                        <label>Hasta:</label>
+                        <input type="date" name="fecha_hasta" value="{{ filtros.fecha_hasta }}" required>
+                    </div>
+
+                    <div class="filtro-field" style="display: flex; align-items: end; gap: 10px;">
+                        <button type="submit" class="btn-buscar">
+                            <i class="fas fa-search me-2"></i>Buscar
+                        </button>
+                        <button type="button" class="btn-limpiar" onclick="limpiarFiltros()">
+                            <i class="fas fa-eraser me-2"></i>Limpiar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filtros activos -->
+    {% if filtros.numero_identificacion or filtros.nombre_paciente or filtros.nombre_empresa %}
+    <div class="filtros-activos">
+        <strong>Filtros activos:</strong>
+        {% if filtros.numero_identificacion %}
+        Identificación: "{{ filtros.numero_identificacion }}"
+        {% endif %}
+        {% if filtros.nombre_paciente %}
+        Paciente: "{{ filtros.nombre_paciente }}"
+        {% endif %}
+        {% if filtros.nombre_empresa %}
+        Empresa: "{{ filtros.nombre_empresa }}"
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Estadísticas -->
+    {% if estadisticas.total_periodo > 0 %}
+    <div class="estadisticas-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ estadisticas.total_periodo }}</div>
+            <div class="stat-label">Total Historias</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">{{ estadisticas.por_tipo|length }}</div>
+            <div class="stat-label">Tipos de Evaluación</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">{{ estadisticas.por_empresa|length }}</div>
+            <div class="stat-label">Empresas</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-number">{{ filtros.fecha_desde|date:"d/m/Y" }} - {{ filtros.fecha_hasta|date:"d/m/Y" }}
+            </div>
+            <div class="stat-label">Período Consultado</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Resultados -->
+    <div class="hc-section">
+        <div class="resultados-header">
+            <span>📊 Resultados de la Búsqueda</span>
+            <span>{{ total_historias }} historia{{ total_historias|pluralize:"s" }} encontrada{{
+                total_historias|pluralize:"s" }}</span>
+        </div>
+
+        <div class="section-content">
+            {% if historias %}
+            <!-- Vista de tarjetas para móvil/tablet -->
+            <div class="d-block d-lg-none">
+                {% for historia_info in historias %}
+                <div class="historia-card">
+                    <div class="historia-header">
+                        <div class="historia-numero">{{ historia_info.ficha.numero_ficha }}</div>
+                        <div class="historia-fecha">{{ historia_info.ficha.fecha_evaluacion|date:"d/m/Y" }}</div>
+                    </div>
+
+                    <div class="historia-paciente">
+                        {{ historia_info.ficha.numero_identificacion }} - {{ historia_info.ficha.nombre_trabajador }}
+                    </div>
+
+                    <div class="historia-empresa">
+                        <i class="fas fa-building me-1"></i>
+                        {% if historia_info.ficha.empresa %}
+                        {{ historia_info.ficha.empresa.razon_social }}
+                        {% else %}
+                        Sin empresa asignada
+                        {% endif %}
+                    </div>
+
+                    <div class="historia-tipo">{{ historia_info.tipo_evaluacion }}</div>
+
+                    <div class="estado-badge estado-{{ historia_info.ficha.estado|lower }}">
+                        {{ historia_info.ficha.get_estado_display }}
+                    </div>
+
+                    {% if historia_info.diagnosticos %}
+                    <div class="historia-diagnosticos">
+                        <strong>Diagnósticos:</strong>
+                        {% for diagnostico in historia_info.diagnosticos %}
+                        <span class="diagnostico-item">{{ diagnostico.codigo_cie10 }} {{
+                            diagnostico.nombre_diagnostico|truncatechars:30 }}</span>
+                        {% endfor %}
+                        {% if historia_info.total_diagnosticos > 3 %}
+                        <span class="diagnostico-item">+{{ historia_info.total_diagnosticos|add:"-3" }} más</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="historia-actions">
+                        <a href="{{ historia_info.url_detalle }}" class="btn-ver">
+                            <i class="fas fa-eye me-1"></i>Ver Detalle
+                        </a>
+                        <button class="btn-imprimir"
+                            onclick="imprimirHistoria('{{ historia_info.ficha.numero_ficha }}')">
+                            <i class="fas fa-print me-1"></i>Imprimir
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Vista de tabla para escritorio -->
+            <div class="d-none d-lg-block">
+                <table class="historias-table">
+                    <thead>
+                        <tr>
+                            <th>H.C.</th>
+                            <th>Fecha</th>
+                            <th>Identificación</th>
+                            <th>Nombre</th>
+                            <th>Empresa</th>
+                            <th>Tipo Evaluación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for historia_info in historias %}
+                        <tr>
+                            <td>
+                                <strong>{{ historia_info.ficha.numero_ficha }}</strong>
+                            </td>
+                            <td>{{ historia_info.ficha.fecha_evaluacion|date:"d/m/Y H:i" }}</td>
+                            <td>{{ historia_info.ficha.numero_identificacion }}</td>
+                            <td>
+                                <strong>{{ historia_info.ficha.nombre_trabajador }}</strong>
+                                {% if historia_info.diagnosticos %}
+                                <br>
+                                <small class="text-muted">
+                                    {% for diagnostico in historia_info.diagnosticos|slice:":2" %}
+                                    {{ diagnostico.codigo_cie10 }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if historia_info.total_diagnosticos > 2 %}
+                                    ...
+                                    {% endif %}
+                                </small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if historia_info.ficha.empresa %}
+                                {{ historia_info.ficha.empresa.razon_social|truncatechars:30 }}
+                                {% else %}
+                                <span class="text-muted">Sin empresa</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="historia-tipo">{{ historia_info.tipo_evaluacion }}</span>
+                                {% if historia_info.tiene_ordenes %}
+                                <br><small class="text-success"><i class="fas fa-prescription-bottle me-1"></i>Con
+                                    órdenes</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="estado-badge estado-{{ historia_info.ficha.estado|lower }}">
+                                    {{ historia_info.ficha.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ historia_info.url_detalle }}" class="btn btn-sm btn-primary"
+                                        title="Ver detalle">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-secondary"
+                                        onclick="imprimirHistoria('{{ historia_info.ficha.numero_ficha }}')"
+                                        title="Imprimir">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Información de paginación -->
+            <div class="pagination-info">
+                Mostrando {{ total_historias }} de máximo 100 resultados.
+                {% if total_historias == 100 %}
+                <br><small class="text-warning">Se alcanzó el límite de resultados. Refine su búsqueda para obtener
+                    resultados más específicos.</small>
+                {% endif %}
+            </div>
+
+            {% else %}
+            <!-- Sin resultados -->
+            <div class="no-resultados">
+                <i class="fas fa-search"></i>
+                <h4>No se encontraron historias clínicas</h4>
+                <p>No se encontraron historias clínicas cerradas con los criterios de búsqueda especificados.</p>
+                <p><strong>Sugerencias:</strong></p>
+                <ul style="text-align: left; display: inline-block;">
+                    <li>Verifique que las fechas estén en el rango correcto</li>
+                    <li>Amplíe el rango de fechas de búsqueda</li>
+                    <li>Verifique la ortografía en los nombres</li>
+                    <li>Use filtros menos específicos</li>
+                    <li>Asegúrese de que existan historias clínicas completadas en el período</li>
+                </ul>
+                <button class="btn-limpiar" onclick="limpiarFiltros()">
+                    <i class="fas fa-refresh me-2"></i>Limpiar Filtros y Buscar Nuevamente
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Estadísticas detalladas -->
+    {% if estadisticas.total_periodo > 0 %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="hc-section">
+                <div class="section-header">
+                    <span>📊 Por Tipo de Evaluación</span>
+                </div>
+                <div class="section-content">
+                    {% for tipo, cantidad in estadisticas.por_tipo.items %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ tipo }}</span>
+                        <span class="badge bg-primary">{{ cantidad }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="hc-section">
+                <div class="section-header">
+                    <span>🏢 Por Empresa</span>
+                </div>
+                <div class="section-content">
+                    {% for empresa, cantidad in estadisticas.por_empresa.items %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ empresa|truncatechars:25 }}</span>
+                        <span class="badge bg-success">{{ cantidad }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="hc-section">
+                <div class="section-header">
+                    <span>📋 Por Estado</span>
+                </div>
+                <div class="section-content">
+                    {% for estado, cantidad in estadisticas.por_estado.items %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ estado }}</span>
+                        <span class="badge bg-info">{{ cantidad }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function limpiarFiltros() {
+        // Limpiar todos los campos del formulario excepto las fechas
+        document.querySelector('input[name="numero_identificacion"]').value = '';
+        document.querySelector('input[name="nombre_paciente"]').value = '';
+        document.querySelector('input[name="nombre_empresa"]').value = '';
+
+        // Mantener las fechas por defecto (hoy)
+        const hoy = new Date().toISOString().split('T')[0];
+        document.querySelector('input[name="fecha_desde"]').value = hoy;
+        document.querySelector('input[name="fecha_hasta"]').value = hoy;
+
+        // Enviar el formulario
+        document.getElementById('filtrosForm').submit();
+    }
+
+    function imprimirHistoria(numeroFicha) {
+        // Implementar funcionalidad de impresión
+        alert(`Imprimiendo historia clínica ${numeroFicha}... (Funcionalidad en desarrollo)`);
+    }
+
+    // Función para exportar a Excel
+    function exportarExcel() {
+        // Implementar exportación a Excel
+        alert('Exportando a Excel... (Funcionalidad en desarrollo)');
+    }
+
+    // Auto-submit del formulario al cambiar fechas
+    document.addEventListener('DOMContentLoaded', function () {
+        const fechaDesde = document.querySelector('input[name="fecha_desde"]');
+        const fechaHasta = document.querySelector('input[name="fecha_hasta"]');
+
+        // Si no hay fechas, establecer fecha de hoy
+        if (!fechaDesde.value || !fechaHasta.value) {
+            const hoy = new Date().toISOString().split('T')[0];
+            if (!fechaDesde.value) fechaDesde.value = hoy;
+            if (!fechaHasta.value) fechaHasta.value = hoy;
+        }
+
+        // Auto-buscar cuando cambian las fechas
+        let timeoutId;
+        [fechaDesde, fechaHasta].forEach(input => {
+            input.addEventListener('change', function () {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    document.getElementById('filtrosForm').submit();
+                }, 500);
+            });
+        });
+    });
+
+    // Función para búsqueda en tiempo real
+    function busquedaEnTiempoReal() {
+        const inputs = document.querySelectorAll('input[name="numero_identificacion"], input[name="nombre_paciente"], input[name="nombre_empresa"]');
+        let timeoutId;
+
+        inputs.forEach(input => {
+            input.addEventListener('input', function () {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    if (this.value.length >= 3 || this.value.length === 0) {
+                        document.getElementById('filtrosForm').submit();
+                    }
+                }, 1000);
+            });
+        });
+    }
+
+    // Inicializar búsqueda en tiempo real
+    document.addEventListener('DOMContentLoaded', function () {
+        busquedaEnTiempoReal();
+        console.log('Historias Clínicas Cerradas cargado correctamente');
+        console.log('Total historias encontradas: {{ total_historias }}');
+    });
+</script>
+{% endblock %}

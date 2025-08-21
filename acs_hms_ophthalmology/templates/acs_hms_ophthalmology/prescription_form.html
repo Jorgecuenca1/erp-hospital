@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Editar{% else %}Nueva{% endif %} Receta Óptica - Hospital{% endblock %}
+
+{% block extra_css %}
+<style>
+.prescription-form {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px 0;
+}
+.form-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+.section-header {
+    background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px 10px 0 0;
+    margin: -20px -20px 20px -20px;
+}
+.prescription-grid {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+}
+.eye-section {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+    transition: all 0.3s ease;
+}
+.eye-section:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.eye-right {
+    border-left: 4px solid #007bff;
+}
+.eye-left {
+    border-left: 4px solid #28a745;
+}
+.sphere-calculator {
+    background: #e3f2fd;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="prescription-form">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-glasses me-2 text-warning"></i>
+                            {% if object %}Editar Receta Óptica{% else %}Nueva Receta Óptica{% endif %}
+                        </h4>
+                        <a href="{% url 'ophthalmology:prescription_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver a la Lista
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Información Básica -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user-md me-2"></i>
+                                        Información de la Receta
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.patient.id_for_label }}" class="form-label">Paciente *</label>
+                                            {{ form.patient }}
+                                            {% if form.patient.errors %}
+                                                <div class="text-danger">{{ form.patient.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.eye_examination.id_for_label }}" class="form-label">Examen Relacionado</label>
+                                            {{ form.eye_examination }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.prescribed_by.id_for_label }}" class="form-label">Prescrito por *</label>
+                                            {{ form.prescribed_by }}
+                                            {% if form.prescribed_by.errors %}
+                                                <div class="text-danger">{{ form.prescribed_by.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.prescription_date.id_for_label }}" class="form-label">Fecha de Prescripción *</label>
+                                            {{ form.prescription_date }}
+                                            {% if form.prescription_date.errors %}
+                                                <div class="text-danger">{{ form.prescription_date.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.valid_until.id_for_label }}" class="form-label">Válida hasta *</label>
+                                            {{ form.valid_until }}
+                                            {% if form.valid_until.errors %}
+                                                <div class="text-danger">{{ form.valid_until.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Calculadora de Esfera/Cilindro -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-calculator me-2"></i>
+                                        Asistente de Prescripción
+                                    </h5>
+                                </div>
+                                <div class="sphere-calculator">
+                                    <h6><i class="fas fa-info-circle text-primary me-2"></i>Guía de Valores</h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Esfera:</strong>
+                                            <ul class="small">
+                                                <li>Positivo (+): Hipermetropía</li>
+                                                <li>Negativo (-): Miopía</li>
+                                                <li>Rango: -20.00 a +20.00</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Cilindro:</strong>
+                                            <ul class="small">
+                                                <li>Corrección del astigmatismo</li>
+                                                <li>Generalmente negativo</li>
+                                                <li>Rango: -6.00 a +6.00</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Eje:</strong>
+                                            <ul class="small">
+                                                <li>Orientación del cilindro</li>
+                                                <li>Rango: 1° a 180°</li>
+                                                <li>Solo cuando hay cilindro</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Prescripción Ojo Derecho -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Prescripción por Ojo
+                                    </h5>
+                                </div>
+                                
+                                <div class="eye-section eye-right">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-eye fa-2x me-3"></i>
+                                        Ojo Derecho (OD)
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label for="{{ form.sphere_right.id_for_label }}" class="form-label">Esfera *</label>
+                                                {{ form.sphere_right }}
+                                                <small class="form-text text-muted">Dioptrías (D)</small>
+                                                {% if form.sphere_right.errors %}
+                                                    <div class="text-danger">{{ form.sphere_right.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label for="{{ form.cylinder_right.id_for_label }}" class="form-label">Cilindro</label>
+                                                {{ form.cylinder_right }}
+                                                <small class="form-text text-muted">Dioptrías (D)</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label for="{{ form.axis_right.id_for_label }}" class="form-label">Eje</label>
+                                                {{ form.axis_right }}
+                                                <small class="form-text text-muted">Grados (1-180)</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label for="{{ form.add_right.id_for_label }}" class="form-label">Adición</label>
+                                                {{ form.add_right }}
+                                                <small class="form-text text-muted">Para presbicia</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="eye-section eye-left">
+                                    <h6 class="text-success mb-3">
+                                        <i class="fas fa-eye fa-2x me-3"></i>
+                                        Ojo Izquierdo (OI)
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label for="{{ form.sphere_left.id_for_label }}" class="form-label">Esfera *</label>
+                                                {{ form.sphere_left }}
+                                                <small class="form-text text-muted">Dioptrías (D)</small>
+                                                {% if form.sphere_left.errors %}
+                                                    <div class="text-danger">{{ form.sphere_left.errors }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label for="{{ form.cylinder_left.id_for_label }}" class="form-label">Cilindro</label>
+                                                {{ form.cylinder_left }}
+                                                <small class="form-text text-muted">Dioptrías (D)</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label for="{{ form.axis_left.id_for_label }}" class="form-label">Eje</label>
+                                                {{ form.axis_left }}
+                                                <small class="form-text text-muted">Grados (1-180)</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-3">
+                                                <label for="{{ form.add_left.id_for_label }}" class="form-label">Adición</label>
+                                                {{ form.add_left }}
+                                                <small class="form-text text-muted">Para presbicia</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Especificaciones del Lente -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-cog me-2"></i>
+                                        Especificaciones del Lente
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.lens_type.id_for_label }}" class="form-label">Tipo de Lente *</label>
+                                            {{ form.lens_type }}
+                                            {% if form.lens_type.errors %}
+                                                <div class="text-danger">{{ form.lens_type.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.pupillary_distance.id_for_label }}" class="form-label">Distancia Pupilar (DP) *</label>
+                                            {{ form.pupillary_distance }}
+                                            <small class="form-text text-muted">Milímetros (mm) - Promedio: 62mm</small>
+                                            {% if form.pupillary_distance.errors %}
+                                                <div class="text-danger">{{ form.pupillary_distance.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vista Previa de la Receta -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Vista Previa de la Receta
+                                    </h5>
+                                </div>
+                                <div id="prescriptionPreview" class="prescription-grid">
+                                    <table class="table table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th width="20%"></th>
+                                                <th width="20%">Esfera</th>
+                                                <th width="20%">Cilindro</th>
+                                                <th width="20%">Eje</th>
+                                                <th width="20%">Adición</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>OD</strong></td>
+                                                <td id="preview_sphere_right">--</td>
+                                                <td id="preview_cylinder_right">--</td>
+                                                <td id="preview_axis_right">--</td>
+                                                <td id="preview_add_right">--</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>OI</strong></td>
+                                                <td id="preview_sphere_left">--</td>
+                                                <td id="preview_cylinder_left">--</td>
+                                                <td id="preview_axis_left">--</td>
+                                                <td id="preview_add_left">--</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="mt-3">
+                                        <strong>Tipo de Lente:</strong> <span id="preview_lens_type">--</span><br>
+                                        <strong>Distancia Pupilar:</strong> <span id="preview_pd">--</span> mm
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Los campos marcados con * son obligatorios
+                                    </small>
+                                </div>
+                                <div>
+                                    <a href="{% url 'ophthalmology:prescription_list' %}" class="btn btn-secondary me-2">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-warning btn-lg">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if object %}Actualizar Receta{% else %}Guardar Receta{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Validación del formulario
+    $('.needs-validation').on('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        $(this).addClass('was-validated');
+    });
+
+    // Auto-completar fechas
+    if (!$('#id_prescription_date').val()) {
+        const today = new Date().toISOString().split('T')[0];
+        $('#id_prescription_date').val(today);
+    }
+
+    if (!$('#id_valid_until').val()) {
+        const validUntil = new Date();
+        validUntil.setFullYear(validUntil.getFullYear() + 2); // Válida por 2 años
+        $('#id_valid_until').val(validUntil.toISOString().split('T')[0]);
+    }
+
+    // Vista previa en tiempo real
+    function updatePreview() {
+        // Ojo derecho
+        $('#preview_sphere_right').text($('#id_sphere_right').val() || '--');
+        $('#preview_cylinder_right').text($('#id_cylinder_right').val() || '--');
+        $('#preview_axis_right').text($('#id_axis_right').val() ? $('#id_axis_right').val() + '°' : '--');
+        $('#preview_add_right').text($('#id_add_right').val() || '--');
+        
+        // Ojo izquierdo
+        $('#preview_sphere_left').text($('#id_sphere_left').val() || '--');
+        $('#preview_cylinder_left').text($('#id_cylinder_left').val() || '--');
+        $('#preview_axis_left').text($('#id_axis_left').val() ? $('#id_axis_left').val() + '°' : '--');
+        $('#preview_add_left').text($('#id_add_left').val() || '--');
+        
+        // Especificaciones
+        $('#preview_lens_type').text($('#id_lens_type option:selected').text() || '--');
+        $('#preview_pd').text($('#id_pupillary_distance').val() || '--');
+    }
+
+    // Eventos para actualizar vista previa
+    $('input[id^="id_sphere"], input[id^="id_cylinder"], input[id^="id_axis"], input[id^="id_add"], #id_lens_type, #id_pupillary_distance').on('input change', updatePreview);
+
+    // Validación del eje (solo si hay cilindro)
+    $('input[id^="id_cylinder"]').on('input', function() {
+        const axisField = $(this).attr('id').replace('cylinder', 'axis');
+        const axisInput = $('#' + axisField);
+        
+        if ($(this).val() && parseFloat($(this).val()) !== 0) {
+            axisInput.prop('required', true);
+            axisInput.closest('.mb-3').find('label').append(' *');
+        } else {
+            axisInput.prop('required', false);
+            axisInput.closest('.mb-3').find('label').text(axisInput.closest('.mb-3').find('label').text().replace(' *', ''));
+        }
+    });
+
+    // Validación de rangos
+    $('input[id^="id_sphere"]').on('input', function() {
+        const value = parseFloat($(this).val());
+        if (value < -20 || value > 20) {
+            $(this).addClass('is-invalid');
+            $(this).siblings('.invalid-feedback').remove();
+            $(this).after('<div class="invalid-feedback">La esfera debe estar entre -20.00 y +20.00</div>');
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+
+    $('input[id^="id_axis"]').on('input', function() {
+        const value = parseInt($(this).val());
+        if (value < 1 || value > 180) {
+            $(this).addClass('is-invalid');
+            $(this).siblings('.invalid-feedback').remove();
+            $(this).after('<div class="invalid-feedback">El eje debe estar entre 1° y 180°</div>');
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+
+    // Inicializar vista previa
+    updatePreview();
+
+    console.log('✅ Formulario de receta óptica cargado');
+});
+</script>
+{% endblock %}
+
+
+

@@ -1,12 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView, View)
+from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView, View, TemplateView)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Medicamento, Receta, DetalleReceta
 from .forms import MedicamentoForm, RecetaForm, DetalleRecetaForm
 from django.forms import inlineformset_factory
 
 # Inline formset para DetalleReceta
 DetalleRecetaFormSet = inlineformset_factory(Receta, DetalleReceta, form=DetalleRecetaForm, extra=1, can_delete=True)
+
+class PharmacyDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal de farmacia"""
+    template_name = 'pharmacy/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'Farmacia'
+        context['medicamentos_total'] = Medicamento.objects.count()
+        return context
 
 # Vistas para Medicamento
 class MedicamentoListView(ListView):

@@ -1,0 +1,545 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Orden {{ orden.numero_orden }} - Detalle{% endblock %}
+
+{% block extra_css %}
+<style>
+    .info-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border: none;
+    }
+
+    .info-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .status-pendiente {
+        background: #fef3cd;
+        color: #856404;
+    }
+
+    .status-en-proceso {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-completada {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-autorizada {
+        background: #cce5ff;
+        color: #004085;
+    }
+
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding: 20px 0 20px 50px;
+        border-left: 2px solid #e3e6f0;
+    }
+
+    .timeline-item:last-child {
+        border-left: none;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -8px;
+        top: 25px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #007bff;
+        z-index: 2;
+    }
+
+    .timeline-marker.completed {
+        background: #28a745;
+        border-color: #28a745;
+    }
+
+    .timeline-marker.current {
+        background: #ffc107;
+        border-color: #ffc107;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .service-item {
+        background: #f8f9fc;
+        border: 1px solid #e3e6f0;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .service-item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .action-buttons .btn {
+        margin: 5px;
+        border-radius: 20px;
+        padding: 8px 20px;
+    }
+
+    .patient-photo {
+        width: 120px;
+        height: 120px;
+        border-radius: 15px;
+        object-fit: cover;
+        border: 3px solid #e3e6f0;
+    }
+
+    .documento-placeholder {
+        width: 120px;
+        height: 120px;
+        background: #f8f9fc;
+        border: 2px dashed #d1d3e2;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:orden_list' %}">Órdenes de Servicios</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ orden.numero_orden }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">📋 Orden {{ orden.numero_orden }}</h1>
+            <p class="mb-0 text-muted">{{ orden.nombre_completo }} - {{ orden.get_tipo_documento_display }} {{
+                orden.numero_identificacion }}</p>
+        </div>
+        <div class="action-buttons">
+            <span class="status-badge status-{{ orden.estado_orden|lower }}">
+                {{ orden.get_estado_orden_display }}
+            </span>
+            <div class="btn-group ms-3">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-cog"></i> Cambiar Estado
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="cambiarEstado('PENDIENTE')">
+                            <i class="fas fa-clock text-warning me-2"></i>Pendiente
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="cambiarEstado('AUTORIZADA')">
+                            <i class="fas fa-check text-info me-2"></i>Autorizada
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="cambiarEstado('EN_PROCESO')">
+                            <i class="fas fa-spinner text-primary me-2"></i>En Proceso
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="cambiarEstado('COMPLETADA')">
+                            <i class="fas fa-check-circle text-success me-2"></i>Completada
+                        </a></li>
+                </ul>
+            </div>
+            <a href="{% url 'admision_recepcion:orden_update' orden.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'admision_recepcion:orden_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información del Paciente -->
+        <div class="col-lg-8">
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-user me-2"></i>Información del Paciente
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Nombre Completo:</strong></div>
+                                <div class="col-sm-8">{{ orden.nombre_completo }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Identificación:</strong></div>
+                                <div class="col-sm-8">{{ orden.get_tipo_documento_display }} {{
+                                    orden.numero_identificacion }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Fecha de Nacimiento:</strong></div>
+                                <div class="col-sm-8">{{ orden.fecha_nacimiento|date:"d/m/Y" }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Género:</strong></div>
+                                <div class="col-sm-8">{{ orden.get_genero_display }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Estado Civil:</strong></div>
+                                <div class="col-sm-8">{{ orden.get_estado_civil_display }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Nivel Educativo:</strong></div>
+                                <div class="col-sm-8">{{ orden.get_nivel_educativo_display }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Email:</strong></div>
+                                <div class="col-sm-8">{{ orden.correo_electronico|default:"No especificado" }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            {% if orden.foto %}
+                            <img src="{{ orden.foto.url }}" alt="Foto del paciente" class="patient-photo">
+                            {% else %}
+                            <div class="documento-placeholder">
+                                <i class="fas fa-camera fa-2x mb-2"></i>
+                                <small>Sin foto</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de Ubicación -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-map-marker-alt me-2"></i>Información de Ubicación
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Dirección:</strong></div>
+                                <div class="col-sm-8">{{ orden.direccion }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Barrio:</strong></div>
+                                <div class="col-sm-8">{{ orden.barrio|default:"No especificado" }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Municipio:</strong></div>
+                                <div class="col-sm-8">{{ orden.municipio }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Zona:</strong></div>
+                                <div class="col-sm-8">{{ orden.get_zona_display }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Estrato:</strong></div>
+                                <div class="col-sm-8">{{ orden.get_estrato_display }}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Sede:</strong></div>
+                                <div class="col-sm-8">{{ orden.get_sede_display }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información Laboral -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-briefcase me-2"></i>Información Laboral
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Profesión/Cargo:</strong></div>
+                        <div class="col-sm-9">{{ orden.profesion_cargo }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Tipo de Evaluación:</strong></div>
+                        <div class="col-sm-9">{{ orden.tipo_evaluacion }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Empresa:</strong></div>
+                        <div class="col-sm-9">{{ orden.empresa_mision.razon_social }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Convenio:</strong></div>
+                        <div class="col-sm-9">{{ orden.convenio.nombre }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong>EPS:</strong> {{ orden.eps|default:"No especificada" }}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>AFP:</strong> {{ orden.afp|default:"No especificada" }}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>ARL:</strong> {{ orden.arl|default:"No especificada" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Estado y Seguimiento -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-timeline me-2"></i>Seguimiento
+                </div>
+                <div class="card-body">
+                    {% if seguimientos %}
+                    <div class="timeline">
+                        {% for seguimiento in seguimientos %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker {% if forloop.first %}current{% else %}completed{% endif %}">
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">{{ seguimiento.get_estado_display }}</h6>
+                                <small class="text-muted d-block mb-2">
+                                    {{ seguimiento.fecha_estado|date:"d/m/Y H:i" }}
+                                    {% if seguimiento.usuario %}
+                                    - {{ seguimiento.usuario.get_full_name }}
+                                    {% endif %}
+                                </small>
+                                {% if seguimiento.observaciones %}
+                                <p class="mb-0 small">{{ seguimiento.observaciones }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No hay seguimientos registrados</p>
+                    {% endif %}
+
+                    <!-- Formulario para agregar seguimiento -->
+                    <div class="mt-4 pt-3 border-top">
+                        <h6>Agregar Seguimiento</h6>
+                        <form id="seguimientoForm">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <select name="estado" class="form-control" required>
+                                    <option value="">Seleccionar estado...</option>
+                                    <option value="EN_ESPERA">En Espera</option>
+                                    <option value="EN_ATENCION">En Atención</option>
+                                    <option value="ATENDIDO">Atendido</option>
+                                    <option value="ALTA">Alta</option>
+                                    <option value="REMITIDO">Remitido</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <textarea name="observaciones" class="form-control" rows="3"
+                                    placeholder="Observaciones..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-plus me-1"></i>Agregar Seguimiento
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen Financiero -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-calculator me-2"></i>Resumen Financiero
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-8"><strong>Total Orden:</strong></div>
+                        <div class="col-sm-4 text-end">${{ orden.total_orden|floatformat:0 }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-8"><strong>Total a Pagar:</strong></div>
+                        <div class="col-sm-4 text-end text-primary"><strong>${{ orden.total_pagar|floatformat:0
+                                }}</strong></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8"><strong>Servicios:</strong></div>
+                        <div class="col-sm-4 text-end">{{ detalles.count }} item{{ detalles.count|pluralize }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de la Orden -->
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i>Información de la Orden
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>Fecha Orden:</strong></div>
+                        <div class="col-sm-6 text-end">{{ orden.fecha_orden|date:"d/m/Y" }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>Fecha Solicitud:</strong></div>
+                        <div class="col-sm-6 text-end">{{ orden.fecha_solicitud|date:"d/m/Y" }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6"><strong>Creado por:</strong></div>
+                        <div class="col-sm-6 text-end">{{
+                            orden.created_by.get_full_name|default:orden.created_by.username }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6"><strong>Creado:</strong></div>
+                        <div class="col-sm-6 text-end">{{ orden.created_at|date:"d/m/Y H:i" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Servicios Solicitados -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="info-card card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-stethoscope me-2"></i>Servicios Solicitados</span>
+                    <span class="badge bg-light text-dark">{{ detalles.count }} servicio{{ detalles.count|pluralize
+                        }}</span>
+                </div>
+                <div class="card-body">
+                    {% if detalles %}
+                    {% for detalle in detalles %}
+                    <div class="service-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-1 text-center">
+                                <span class="badge bg-primary rounded-pill">{{ detalle.cantidad }}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="mb-1">{{ detalle.servicio.nombre }}</h6>
+                                <small class="text-muted">{{ detalle.servicio.codigo }} - {{
+                                    detalle.servicio.get_tipo_display }}</small>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>{{ detalle.prestador.nombre }}</strong>
+                                <br><small class="text-muted">{{
+                                    detalle.prestador.especialidad|default:detalle.prestador.tipo }}</small>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <strong>${{ detalle.valor_unitario|floatformat:0 }}</strong>
+                                <br><small class="text-muted">{{ detalle.get_forma_pago_display }}</small>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <h6 class="mb-0 text-primary">${{ detalle.valor_pagar|floatformat:0 }}</h6>
+                                {% if detalle.autorizado %}
+                                <small class="text-success"><i class="fas fa-check-circle me-1"></i>Autorizado</small>
+                                {% else %}
+                                <small class="text-warning"><i class="fas fa-clock me-1"></i>Pendiente</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-stethoscope fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay servicios registrados</h5>
+                        <p class="text-muted">No se han agregado servicios a esta orden.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Observaciones -->
+    {% if orden.observaciones %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="info-card card">
+                <div class="card-header">
+                    <i class="fas fa-comment-alt me-2"></i>Observaciones
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ orden.observaciones }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Formulario de seguimiento
+        $('#seguimientoForm').on('submit', function (e) {
+            e.preventDefault();
+
+            $.post('{% url "admision_recepcion:ajax_seguimiento" orden.pk %}', $(this).serialize(), function (response) {
+                if (response.success) {
+                    // Recargar la página para mostrar el nuevo seguimiento
+                    location.reload();
+                } else {
+                    alert('Error al agregar seguimiento: ' + JSON.stringify(response.errors));
+                }
+            }).fail(function () {
+                alert('Error de conexión al agregar seguimiento');
+            });
+        });
+    });
+
+    // Función para cambiar estado de orden
+    function cambiarEstado(nuevoEstado) {
+        if (confirm('¿Está seguro de cambiar el estado de la orden?')) {
+            $.post('{% url "admision_recepcion:ajax_cambiar_estado" orden.pk %}', {
+                'estado': nuevoEstado,
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            }, function (response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Error al cambiar estado: ' + response.message);
+                }
+            }).fail(function () {
+                alert('Error de conexión al cambiar estado');
+            });
+        }
+    }
+</script>

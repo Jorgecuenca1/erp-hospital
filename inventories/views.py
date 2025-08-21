@@ -5,8 +5,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum, Count, Q, F
 from django.utils import timezone
 from datetime import timedelta
-from .models import UbicacionAlmacen, CategoriaProducto, Producto, MovimientoInventario, OrdenDispensacion, DetalleOrdenDispensacion
-from .forms import UbicacionAlmacenForm, CategoriaProductoForm, ProductoForm, MovimientoInventarioForm, OrdenDispensacionForm, DetalleOrdenDispensacionForm
+from .models import (
+    UbicacionAlmacen, CategoriaProducto, Producto, MovimientoInventario, 
+    OrdenDispensacion, DetalleOrdenDispensacion, OrdenCompra, DetalleOrdenCompra,
+    RecepcionMercancia, DetalleRecepcionMercancia, InventarioFisico, DetalleInventarioFisico
+)
+from .forms import (
+    UbicacionAlmacenForm, CategoriaProductoForm, ProductoForm, MovimientoInventarioForm, 
+    OrdenDispensacionForm, DetalleOrdenDispensacionForm
+)
 
 # Dashboard principal
 class InventoryDashboardView(LoginRequiredMixin, TemplateView):
@@ -50,7 +57,7 @@ class InventoryDashboardView(LoginRequiredMixin, TemplateView):
         
         # Valor total del inventario
         context['valor_total_inventario'] = Producto.objects.filter(activo=True).aggregate(
-            total=Sum(F('stock_actual') * F('precio_unitario'))
+            total=Sum(F('stock_actual') * F('precio_venta'))
         )['total'] or 0
         
         # Movimientos por tipo en el último mes
@@ -369,3 +376,102 @@ class MovementsSummaryView(LoginRequiredMixin, ListView):
         ).order_by('-total_movimientos')[:10]
         
         return context
+
+# ==================== ÓRDENES DE COMPRA ====================
+
+class OrdenCompraListView(LoginRequiredMixin, ListView):
+    model = OrdenCompra
+    template_name = 'inventories/ordencompra_list.html'
+    context_object_name = 'ordenes'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        return OrdenCompra.objects.select_related('proveedor').order_by('-fecha_orden')
+
+class OrdenCompraDetailView(LoginRequiredMixin, DetailView):
+    model = OrdenCompra
+    template_name = 'inventories/ordencompra_detail.html'
+    context_object_name = 'orden'
+
+class OrdenCompraCreateView(LoginRequiredMixin, CreateView):
+    model = OrdenCompra
+    template_name = 'inventories/ordencompra_form.html'
+    fields = ['proveedor', 'fecha_orden', 'fecha_entrega_esperada', 'observaciones']
+    success_url = reverse_lazy('inventories:ordencompra_list')
+
+class OrdenCompraUpdateView(LoginRequiredMixin, UpdateView):
+    model = OrdenCompra
+    template_name = 'inventories/ordencompra_form.html'
+    fields = ['proveedor', 'fecha_orden', 'fecha_entrega_esperada', 'estado', 'observaciones']
+    success_url = reverse_lazy('inventories:ordencompra_list')
+
+class OrdenCompraDeleteView(LoginRequiredMixin, DeleteView):
+    model = OrdenCompra
+    template_name = 'inventories/ordencompra_confirm_delete.html'
+    success_url = reverse_lazy('inventories:ordencompra_list')
+
+# ==================== RECEPCIÓN DE MERCANCÍA ====================
+
+class RecepcionMercanciaListView(LoginRequiredMixin, ListView):
+    model = RecepcionMercancia
+    template_name = 'inventories/recepcionmercancia_list.html'
+    context_object_name = 'recepciones'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        return RecepcionMercancia.objects.select_related('orden_compra', 'orden_compra__proveedor').order_by('-fecha_recepcion')
+
+class RecepcionMercanciaDetailView(LoginRequiredMixin, DetailView):
+    model = RecepcionMercancia
+    template_name = 'inventories/recepcionmercancia_detail.html'
+    context_object_name = 'recepcion'
+
+class RecepcionMercanciaCreateView(LoginRequiredMixin, CreateView):
+    model = RecepcionMercancia
+    template_name = 'inventories/recepcionmercancia_form.html'
+    fields = ['orden_compra', 'numero_factura_proveedor', 'numero_remision', 'observaciones']
+    success_url = reverse_lazy('inventories:recepcionmercancia_list')
+
+class RecepcionMercanciaUpdateView(LoginRequiredMixin, UpdateView):
+    model = RecepcionMercancia
+    template_name = 'inventories/recepcionmercancia_form.html'
+    fields = ['orden_compra', 'numero_factura_proveedor', 'numero_remision', 'estado', 'observaciones']
+    success_url = reverse_lazy('inventories:recepcionmercancia_list')
+
+class RecepcionMercanciaDeleteView(LoginRequiredMixin, DeleteView):
+    model = RecepcionMercancia
+    template_name = 'inventories/recepcionmercancia_confirm_delete.html'
+    success_url = reverse_lazy('inventories:recepcionmercancia_list')
+
+# ==================== INVENTARIO FÍSICO ====================
+
+class InventarioFisicoListView(LoginRequiredMixin, ListView):
+    model = InventarioFisico
+    template_name = 'inventories/inventariofisico_list.html'
+    context_object_name = 'inventarios'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        return InventarioFisico.objects.all().order_by('-fecha_planificada')
+
+class InventarioFisicoDetailView(LoginRequiredMixin, DetailView):
+    model = InventarioFisico
+    template_name = 'inventories/inventariofisico_detail.html'
+    context_object_name = 'inventario'
+
+class InventarioFisicoCreateView(LoginRequiredMixin, CreateView):
+    model = InventarioFisico
+    template_name = 'inventories/inventariofisico_form.html'
+    fields = ['nombre', 'fecha_planificada', 'ubicaciones', 'categorias', 'tipos_producto']
+    success_url = reverse_lazy('inventories:inventariofisico_list')
+
+class InventarioFisicoUpdateView(LoginRequiredMixin, UpdateView):
+    model = InventarioFisico
+    template_name = 'inventories/inventariofisico_form.html'
+    fields = ['nombre', 'fecha_planificada', 'fecha_inicio', 'fecha_fin', 'estado', 'ubicaciones', 'categorias', 'tipos_producto']
+    success_url = reverse_lazy('inventories:inventariofisico_list')
+
+class InventarioFisicoDeleteView(LoginRequiredMixin, DeleteView):
+    model = InventarioFisico
+    template_name = 'inventories/inventariofisico_confirm_delete.html'
+    success_url = reverse_lazy('inventories:inventariofisico_list')

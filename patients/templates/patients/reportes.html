@@ -1,0 +1,96 @@
+{% extends 'base_hms.html' %}
+
+{% block title %}Reportes de Pacientes - HMetaHIS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-chart-bar text-primary"></i> {{ title }}
+        </h1>
+    </div>
+
+    <!-- Reportes disponibles -->
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Reporte de Pacientes</h5>
+                    <p class="card-text">Listado completo de pacientes registrados</p>
+                    <button class="btn btn-primary">Generar</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-pie fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Estadísticas por Régimen</h5>
+                    <p class="card-text">Distribución de pacientes por tipo de régimen</p>
+                    <button class="btn btn-success">Generar</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-alt fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Pacientes por Período</h5>
+                    <p class="card-text">Registro de pacientes en rangos de fecha</p>
+                    <button class="btn btn-info">Generar</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-map-marker-alt fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Pacientes por Ubicación</h5>
+                    <p class="card-text">Distribución geográfica de pacientes</p>
+                    <button class="btn btn-warning">Generar</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-heartbeat fa-3x text-danger mb-3"></i>
+                    <h5 class="card-title">Pacientes por EPS</h5>
+                    <p class="card-text">Agrupación por entidad promotora de salud</p>
+                    <button class="btn btn-danger">Generar</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-birthday-cake fa-3x text-secondary mb-3"></i>
+                    <h5 class="card-title">Pacientes por Edad</h5>
+                    <p class="card-text">Distribución etaria de pacientes</p>
+                    <button class="btn btn-secondary">Generar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación a reportes generales -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Sistema de Reportes General</h5>
+                    <p class="card-text">Accede a reportes avanzados y análisis estadísticos</p>
+                    <a href="/reports/" class="btn btn-primary">
+                        <i class="fas fa-external-link-alt"></i> Ir al Módulo de Reportes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,33 @@
+{%% extends "pos/base.html" %%}
+
+{%% block title %%}Movimiento de Caja - Detalle{%% endblock %%}
+
+{%% block content %%}
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h1><i class="fas fa-exchange-alt"></i> Movimiento de Caja - Detalle</h1>
+    </div>
+    <div class="col-md-4 text-right">
+        <div class="btn-group" role="group">
+            <a href="{%% url 'pos:movimientocaja_edit' object.pk %%}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{%% url 'pos:movimientocaja_list' %%}" class="btn btn-secondary">
+                <i class="fas fa-list"></i> Volver
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Código:</dt>
+            <dd class="col-sm-9">{{ object.codigo }}</dd>
+            
+            <dt class="col-sm-3">Nombre:</dt>
+            <dd class="col-sm-9">{{ object.nombre }}</dd>
+        </dl>
+    </div>
+</div>
+{%% endblock %%}

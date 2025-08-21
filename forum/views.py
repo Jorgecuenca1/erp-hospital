@@ -1,8 +1,19 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
 from .models import Tema, Pregunta, Respuesta
 from .forms import TemaForm, PreguntaForm, RespuestaForm
+
+class ForumDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal del foro"""
+    template_name = 'forum/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'Foro'
+        context['temas_total'] = Tema.objects.count()
+        return context
 
 # Vistas para Tema
 class TemaListView(ListView):

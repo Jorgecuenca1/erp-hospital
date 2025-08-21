@@ -1,0 +1,96 @@
+{% extends 'base_hms.html' %}
+
+{% block title %}Ingresos Hospitalarios - HMetaHIS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-procedures text-primary"></i> {{ title }}
+        </h1>
+    </div>
+
+    <!-- Estado de camas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Camas Ocupadas</h6>
+                            <h3 class="mb-0">45</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-bed fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Camas Disponibles</h6>
+                            <h3 class="mb-0">15</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-bed fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Ingresos Hoy</h6>
+                            <h3 class="mb-0">8</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-sign-in-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Altas Hoy</h6>
+                            <h3 class="mb-0">6</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-sign-out-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación a hospitalización -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Sistema de Hospitalización</h5>
+                    <p class="card-text">Gestiona ingresos, altas y ocupación de camas</p>
+                    <a href="/hms/hospitalization/" class="btn btn-primary">
+                        <i class="fas fa-external-link-alt"></i> Ir al Módulo de Hospitalización
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

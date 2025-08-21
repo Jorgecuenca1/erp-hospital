@@ -1,7 +1,18 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from .models import Curso, Modulo, Leccion, Inscripcion, ProgresoLeccion
 from .forms import CursoForm, ModuloForm, LeccionForm, InscripcionForm, ProgresoLeccionForm
+
+class ElearningDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal de e-learning"""
+    template_name = 'elearning/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'E-learning'
+        context['cursos_total'] = Curso.objects.count()
+        return context
 
 # Vistas para Curso
 class CursoListView(ListView):

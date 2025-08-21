@@ -1,0 +1,169 @@
+{% extends "inventories/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Órdenes de Compra{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1><i class="fas fa-shopping-cart"></i> Órdenes de Compra</h1>
+    </div>
+    <div class="col-md-4 text-right">
+        <a href="{% url 'inventories:ordencompra_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nueva Orden de Compra
+        </a>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="form-inline">
+            <div class="form-group mr-3">
+                <label for="estado" class="mr-2">Estado:</label>
+                <select name="estado" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="BORRADOR">Borrador</option>
+                    <option value="ENVIADA">Enviada</option>
+                    <option value="CONFIRMADA">Confirmada</option>
+                    <option value="RECIBIDA">Recibida</option>
+                    <option value="FACTURADA">Facturada</option>
+                    <option value="CANCELADA">Cancelada</option>
+                </select>
+            </div>
+            <div class="form-group mr-3">
+                <label for="proveedor" class="mr-2">Proveedor:</label>
+                <input type="text" name="proveedor" class="form-control" placeholder="Buscar proveedor...">
+            </div>
+            <button type="submit" class="btn btn-secondary">
+                <i class="fas fa-search"></i> Filtrar
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Órdenes -->
+<div class="card">
+    <div class="card-body">
+        {% if ordenes %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Número</th>
+                        <th>Proveedor</th>
+                        <th>Fecha Orden</th>
+                        <th>Fecha Entrega</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                        <th>Contabilizada</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orden in ordenes %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'inventories:ordencompra_detail' orden.pk %}" class="font-weight-bold">
+                                {{ orden.numero }}
+                            </a>
+                        </td>
+                        <td>{{ orden.proveedor.nombre_completo }}</td>
+                        <td>{{ orden.fecha_orden|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if orden.fecha_entrega_esperada %}
+                            {{ orden.fecha_entrega_esperada|date:"d/m/Y" }}
+                            {% else %}
+                            <span class="text-muted">No definida</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if orden.estado == 'BORRADOR' %}
+                            <span class="badge badge-secondary">{{ orden.get_estado_display }}</span>
+                            {% elif orden.estado == 'ENVIADA' %}
+                            <span class="badge badge-info">{{ orden.get_estado_display }}</span>
+                            {% elif orden.estado == 'CONFIRMADA' %}
+                            <span class="badge badge-warning">{{ orden.get_estado_display }}</span>
+                            {% elif orden.estado == 'RECIBIDA' %}
+                            <span class="badge badge-success">{{ orden.get_estado_display }}</span>
+                            {% elif orden.estado == 'FACTURADA' %}
+                            <span class="badge badge-primary">{{ orden.get_estado_display }}</span>
+                            {% elif orden.estado == 'CANCELADA' %}
+                            <span class="badge badge-danger">{{ orden.get_estado_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right font-weight-bold">${{ orden.total|floatformat:2 }}</td>
+                        <td class="text-center">
+                            {% if orden.contabilizada %}
+                            <i class="fas fa-check-circle text-success" title="Contabilizada"></i>
+                            {% else %}
+                            <i class="fas fa-times-circle text-warning" title="Pendiente contabilización"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'inventories:ordencompra_detail' orden.pk %}"
+                                    class="btn btn-sm btn-outline-info" title="Ver">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'inventories:ordencompra_edit' orden.pk %}"
+                                    class="btn btn-sm btn-outline-warning" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'inventories:ordencompra_delete' orden.pk %}"
+                                    class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <nav aria-label="Navegación de páginas">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">&laquo; Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No hay órdenes de compra registradas</h4>
+            <p class="text-muted">Comienza creando tu primera orden de compra</p>
+            <a href="{% url 'inventories:ordencompra_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Crear Primera Orden
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

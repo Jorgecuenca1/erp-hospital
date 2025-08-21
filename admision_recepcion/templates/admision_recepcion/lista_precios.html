@@ -1,0 +1,743 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Lista de Precios - Admisión{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-section {
+        background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #e3e6f0;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-title {
+        color: #5a5c69;
+        margin-bottom: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .precio-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+    }
+
+    .precio-table table {
+        margin-bottom: 0;
+    }
+
+    .precio-table thead {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+    }
+
+    .precio-table thead th {
+        border: none;
+        padding: 15px 12px;
+        font-weight: 600;
+        text-align: center;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    .precio-table tbody td {
+        padding: 12px;
+        border-bottom: 1px solid #f8f9fa;
+        vertical-align: middle;
+    }
+
+    .precio-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .precio-valor {
+        font-weight: bold;
+        color: #28a745;
+        text-align: right;
+        font-size: 1rem;
+    }
+
+    .codigo-cups {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-family: monospace;
+        display: inline-block;
+    }
+
+    .codigo-vacio {
+        color: #6c757d;
+        font-style: italic;
+        font-size: 0.8rem;
+    }
+
+    .tipo-rips {
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .rips-consulta {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .rips-procedimiento {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .rips-otros {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .rips-medicamentos {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .rips-vacio {
+        background: #f8f9fa;
+        color: #6c757d;
+    }
+
+    .iva-badge {
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .iva-si {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .iva-no {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e3e6f0;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .search-input {
+        border-radius: 10px;
+        border: 2px solid #e3e6f0;
+        padding: 10px 15px;
+    }
+
+    .search-input:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .convenio-selector {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+
+    .convenio-selector select {
+        background: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        width: 100%;
+    }
+
+    .pagination-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 0 0 15px 15px;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #6c757d;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.3;
+    }
+
+    .producto-nombre {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 2px;
+    }
+
+    .producto-codigo {
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-family: monospace;
+    }
+
+    .filter-chip {
+        background: #4e73df;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin: 3px;
+        display: inline-block;
+    }
+
+    .filter-chip .remove {
+        margin-left: 8px;
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    .filter-chip .remove:hover {
+        opacity: 1;
+    }
+
+    .export-section {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 25px;
+        border: 1px solid #e3e6f0;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Lista de Precios</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:dashboard' %}">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_create' %}">
+        <i class="fas fa-plus-circle me-2"></i>Nueva Orden
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_list' %}">
+        <i class="fas fa-file-medical-alt me-2"></i>Órdenes de Servicios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:seguimiento_pacientes' %}">
+        <i class="fas fa-user-check me-2"></i>Seguimiento Pacientes
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:seguimiento_atenciones' %}">
+        <i class="fas fa-stethoscope me-2"></i>Seguimiento Atenciones
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:portal_empresas' %}">
+        <i class="fas fa-building me-2"></i>Portal Empresas
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'admision_recepcion:lista_precios' %}">
+        <i class="fas fa-tags me-2"></i>Lista de Precios
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">💰 Lista de Precios</h1>
+            <p class="mb-0 text-muted">de la sección Admisión - Recepción
+                <a href="#" class="text-primary ms-2" data-bs-toggle="modal" data-bs-target="#instructionsModal">
+                    👉🏼 De clic aquí para aprender o ver los instructivos <i class="fas fa-info-circle"></i>
+                </a>
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-outline-success me-2" id="refreshBtn">
+                <i class="fas fa-sync-alt me-1"></i>Actualizar
+            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-download me-1"></i>Exportar a Excel
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="exportarExcel('completo')">
+                            <i class="fas fa-file-excel text-success me-2"></i>Lista Completa
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="exportarExcel('filtrado')">
+                            <i class="fas fa-filter text-primary me-2"></i>Solo Filtrados
+                        </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selector de Convenio -->
+    <div class="convenio-selector">
+        <form method="get" id="convenioForm">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-2">Nombre del Acuerdo Comercial, Convenio o Contrato:</label>
+                </div>
+                <div class="col-md-6">
+                    <select name="convenio" class="form-control" id="convenioSelector">
+                        <option value="">Precios de Lista Estándar (Productos)</option>
+                        {% for convenio in convenios %}
+                        <option value="{{ convenio.id }}" {% if filtros_actuales.convenio==convenio.id|stringformat:"s"
+                            %}selected{% endif %}>
+                            {{ convenio.nombre }} - {{ convenio.empresa.razon_social }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="hidden" name="buscar" value="{{ filtros_actuales.buscar }}">
+                    <input type="hidden" name="categoria" value="{{ filtros_actuales.categoria }}">
+                    <input type="hidden" name="tipo_rips" value="{{ filtros_actuales.tipo_rips }}">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="filter-section">
+        <div class="filter-title">
+            <i class="fas fa-search me-2"></i>Filtros de Búsqueda
+        </div>
+        <form method="get" id="filterForm">
+            <input type="hidden" name="convenio" value="{{ filtros_actuales.convenio }}">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Nombre del Producto o Servicio:</label>
+                    <input type="text" name="buscar" class="search-input form-control"
+                        value="{{ filtros_actuales.buscar }}"
+                        placeholder="Escriba parte del contenido del nombre y ENTER para filtrar." id="buscarInput">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Categoría:</label>
+                    <select name="categoria" class="form-control" id="categoriaFilter">
+                        <option value="">Todas</option>
+                        {% for categoria_code, categoria_name in categorias %}
+                        <option value="{{ categoria_code }}" {% if filtros_actuales.categoria==categoria_code
+                            %}selected{% endif %}>
+                            {{ categoria_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Tipo RIPS:</label>
+                    <select name="tipo_rips" class="form-control" id="tipoRipsFilter">
+                        <option value="">Todos</option>
+                        {% for tipo_code, tipo_name in tipos_rips %}
+                        <option value="{{ tipo_code }}" {% if filtros_actuales.tipo_rips==tipo_code %}selected{% endif
+                            %}>
+                            {{ tipo_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Precio Mín:</label>
+                    <input type="number" name="precio_min" class="form-control"
+                        value="{{ filtros_actuales.precio_min }}" placeholder="0" step="1000">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Precio Máx:</label>
+                    <input type="number" name="precio_max" class="form-control"
+                        value="{{ filtros_actuales.precio_max }}" placeholder="999999999" step="1000">
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-10">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i>Buscar
+                    </button>
+                    <a href="{% url 'admision_recepcion:lista_precios' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-eraser me-1"></i>Limpiar Filtros
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Filtros activos -->
+        {% if filtros_actuales.buscar or filtros_actuales.categoria or filtros_actuales.tipo_rips or
+        filtros_actuales.convenio %}
+        <div class="mt-3">
+            <small class="text-muted me-2">Filtros activos:</small>
+            {% if filtros_actuales.buscar %}
+            <span class="filter-chip">
+                Búsqueda: {{ filtros_actuales.buscar }}
+                <span class="remove" onclick="removeFilter('buscar')">&times;</span>
+            </span>
+            {% endif %}
+            {% if filtros_actuales.categoria %}
+            <span class="filter-chip">
+                Categoría: {{ filtros_actuales.categoria }}
+                <span class="remove" onclick="removeFilter('categoria')">&times;</span>
+            </span>
+            {% endif %}
+            {% if filtros_actuales.tipo_rips %}
+            <span class="filter-chip">
+                RIPS: {{ filtros_actuales.tipo_rips }}
+                <span class="remove" onclick="removeFilter('tipo_rips')">&times;</span>
+            </span>
+            {% endif %}
+            {% if convenio_seleccionado %}
+            <span class="filter-chip">
+                Convenio: {{ convenio_seleccionado.nombre }}
+                <span class="remove" onclick="removeFilter('convenio')">&times;</span>
+            </span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-card">
+        <div class="row">
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-primary">{{ stats.total_productos }}</span>
+                <div class="stat-label">Total Productos</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-success">${{ stats.total_valor|floatformat:0 }}</span>
+                <div class="stat-label">Valor Total</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-info">{{ stats.con_cups }}</span>
+                <div class="stat-label">Con Código CUPS</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-warning">{{ stats.con_iva }}</span>
+                <div class="stat-label">Con IVA</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Precios -->
+    <div class="precio-table">
+        {% if productos %}
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 45%;">Nombre del Producto o Servicio</th>
+                    <th style="width: 15%;">Precio</th>
+                    <th style="width: 12%;">CUPS</th>
+                    <th style="width: 15%;">RIPS</th>
+                    <th style="width: 8%;">IVA</th>
+                    <th style="width: 5%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>
+                        <div class="producto-nombre">{{ producto.nombre_producto_servicio }}</div>
+                        {% if producto.codigo_interno %}
+                        <div class="producto-codigo">Código: {{ producto.codigo_interno }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="precio-valor">
+                        {% if convenio_seleccionado %}
+                        ${{ producto.get_precio_para_convenio:convenio_seleccionado.id|floatformat:0 }}
+                        {% else %}
+                        ${{ producto.precio|floatformat:0 }}
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if producto.codigo_cups %}
+                        <span class="codigo-cups">{{ producto.codigo_cups }}</span>
+                        {% else %}
+                        <span class="codigo-vacio">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if producto.tipo_rips %}
+                        <span class="tipo-rips rips-{{ producto.tipo_rips|lower }}">
+                            {{ producto.get_tipo_rips_display }}
+                        </span>
+                        {% else %}
+                        <span class="tipo-rips rips-vacio">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        {% if producto.gravado_iva %}
+                        <span class="iva-badge iva-si">{{ producto.porcentaje_iva }}%</span>
+                        {% else %}
+                        <span class="iva-badge iva-no">0.00%</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-info btn-sm"
+                                onclick="verDetalleProducto({{ producto.id }})" title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Información de paginación -->
+        <div class="pagination-info">
+            Mostrar de a
+            <select id="pageSize" onchange="changePage Size()">
+                <option value="20" {% if request.GET.page_size == "20" or not request.GET.page_size %}selected{% endif %}>
+                    20</option>
+                <option value="50" {% if request.GET.page_size == "50" %}selected{% endif %}>50</option>
+                <option value="100" {% if request.GET.page_size == "100" %}selected{% endif %}>100</option>
+            </select>
+            registros, de un total de {{ paginator.count }} - Página N° {{ page_obj.number }} de {{ paginator.num_pages
+            }}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-tags"></i>
+            <h5>No se encontraron productos o servicios</h5>
+            <p>No hay productos que coincidan con los criterios de búsqueda.</p>
+            <a href="{% url 'admision_recepcion:lista_precios' %}" class="btn btn-primary">
+                <i class="fas fa-refresh me-1"></i>Ver Todos los Productos
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Paginación">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Instrucciones -->
+<div class="modal fade" id="instructionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Instrucciones - Lista de Precios
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="fw-bold mb-3">🎯 Objetivo del Módulo</h6>
+                        <p>Gestionar la lista de precios de todos los productos y servicios médicos, con códigos CUPS
+                            para RIPS y control de convenios.</p>
+
+                        <h6 class="fw-bold mb-3">🔍 Funcionalidades de Búsqueda</h6>
+                        <ul>
+                            <li><strong>Por nombre:</strong> Buscar productos por nombre o código</li>
+                            <li><strong>Por convenio:</strong> Ver precios específicos según convenio</li>
+                            <li><strong>Por categoría:</strong> Filtrar por tipo de servicio</li>
+                            <li><strong>Por RIPS:</strong> Filtrar según tipo de registro RIPS</li>
+                            <li><strong>Por precio:</strong> Rango mínimo y máximo</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">📊 Códigos Importantes</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>CUPS:</strong> Clasificación Única de Procedimientos en Salud</p>
+                                <p><strong>RIPS:</strong> Registro Individual de Prestación de Servicios</p>
+                                <p><strong>CUM:</strong> Código Único de Medicamentos</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>CIE-10:</strong> Código de diagnóstico</p>
+                                <p><strong>IVA:</strong> Impuesto sobre las ventas</p>
+                                <p><strong>Convenios:</strong> Precios especiales por empresa</p>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold mb-3">🏥 Tipos de RIPS</h6>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="tipo-rips rips-consulta">Consulta</span>
+                            <span class="tipo-rips rips-procedimiento">Procedimiento</span>
+                            <span class="tipo-rips rips-otros">Otros Servicios</span>
+                            <span class="tipo-rips rips-medicamentos">Medicamentos</span>
+                        </div>
+
+                        <h6 class="fw-bold mb-3">💡 Uso del Sistema</h6>
+                        <ol>
+                            <li>Seleccione un convenio para ver precios específicos</li>
+                            <li>Use el filtro de búsqueda para encontrar productos</li>
+                            <li>Los códigos CUPS son fundamentales para generar RIPS</li>
+                            <li>Exporte la lista a Excel para uso externo</li>
+                            <li>Los precios pueden variar según el convenio seleccionado</li>
+                        </ol>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Nota importante:</strong> Los códigos CUPS son esenciales para la generación
+                            automática de RIPS. Los medicamentos requieren código CUM para facturación correcta.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Cambio de convenio
+        $('#convenioSelector').change(function () {
+            $('#convenioForm').submit();
+        });
+
+        // Auto-submit al presionar Enter en búsqueda
+        $('#buscarInput').on('keypress', function (e) {
+            if (e.which === 13) {
+                $('#filterForm').submit();
+            }
+        });
+
+        // Auto-submit en cambio de filtros
+        $('#categoriaFilter, #tipoRipsFilter').change(function () {
+            $('#filterForm').submit();
+        });
+
+        // Actualizar página
+        $('#refreshBtn').click(function () {
+            window.location.reload();
+        });
+    });
+
+    // Exportar a Excel
+    function exportarExcel(tipo) {
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', 'excel');
+        params.set('tipo', tipo);
+        window.open(`${window.location.pathname}?${params.toString()}`);
+    }
+
+    // Ver detalles del producto
+    function verDetalleProducto(productoId) {
+        // Implementar modal de detalles o redireccionar
+        alert(`Ver detalles del producto ID: ${productoId}\n(Funcionalidad en desarrollo)`);
+    }
+
+    // Cambiar tamaño de página
+    function changePageSize() {
+        const pageSize = $('#pageSize').val();
+        const url = new URL(window.location);
+        url.searchParams.set('page_size', pageSize);
+        url.searchParams.delete('page'); // Reset page to 1
+        window.location.href = url.toString();
+    }
+
+    // Remover filtro específico
+    function removeFilter(filterName) {
+        const url = new URL(window.location);
+        url.searchParams.delete(filterName);
+        window.location.href = url.toString();
+    }
+
+    // Funciones adicionales para futuras implementaciones
+    function agregarProducto() {
+        window.location.href = '/admin/admision_recepcion/listaprecios/add/';
+    }
+
+    function editarProducto(productoId) {
+        window.location.href = `/admin/admision_recepcion/listaprecios/${productoId}/change/`;
+    }
+</script>
+{% endblock %}

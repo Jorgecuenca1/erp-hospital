@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Editar{% else %}Nuevo{% endif %} Test de Campo Visual - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-chart-area me-2 text-primary"></i>
+                        {% if object %}Editar Test de Campo Visual{% else %}Nuevo Test de Campo Visual{% endif %}
+                    </h4>
+                    <a href="{% url 'ophthalmology:visual_field_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver a la Lista
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.patient.id_for_label }}" class="form-label">Paciente</label>
+                                    {{ form.patient }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.performed_by.id_for_label }}" class="form-label">Realizado por</label>
+                                    {{ form.performed_by }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.test_date.id_for_label }}" class="form-label">Fecha del Test</label>
+                                    {{ form.test_date }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.test_type.id_for_label }}" class="form-label">Tipo de Test</label>
+                                    {{ form.test_type }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.eye_tested.id_for_label }}" class="form-label">Ojo Testado</label>
+                                    {{ form.eye_tested }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.mean_deviation.id_for_label }}" class="form-label">Mean Deviation (dB)</label>
+                                    {{ form.mean_deviation }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.pattern_standard_deviation.id_for_label }}" class="form-label">Pattern Standard Deviation (dB)</label>
+                                    {{ form.pattern_standard_deviation }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.visual_field_index.id_for_label }}" class="form-label">Visual Field Index (%)</label>
+                                    {{ form.visual_field_index }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.interpretation.id_for_label }}" class="form-label">Interpretación</label>
+                            {{ form.interpretation }}
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'ophthalmology:visual_field_list' %}" class="btn btn-secondary me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if object %}Actualizar{% else %}Guardar{% endif %} Test
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

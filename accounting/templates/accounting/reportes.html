@@ -30,7 +30,8 @@
                             <select name="periodo" id="periodo" class="form-control">
                                 <option value="">Todos los períodos</option>
                                 {% for periodo in periodos %}
-                                <option value="{{ periodo.id }}" {% if periodo.id|stringformat:"s" == request.GET.periodo %}selected{% endif %}>
+                                <option value="{{ periodo.id }}" {% if periodo.id|stringformat:"s"==request.GET.periodo
+                                    %}selected{% endif %}>
                                     {{ periodo.nombre }}
                                 </option>
                                 {% endfor %}
@@ -38,28 +39,39 @@
                         </div>
                         <div class="col-md-3">
                             <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
-                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" 
-                                   value="{{ request.GET.fecha_inicio }}">
+                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control"
+                                value="{{ request.GET.fecha_inicio }}">
                         </div>
                         <div class="col-md-3">
                             <label for="fecha_fin" class="form-label">Fecha Fin</label>
-                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" 
-                                   value="{{ request.GET.fecha_fin }}">
+                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control"
+                                value="{{ request.GET.fecha_fin }}">
                         </div>
                         <div class="col-md-3">
                             <label for="tipo_reporte" class="form-label">Tipo de Reporte</label>
                             <select name="tipo_reporte" id="tipo_reporte" class="form-control">
-                                <option value="general" {% if request.GET.tipo_reporte == 'general' %}selected{% endif %}>Reporte General</option>
-                                <option value="banco" {% if request.GET.tipo_reporte == 'banco' %}selected{% endif %}>Reporte Bancario</option>
-                                <option value="conciliacion" {% if request.GET.tipo_reporte == 'conciliacion' %}selected{% endif %}>Conciliación Bancaria</option>
-                                <option value="movimientos" {% if request.GET.tipo_reporte == 'movimientos' %}selected{% endif %}>Movimientos Bancarios</option>
-                                <option value="flujo_efectivo" {% if request.GET.tipo_reporte == 'flujo_efectivo' %}selected{% endif %}>Flujo de Efectivo</option>
-                                <option value="presupuesto" {% if request.GET.tipo_reporte == 'presupuesto' %}selected{% endif %}>Análisis Presupuestal</option>
-                                <option value="costos" {% if request.GET.tipo_reporte == 'costos' %}selected{% endif %}>Análisis de Costos</option>
-                                <option value="fiscal" {% if request.GET.tipo_reporte == 'fiscal' %}selected{% endif %}>Reportes Fiscales</option>
-                                <option value="auditoria" {% if request.GET.tipo_reporte == 'auditoria' %}selected{% endif %}>Reportes de Auditoría</option>
-                                <option value="indicadores" {% if request.GET.tipo_reporte == 'indicadores' %}selected{% endif %}>Indicadores Financieros</option>
-                                <option value="cartera" {% if request.GET.tipo_reporte == 'cartera' %}selected{% endif %}>Análisis de Cartera</option>
+                                <option value="general" {% if request.GET.tipo_reporte == "general" %}selected{% endif %}>
+                                    Reporte General</option>
+                                <option value="banco" {% if request.GET.tipo_reporte == "banco" %}selected{% endif %}>
+                                    Reporte Bancario</option>
+                                <option value="conciliacion" {% if request.GET.tipo_reporte == "conciliacion" %}selected{%
+                                    endif %}>Conciliación Bancaria</option>
+                                <option value="movimientos" {% if request.GET.tipo_reporte == "movimientos" %}selected{%
+                                    endif %}>Movimientos Bancarios</option>
+                                <option value="flujo_efectivo" {% if request.GET.tipo_reporte == "flujo_efectivo"
+                                    %}selected{% endif %}>Flujo de Efectivo</option>
+                                <option value="presupuesto" {% if request.GET.tipo_reporte == "presupuesto" %}selected{%
+                                    endif %}>Análisis Presupuestal</option>
+                                <option value="costos" {% if request.GET.tipo_reporte == "costos" %}selected{% endif %}>
+                                    Análisis de Costos</option>
+                                <option value="fiscal" {% if request.GET.tipo_reporte == "fiscal" %}selected{% endif %}>
+                                    Reportes Fiscales</option>
+                                <option value="auditoria" {% if request.GET.tipo_reporte == "auditoria" %}selected{% endif
+                                    %}>Reportes de Auditoría</option>
+                                <option value="indicadores" {% if request.GET.tipo_reporte == "indicadores" %}selected{%
+                                    endif %}>Indicadores Financieros</option>
+                                <option value="cartera" {% if request.GET.tipo_reporte == "cartera" %}selected{% endif %}>
+                                    Análisis de Cartera</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -67,7 +79,8 @@
                             <select name="banco" id="banco" class="form-control">
                                 <option value="">Todos los bancos</option>
                                 {% for banco in bancos %}
-                                <option value="{{ banco }}" {% if banco == request.GET.banco %}selected{% endif %}>{{ banco }}</option>
+                                <option value="{{ banco }}" {% if banco==request.GET.banco %}selected{% endif %}>{{
+                                    banco }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -122,13 +135,15 @@
                                     <td>{{ movimiento.cuenta_bancaria }}</td>
                                     <td>{{ movimiento.descripcion }}</td>
                                     <td>
-                                        <span class="badge badge-{% if movimiento.tipo == 'DEBITO' %}danger{% else %}success{% endif %}">
+                                        <span
+                                            class="badge badge-{% if movimiento.tipo == 'DEBITO' %}danger{% else %}success{% endif %}">
                                             {{ movimiento.get_tipo_display }}
                                         </span>
                                     </td>
                                     <td class="text-end">${{ movimiento.valor|floatformat:2 }}</td>
                                     <td>
-                                        <span class="badge badge-{% if movimiento.conciliado %}success{% else %}warning{% endif %}">
+                                        <span
+                                            class="badge badge-{% if movimiento.conciliado %}success{% else %}warning{% endif %}">
                                             {% if movimiento.conciliado %}Conciliado{% else %}Pendiente{% endif %}
                                         </span>
                                     </td>
@@ -214,7 +229,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    
+
                     <!-- Resumen de Conciliación -->
                     <div class="row mt-4">
                         <div class="col-12">
@@ -229,7 +244,8 @@
                                             <strong>Total Pendiente:</strong> ${{ total_pendiente|floatformat:2 }}
                                         </div>
                                         <div class="col-md-3">
-                                            <strong>Porcentaje Conciliado:</strong> {{ porcentaje_conciliado|floatformat:1 }}%
+                                            <strong>Porcentaje Conciliado:</strong> {{
+                                            porcentaje_conciliado|floatformat:1 }}%
                                         </div>
                                         <div class="col-md-3">
                                             <strong>Diferencia:</strong> ${{ diferencia_conciliacion|floatformat:2 }}
@@ -280,23 +296,26 @@
                                     <td>{{ movimiento.cuenta_bancaria }}</td>
                                     <td>{{ movimiento.descripcion }}</td>
                                     <td>
-                                        <span class="badge badge-{% if movimiento.tipo == 'DEBITO' %}danger{% else %}success{% endif %}">
+                                        <span
+                                            class="badge badge-{% if movimiento.tipo == 'DEBITO' %}danger{% else %}success{% endif %}">
                                             {{ movimiento.get_tipo_display }}
                                         </span>
                                     </td>
                                     <td class="text-end">${{ movimiento.valor|floatformat:2 }}</td>
                                     <td>
-                                        <span class="badge badge-{% if movimiento.conciliado %}success{% else %}warning{% endif %}">
+                                        <span
+                                            class="badge badge-{% if movimiento.conciliado %}success{% else %}warning{% endif %}">
                                             {% if movimiento.conciliado %}Conciliado{% else %}Pendiente{% endif %}
                                         </span>
                                     </td>
                                     <td>
                                         {% if movimiento.asiento %}
-                                            <a href="{% url 'accounting:asientocontable_detail' movimiento.asiento.pk %}" class="btn btn-sm btn-info">
-                                                Ver Asiento
-                                            </a>
+                                        <a href="{% url 'accounting:asientocontable_detail' movimiento.asiento.pk %}"
+                                            class="btn btn-sm btn-info">
+                                            Ver Asiento
+                                        </a>
                                         {% else %}
-                                            -
+                                        -
                                         {% endif %}
                                     </td>
                                     <td>{{ movimiento.referencia|default:"-" }}</td>
@@ -343,7 +362,8 @@
                                 {% for item in flujo_efectivo.operacionales %}
                                 <tr>
                                     <td>{{ item.concepto }}</td>
-                                    <td class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
+                                    <td
+                                        class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
                                         ${{ item.monto|floatformat:2 }}
                                     </td>
                                     <td>{{ item.descripcion }}</td>
@@ -362,7 +382,8 @@
                                 {% for item in flujo_efectivo.inversion %}
                                 <tr>
                                     <td>{{ item.concepto }}</td>
-                                    <td class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
+                                    <td
+                                        class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
                                         ${{ item.monto|floatformat:2 }}
                                     </td>
                                     <td>{{ item.descripcion }}</td>
@@ -381,7 +402,8 @@
                                 {% for item in flujo_efectivo.financiacion %}
                                 <tr>
                                     <td>{{ item.concepto }}</td>
-                                    <td class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
+                                    <td
+                                        class="text-end {% if item.monto < 0 %}text-danger{% else %}text-success{% endif %}">
                                         ${{ item.monto|floatformat:2 }}
                                     </td>
                                     <td>{{ item.descripcion }}</td>
@@ -443,22 +465,24 @@
                                     <td>{{ item.centro_costo.nombre|default:"-" }}</td>
                                     <td class="text-end">${{ item.presupuestado|floatformat:2 }}</td>
                                     <td class="text-end">${{ item.real|floatformat:2 }}</td>
-                                    <td class="text-end {% if item.variacion < 0 %}text-danger{% else %}text-success{% endif %}">
+                                    <td
+                                        class="text-end {% if item.variacion < 0 %}text-danger{% else %}text-success{% endif %}">
                                         ${{ item.variacion|floatformat:2 }}
                                     </td>
                                     <td class="text-end">
-                                        <span class="badge badge-{% if item.porcentaje_variacion <= 5 %}success{% elif item.porcentaje_variacion <= 15 %}warning{% else %}danger{% endif %}">
+                                        <span
+                                            class="badge badge-{% if item.porcentaje_variacion <= 5 %}success{% elif item.porcentaje_variacion <= 15 %}warning{% else %}danger{% endif %}">
                                             {{ item.porcentaje_variacion|floatformat:1 }}%
                                         </span>
                                     </td>
                                     <td>
-                                        {% if item.porcentaje_variacion <= 5 %}
-                                            <span class="badge badge-success">Dentro del presupuesto</span>
-                                        {% elif item.porcentaje_variacion <= 15 %}
-                                            <span class="badge badge-warning">Atención</span>
-                                        {% else %}
-                                            <span class="badge badge-danger">Excede presupuesto</span>
-                                        {% endif %}
+                                        {% if item.porcentaje_variacion <= 5 %} <span class="badge badge-success">Dentro
+                                            del presupuesto</span>
+                                            {% elif item.porcentaje_variacion <= 15 %} <span
+                                                class="badge badge-warning">Atención</span>
+                                                {% else %}
+                                                <span class="badge badge-danger">Excede presupuesto</span>
+                                                {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -571,11 +595,13 @@
                                     <tbody>
                                         <tr>
                                             <td>Base Retención</td>
-                                            <td class="text-end">${{ retenciones_data.base_retencion|floatformat:2 }}</td>
+                                            <td class="text-end">${{ retenciones_data.base_retencion|floatformat:2 }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Retención en la Fuente</td>
-                                            <td class="text-end">${{ retenciones_data.retencion_fuente|floatformat:2 }}</td>
+                                            <td class="text-end">${{ retenciones_data.retencion_fuente|floatformat:2 }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>ICA</td>
@@ -583,7 +609,8 @@
                                         </tr>
                                         <tr class="table-info">
                                             <th>Total Retenciones</th>
-                                            <th class="text-end">${{ retenciones_data.total_retenciones|floatformat:2 }}</th>
+                                            <th class="text-end">${{ retenciones_data.total_retenciones|floatformat:2 }}
+                                            </th>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -629,7 +656,8 @@
                                     <td>{{ log.fecha|date:"d/m/Y H:i" }}</td>
                                     <td>{{ log.usuario|default:"-" }}</td>
                                     <td>
-                                        <span class="badge badge-{% if log.accion == 'CREATE' %}success{% elif log.accion == 'UPDATE' %}warning{% elif log.accion == 'DELETE' %}danger{% else %}info{% endif %}">
+                                        <span
+                                            class="badge badge-{% if log.accion == 'CREATE' %}success{% elif log.accion == 'UPDATE' %}warning{% elif log.accion == 'DELETE' %}danger{% else %}info{% endif %}">
                                             {{ log.get_accion_display }}
                                         </span>
                                     </td>
@@ -671,15 +699,18 @@
                                     <tbody>
                                         <tr>
                                             <td>Razón Corriente</td>
-                                            <td class="text-end">{{ indicadores_financieros.razon_corriente|floatformat:2 }}</td>
+                                            <td class="text-end">{{
+                                                indicadores_financieros.razon_corriente|floatformat:2 }}</td>
                                         </tr>
                                         <tr>
                                             <td>Razón Ácida</td>
-                                            <td class="text-end">{{ indicadores_financieros.razon_acida|floatformat:2 }}</td>
+                                            <td class="text-end">{{ indicadores_financieros.razon_acida|floatformat:2 }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Capital de Trabajo</td>
-                                            <td class="text-end">${{ indicadores_financieros.capital_trabajo|floatformat:2 }}</td>
+                                            <td class="text-end">${{
+                                                indicadores_financieros.capital_trabajo|floatformat:2 }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -694,15 +725,18 @@
                                     <tbody>
                                         <tr>
                                             <td>Razón de Endeudamiento</td>
-                                            <td class="text-end">{{ indicadores_financieros.razon_endeudamiento|floatformat:2 }}%</td>
+                                            <td class="text-end">{{
+                                                indicadores_financieros.razon_endeudamiento|floatformat:2 }}%</td>
                                         </tr>
                                         <tr>
                                             <td>Razón de Patrimonio</td>
-                                            <td class="text-end">{{ indicadores_financieros.razon_patrimonio|floatformat:2 }}%</td>
+                                            <td class="text-end">{{
+                                                indicadores_financieros.razon_patrimonio|floatformat:2 }}%</td>
                                         </tr>
                                         <tr>
                                             <td>Razón de Cobertura</td>
-                                            <td class="text-end">{{ indicadores_financieros.razon_cobertura|floatformat:2 }}</td>
+                                            <td class="text-end">{{
+                                                indicadores_financieros.razon_cobertura|floatformat:2 }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -717,11 +751,13 @@
                                     <tbody>
                                         <tr>
                                             <td>Margen Bruto</td>
-                                            <td class="text-end">{{ indicadores_financieros.margen_bruto|floatformat:2 }}%</td>
+                                            <td class="text-end">{{ indicadores_financieros.margen_bruto|floatformat:2
+                                                }}%</td>
                                         </tr>
                                         <tr>
                                             <td>Margen Operacional</td>
-                                            <td class="text-end">{{ indicadores_financieros.margen_operacional|floatformat:2 }}%</td>
+                                            <td class="text-end">{{
+                                                indicadores_financieros.margen_operacional|floatformat:2 }}%</td>
                                         </tr>
                                         <tr>
                                             <td>ROA (Rentabilidad Activos)</td>
@@ -744,15 +780,18 @@
                                     <tbody>
                                         <tr>
                                             <td>Rotación de Activos</td>
-                                            <td class="text-end">{{ indicadores_financieros.rotacion_activos|floatformat:2 }}</td>
+                                            <td class="text-end">{{
+                                                indicadores_financieros.rotacion_activos|floatformat:2 }}</td>
                                         </tr>
                                         <tr>
                                             <td>Rotación de Inventarios</td>
-                                            <td class="text-end">{{ indicadores_financieros.rotacion_inventarios|floatformat:2 }}</td>
+                                            <td class="text-end">{{
+                                                indicadores_financieros.rotacion_inventarios|floatformat:2 }}</td>
                                         </tr>
                                         <tr>
                                             <td>Período de Cobranza</td>
-                                            <td class="text-end">{{ indicadores_financieros.periodo_cobranza|floatformat:0 }} días</td>
+                                            <td class="text-end">{{
+                                                indicadores_financieros.periodo_cobranza|floatformat:0 }} días</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -801,9 +840,10 @@
                                             <td class="text-end">${{ cuenta.saldo|floatformat:2 }}</td>
                                             <td class="text-center">{{ cuenta.dias_vencido }}</td>
                                             <td>
-                                                <span class="badge badge-{% if cuenta.dias_vencido <= 30 %}success{% elif cuenta.dias_vencido <= 60 %}warning{% else %}danger{% endif %}">
-                                                    {% if cuenta.dias_vencido <= 30 %}Al día{% elif cuenta.dias_vencido <= 60 %}Vencido{% else %}Mora{% endif %}
-                                                </span>
+                                                <span
+                                                    class="badge badge-{% if cuenta.dias_vencido <= 30 %}success{% elif cuenta.dias_vencido <= 60 %}warning{% else %}danger{% endif %}">
+                                                    {% if cuenta.dias_vencido <= 30 %}Al día{% elif cuenta.dias_vencido
+                                                        <=60 %}Vencido{% else %}Mora{% endif %} </span>
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -836,9 +876,10 @@
                                             <td class="text-end">${{ cuenta.saldo|floatformat:2 }}</td>
                                             <td class="text-center">{{ cuenta.dias_vencido }}</td>
                                             <td>
-                                                <span class="badge badge-{% if cuenta.dias_vencido <= 30 %}success{% elif cuenta.dias_vencido <= 60 %}warning{% else %}danger{% endif %}">
-                                                    {% if cuenta.dias_vencido <= 30 %}Al día{% elif cuenta.dias_vencido <= 60 %}Vencido{% else %}Mora{% endif %}
-                                                </span>
+                                                <span
+                                                    class="badge badge-{% if cuenta.dias_vencido <= 30 %}success{% elif cuenta.dias_vencido <= 60 %}warning{% else %}danger{% endif %}">
+                                                    {% if cuenta.dias_vencido <= 30 %}Al día{% elif cuenta.dias_vencido
+                                                        <=60 %}Vencido{% else %}Mora{% endif %} </span>
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -868,7 +909,8 @@
                                             <strong>Neto Cartera:</strong> ${{ neto_cartera|floatformat:2 }}
                                         </div>
                                         <div class="col-md-3">
-                                            <strong>Antigüedad Promedio:</strong> {{ antiguedad_promedio|floatformat:0 }} días
+                                            <strong>Antigüedad Promedio:</strong> {{ antiguedad_promedio|floatformat:0
+                                            }} días
                                         </div>
                                     </div>
                                 </div>
@@ -943,7 +985,8 @@
                                 {% for concepto in estado_resultados %}
                                 <tr>
                                     <td>{{ concepto.nombre }}</td>
-                                    <td class="text-end {% if concepto.monto < 0 %}text-danger{% else %}text-success{% endif %}">
+                                    <td
+                                        class="text-end {% if concepto.monto < 0 %}text-danger{% else %}text-success{% endif %}">
                                         ${{ concepto.monto|floatformat:2 }}
                                     </td>
                                 </tr>
@@ -989,13 +1032,15 @@
                                     <td>#{{ asiento.id }}</td>
                                     <td>{{ linea.descripcion|default:asiento.descripcion }}</td>
                                     <td>{{ linea.cuenta.codigo }} - {{ linea.cuenta.nombre }}</td>
-                                    <td class="text-end">{% if linea.debito > 0 %}${{ linea.debito|floatformat:2 }}{% endif %}</td>
-                                    <td class="text-end">{% if linea.credito > 0 %}${{ linea.credito|floatformat:2 }}{% endif %}</td>
+                                    <td class="text-end">{% if linea.debito > 0 %}${{ linea.debito|floatformat:2 }}{%
+                                        endif %}</td>
+                                    <td class="text-end">{% if linea.credito > 0 %}${{ linea.credito|floatformat:2 }}{%
+                                        endif %}</td>
                                     <td class="text-end">
                                         {% if linea.debito > linea.credito %}
-                                            <span class="text-danger">${{ linea.debito|floatformat:2 }}</span>
+                                        <span class="text-danger">${{ linea.debito|floatformat:2 }}</span>
                                         {% else %}
-                                            <span class="text-success">${{ linea.credito|floatformat:2 }}</span>
+                                        <span class="text-success">${{ linea.credito|floatformat:2 }}</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -1039,7 +1084,8 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Total Débitos</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_debitos|default:"0.00" }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_debitos|default:"0.00" }}
+                            </div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-arrow-down fa-2x text-gray-300"></i>
@@ -1056,7 +1102,8 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Total Créditos</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_creditos|default:"0.00" }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_creditos|default:"0.00" }}
+                            </div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-arrow-up fa-2x text-gray-300"></i>
@@ -1083,5 +1130,96 @@
             </div>
         </div>
     </div>
+
+    <!-- REPORTES AVANZADOS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie"></i> Reportes Avanzados y Análisis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Balance General -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <i class="fas fa-balance-scale fa-3x text-primary mb-3"></i>
+                                    <h5 class="card-title">Balance General</h5>
+                                    <p class="card-text">Estado de situación financiera completo</p>
+                                    <a href="{% url 'accounting:balance_general' %}" class="btn btn-primary">
+                                        <i class="fas fa-chart-line"></i> Ver Reporte
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estado de Resultados -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <i class="fas fa-chart-bar fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Estado de Resultados</h5>
+                                    <p class="card-text">Pérdidas y ganancias del período</p>
+                                    <a href="{% url 'accounting:estado_resultados' %}" class="btn btn-success">
+                                        <i class="fas fa-calculator"></i> Ver Reporte
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Flujo de Efectivo -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <i class="fas fa-water fa-3x text-info mb-3"></i>
+                                    <h5 class="card-title">Flujo de Efectivo</h5>
+                                    <p class="card-text">Movimientos de caja y bancos</p>
+                                    <a href="{% url 'accounting:flujo_efectivo' %}" class="btn btn-info">
+                                        <i class="fas fa-exchange-alt"></i> Ver Reporte
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Análisis Financiero -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100">
+                                <div class="card-body">
+                                    <i class="fas fa-chart-pie fa-3x text-warning mb-3"></i>
+                                    <h5 class="card-title">Análisis Financiero</h5>
+                                    <p class="card-text">Ratios e indicadores financieros</p>
+                                    <a href="{% url 'accounting:analisis_financiero' %}" class="btn btn-warning">
+                                        <i class="fas fa-analytics"></i> Ver Análisis
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Características de los Reportes Avanzados -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> Características de los Reportes Avanzados:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Datos en Tiempo Real:</strong> Información actualizada automáticamente
+                                    </li>
+                                    <li><strong>Análisis Integrado:</strong> Vinculación automática con inventarios y
+                                        POS</li>
+                                    <li><strong>Estándares Colombianos:</strong> Cumple normativas NIIF y PUC</li>
+                                    <li><strong>Exportación:</strong> PDF, Excel y formatos contables estándar</li>
+                                    <li><strong>Comparaciones:</strong> Análisis de tendencias y períodos anteriores
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-{% endblock %} 
+{% endblock %}

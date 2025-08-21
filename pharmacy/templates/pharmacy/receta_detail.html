@@ -16,8 +16,8 @@
             </div>
         </div>
         <div class="card-body">
-            <p><strong>Paciente:</strong> <a href="{% url 'paciente_detail' receta.paciente.pk %}">{{ receta.paciente.nombres }} {{ receta.paciente.apellidos }}</a></p>
-            <p><strong>Prescrita por:</strong> <a href="{% url 'profesional_detail' receta.profesional_prescriptor.pk %}">{{ receta.profesional_prescriptor.nombres }} {{ receta.profesional_prescriptor.apellidos }}</a></p>
+            <p><strong>Paciente:</strong> <a href="{% url 'patients:paciente_detail' receta.paciente.pk %}">{{ receta.paciente.nombres }} {{ receta.paciente.apellidos }}</a></p>
+            <p><strong>Prescrita por:</strong> <a href="{% url 'professionals:profesional_detail' receta.profesional_prescriptor.pk %}">{{ receta.profesional_prescriptor.nombres }} {{ receta.profesional_prescriptor.apellidos }}</a></p>
             <p><strong>Fecha de Emisión:</strong> {{ receta.fecha_emision|date:"d M, Y H:i" }}</p>
             <p><strong>Fecha de Caducidad:</strong> {{ receta.fecha_caducidad|date:"d M, Y"|default:"No especificada" }}</p>
             <hr>

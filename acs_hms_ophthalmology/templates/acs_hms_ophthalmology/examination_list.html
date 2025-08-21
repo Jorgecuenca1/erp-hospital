@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Exámenes Oftalmológicos - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-eye me-2 text-primary"></i>
+                        Exámenes Oftalmológicos
+                    </h4>
+                    <div>
+                        <a href="{% url 'ophthalmology:examination_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Examen
+                        </a>
+                        <a href="{% url 'ophthalmology:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Formulario de búsqueda -->
+                    <form method="get" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <input type="text" name="search" class="form-control" 
+                                       placeholder="Buscar por paciente, número de examen o diagnóstico..." 
+                                       value="{{ request.GET.search }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Tabla de exámenes -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Paciente</th>
+                                    <th>Fecha</th>
+                                    <th>Oftalmólogo</th>
+                                    <th>Diagnóstico</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for examination in examinations %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">{{ examination.examination_number }}</strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ examination.patient.first_name }} {{ examination.patient.last_name }}</strong>
+                                        </div>
+                                        <small class="text-muted">ID: {{ examination.patient.id }}</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ examination.examination_date|date:"d/m/Y" }}</div>
+                                        <small class="text-muted">{{ examination.examination_date|time:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ examination.ophthalmologist.first_name }} {{ examination.ophthalmologist.last_name }}</div>
+                                        <small class="text-muted">Oftalmólogo</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ examination.diagnosis|truncatechars:50 }}</div>
+                                        {% if examination.follow_up_date %}
+                                        <small class="text-info">
+                                            <i class="fas fa-calendar-alt"></i> Seguimiento: {{ examination.follow_up_date|date:"d/m/Y" }}
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'ophthalmology:examination_detail' examination.pk %}" 
+                                               class="btn btn-sm btn-outline-primary" title="Ver Detalle">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'ophthalmology:examination_update' examination.pk %}" 
+                                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'ophthalmology:examination_delete' examination.pk %}" 
+                                               class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                               onclick="return confirm('¿Está seguro de eliminar este examen?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-eye fa-3x mb-3"></i>
+                                            <h5>No hay exámenes registrados</h5>
+                                            <p>Haga clic en "Nuevo Examen" para agregar el primer examen oftalmológico.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginación">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Tooltip para botones
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    console.log('✅ Lista de exámenes oftalmológicos cargada');
+});
+</script>
+{% endblock %}
+
+
+

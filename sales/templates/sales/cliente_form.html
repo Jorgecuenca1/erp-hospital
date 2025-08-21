@@ -1,0 +1,409 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Editar{% else %}Nuevo{% endif %} Cliente - Hospital{% endblock %}
+
+{% block extra_css %}
+<style>
+    .client-form {
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+
+    .form-section {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px 10px 0 0;
+        margin: -20px -20px 20px -20px;
+    }
+
+    .client-type-selector {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .client-type-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 10px 0;
+    }
+
+    .client-type-card:hover {
+        border-color: #007bff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .client-type-card.selected {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+
+    .credit-info {
+        background: #fff3cd;
+        border-radius: 8px;
+        padding: 15px;
+        border: 1px solid #ffeaa7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="client-form">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-user me-2 text-primary"></i>
+                            {% if object %}Editar Cliente: {{ object.nombre }}{% else %}Nuevo Cliente{% endif %}
+                        </h4>
+                        <a href="{% url 'sales:cliente_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver a la Lista
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+
+                            <!-- Tipo de Cliente -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-tags me-2"></i>
+                                        Tipo de Cliente
+                                    </h5>
+                                </div>
+
+                                <div class="client-type-selector">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="client-type-card" data-type="NATURAL">
+                                                <i class="fas fa-user fa-3x text-primary mb-3"></i>
+                                                <h5>Persona Natural</h5>
+                                                <p class="text-muted">Cliente individual</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="client-type-card" data-type="JURIDICA">
+                                                <i class="fas fa-building fa-3x text-success mb-3"></i>
+                                                <h5>Persona Jurídica</h5>
+                                                <p class="text-muted">Empresa u organización</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="client-type-card" data-type="EPS">
+                                                <i class="fas fa-hospital fa-3x text-info mb-3"></i>
+                                                <h5>EPS / Aseguradora</h5>
+                                                <p class="text-muted">Entidad de salud</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.tipo_cliente.id_for_label }}" class="form-label">Tipo de Cliente
+                                        *</label>
+                                    {{ form.tipo_cliente }}
+                                    {% if form.tipo_cliente.errors %}
+                                    <div class="text-danger">{{ form.tipo_cliente.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Información Básica -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-id-card me-2"></i>
+                                        Información Básica
+                                    </h5>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre/Razón
+                                                Social *</label>
+                                            {{ form.nombre }}
+                                            {% if form.nombre.errors %}
+                                            <div class="text-danger">{{ form.nombre.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.identificacion.id_for_label }}"
+                                                class="form-label">Identificación *</label>
+                                            {{ form.identificacion }}
+                                            {% if form.identificacion.errors %}
+                                            <div class="text-danger">{{ form.identificacion.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                            {{ form.email }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.telefono.id_for_label }}"
+                                                class="form-label">Teléfono</label>
+                                            {{ form.telefono }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección</label>
+                                    {{ form.direccion }}
+                                </div>
+                            </div>
+
+                            <!-- Información de Contacto -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-address-book me-2"></i>
+                                        Contacto Adicional
+                                    </h5>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.contacto_principal.id_for_label }}"
+                                                class="form-label">Contacto Principal</label>
+                                            {{ form.contacto_principal }}
+                                            <small class="form-text text-muted">Nombre de la persona de contacto</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.telefono_contacto.id_for_label }}"
+                                                class="form-label">Teléfono de Contacto</label>
+                                            {{ form.telefono_contacto }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.email_contacto.id_for_label }}" class="form-label">Email de
+                                        Contacto</label>
+                                    {{ form.email_contacto }}
+                                </div>
+                            </div>
+
+                            <!-- Información Comercial -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-money-bill-wave me-2"></i>
+                                        Información Comercial
+                                    </h5>
+                                </div>
+
+                                <div class="credit-info mb-3">
+                                    <h6><i class="fas fa-info-circle text-warning me-2"></i>Límite de Crédito</h6>
+                                    <p class="mb-0">Establezca el límite de crédito para este cliente. Esto ayudará a
+                                        controlar las ventas a crédito.</p>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.limite_credito.id_for_label }}"
+                                                class="form-label">Límite de Crédito</label>
+                                            {{ form.limite_credito }}
+                                            <small class="form-text text-muted">Monto máximo para ventas a
+                                                crédito</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.saldo_actual.id_for_label }}" class="form-label">Saldo
+                                                Actual</label>
+                                            {{ form.saldo_actual }}
+                                            <small class="form-text text-muted">Saldo pendiente actual</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.estado.id_for_label }}"
+                                                class="form-label">Estado</label>
+                                            {{ form.estado }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.terminos_pago.id_for_label }}"
+                                                class="form-label">Términos de Pago</label>
+                                            {{ form.terminos_pago }}
+                                            <small class="form-text text-muted">Ej: 30 días, Contado, etc.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.descuento_maximo.id_for_label }}"
+                                                class="form-label">Descuento Máximo (%)</label>
+                                            {{ form.descuento_maximo }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notas Adicionales -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-sticky-note me-2"></i>
+                                        Notas y Observaciones
+                                    </h5>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.notas.id_for_label }}" class="form-label">Notas</label>
+                                    {{ form.notas }}
+                                    <small class="form-text text-muted">Información adicional sobre el cliente</small>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Los campos marcados con * son obligatorios
+                                    </small>
+                                </div>
+                                <div>
+                                    <a href="{% url 'sales:cliente_list' %}" class="btn btn-secondary me-2">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if object %}Actualizar Cliente{% else %}Guardar Cliente{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Validación del formulario
+        $('.needs-validation').on('submit', function (e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            $(this).addClass('was-validated');
+        });
+
+        // Selector visual de tipo de cliente
+        $('.client-type-card').click(function () {
+            $('.client-type-card').removeClass('selected');
+            $(this).addClass('selected');
+            const clientType = $(this).data('type');
+            $('#id_tipo_cliente').val(clientType);
+        });
+
+        // Sincronizar selección existente
+        const currentType = $('#id_tipo_cliente').val();
+        if (currentType) {
+            $(`.client-type-card[data-type="${currentType}"]`).addClass('selected');
+        }
+
+        // Formatear campo de límite de crédito
+        $('#id_limite_credito, #id_saldo_actual').on('input', function () {
+            let value = $(this).val().replace(/[^\d.-]/g, '');
+            if (value) {
+                $(this).val(parseFloat(value).toFixed(2));
+            }
+        });
+
+        // Validación de email
+        $('#id_email, #id_email_contacto').on('blur', function () {
+            const email = $(this).val();
+            if (email && !isValidEmail(email)) {
+                $(this).addClass('is-invalid');
+                if (!$(this).siblings('.invalid-feedback').length) {
+                    $(this).after('<div class="invalid-feedback">Por favor ingrese un email válido</div>');
+                }
+            } else {
+                $(this).removeClass('is-invalid');
+                $(this).siblings('.invalid-feedback').remove();
+            }
+        });
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Calcular crédito disponible
+        function updateCreditoDisponible() {
+            const limite = parseFloat($('#id_limite_credito').val()) || 0;
+            const saldo = parseFloat($('#id_saldo_actual').val()) || 0;
+            const disponible = limite - saldo;
+
+            // Mostrar información del crédito disponible
+            if (limite > 0) {
+                let statusClass = 'text-success';
+                if (disponible < 0) statusClass = 'text-danger';
+                else if (disponible < limite * 0.2) statusClass = 'text-warning';
+
+                $('.credit-info').append(`
+                <div class="mt-2 ${statusClass}" id="credito-disponible">
+                    <strong>Crédito Disponible: $${disponible.toFixed(2)}</strong>
+                </div>
+            `);
+            }
+        }
+
+        $('#id_limite_credito, #id_saldo_actual').on('input', function () {
+            $('#credito-disponible').remove();
+            updateCreditoDisponible();
+        });
+
+        // Inicializar crédito disponible
+        updateCreditoDisponible();
+
+        console.log('✅ Formulario de cliente cargado');
+    });
+</script>
+
+
+

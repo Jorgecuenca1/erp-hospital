@@ -1,77 +1,194 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
+{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Asiento Contable - Contabilidad{% endblock %}
+
+{% block extra_css %}
+<style>
+    .linea-asiento-form {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        padding: 15px;
+        position: relative;
+    }
+    .linea-asiento-form.nueva {
+        border-color: #28a745;
+        background: #f8fff9;
+    }
+    .balance-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    .balance-indicator.balanceado {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .balance-indicator.desbalanceado {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    .form-section {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .form-section h5 {
+        color: #495057;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    .delete-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Asiento Contable</h3>
+            <h3 class="mb-0">
+                <i class="fas fa-receipt"></i>
+                {% if form.instance.pk %}Editar{% else %}Crear{% endif %} Asiento Contable
+            </h3>
+            <small class="d-block mt-1">Registro de movimientos contables con partida doble</small>
         </div>
         <div class="card-body">
             <form method="post" id="asientoForm">
                 {% csrf_token %}
-                {{ form|crispy }}
-
-                <h5 class="mt-4">Líneas del Asiento</h5>
-                <div id="lineas-asiento">
-                    {{ linea_formset.management_form }}
-                    {% for form in linea_formset %}
-                    <div class="linea-asiento-form border p-3 mb-3 rounded">
+                
+                <!-- Información del Asiento -->
+                <div class="form-section">
+                    <h5><i class="fas fa-info-circle"></i> Información del Asiento</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            {{ form.fecha|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.descripcion|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.diario|as_crispy_field }}
+                        </div>
+                    </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <label for="{{ form.cuenta.id_for_label }}">Cuenta:</label>
-                                {{ form.cuenta }}
-                                {% if form.cuenta.errors %}
-                                    <div class="text-danger">{{ form.cuenta.errors }}</div>
-                                {% endif %}
+                            {{ form.periodo|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.tercero|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.centro_costo|as_crispy_field }}
                             </div>
                             <div class="col-md-3">
-                                <label for="{{ form.descripcion.id_for_label }}">Descripción:</label>
-                                {{ form.descripcion }}
-                                {% if form.descripcion.errors %}
-                                    <div class="text-danger">{{ form.descripcion.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-2">
-                                <label for="{{ form.debito.id_for_label }}">Débito:</label>
-                                {{ form.debito }}
-                                {% if form.debito.errors %}
-                                    <div class="text-danger">{{ form.debito.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-2">
-                                <label for="{{ form.credito.id_for_label }}">Crédito:</label>
-                                {{ form.credito }}
-                                {% if form.credito.errors %}
-                                    <div class="text-danger">{{ form.credito.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-2">
-                                <label for="{{ form.impuesto.id_for_label }}">Impuesto:</label>
-                                {{ form.impuesto }}
-                                {% if form.impuesto.errors %}
-                                    <div class="text-danger">{{ form.impuesto.errors }}</div>
-                                {% endif %}
-                            </div>
+                            {{ form.referencia|as_crispy_field }}
                         </div>
-                        {% if linea_formset.can_delete %}
-                        <div class="form-check text-end mt-2">
-                            <input type="checkbox" name="{{ form.DELETE.html_name }}" id="{{ form.DELETE.id_for_label }}" class="form-check-input">
-                            <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">Eliminar línea</label>
-                        </div>
-                        {% endif %}
                     </div>
-                    {% endfor %}
                 </div>
-                <button type="button" id="add-linea" class="btn btn-info btn-sm mt-3">
-                    <i class="fas fa-plus"></i> Agregar Línea
-                </button>
+
+                <!-- Líneas del Asiento -->
+                <div class="form-section">
+                    <h5><i class="fas fa-list"></i> Líneas del Asiento</h5>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Importante:</strong> El total de débitos debe ser igual al total de créditos para que el asiento esté balanceado.
+                    </div>
+                    
+                    <div id="lineas-asiento">
+                        {{ linea_formset.management_form }}
+                        {% for linea_form in linea_formset %}
+                        <div class="linea-asiento-form" data-form-index="{{ forloop.counter0 }}">
+                            <div class="delete-btn">
+                                {% if linea_formset.can_delete %}
+                                <button type="button" class="btn btn-danger btn-sm delete-linea" title="Eliminar línea">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {{ linea_form.DELETE }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-3">
+                                    {{ linea_form.cuenta|as_crispy_field }}
+                                </div>
+                                <div class="col-md-3">
+                                    {{ linea_form.descripcion|as_crispy_field }}
+                            </div>
+                            <div class="col-md-2">
+                                    {{ linea_form.debito|as_crispy_field }}
+                            </div>
+                            <div class="col-md-2">
+                                    {{ linea_form.credito|as_crispy_field }}
+                            </div>
+                            <div class="col-md-2">
+                                    {{ linea_form.impuesto|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    {{ linea_form.tercero|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ linea_form.centro_costo|as_crispy_field }}
+                                </div>
+                            </div>
+                            
+                            {% for hidden in linea_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button type="button" id="add-linea" class="btn btn-info">
+                        <i class="fas fa-plus"></i> Agregar Línea
+                    </button>
+                    
+                    <!-- Resumen de Balance -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-md-4">
+                                            <h6>Total Débitos</h6>
+                                            <span id="total-debitos" class="h4 text-info">$0.00</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>Total Créditos</h6>
+                                            <span id="total-creditos" class="h4 text-info">$0.00</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>Diferencia</h6>
+                                            <span id="diferencia" class="h4">$0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <a href="{% url 'accounting:asientocontable_list' %}" class="btn btn-secondary">
                         <i class="fas fa-arrow-alt-circle-left"></i> Cancelar
                     </a>
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-success" id="submit-btn">
                         <i class="fas fa-save"></i> Guardar Asiento
                     </button>
                 </div>
@@ -80,23 +197,188 @@
     </div>
 </div>
 
+<!-- Indicador de Balance -->
+<div id="balance-indicator" class="balance-indicator" style="display: none;">
+    <span id="balance-text"></span>
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const addLineaBtn = document.getElementById('add-linea');
-        const lineasAsientoDiv = document.getElementById('lineas-asiento');
-        const totalFormsInput = document.querySelector('input[name="lineas-TOTAL_FORMS"]');
-        const emptyForm = document.querySelector('.linea-asiento-form').outerHTML.replace(/__prefix__/g, totalFormsInput.value);
-
-        addLineaBtn.addEventListener('click', function() {
-            const newForm = emptyForm.replace(/form-(\d+)/g, function(match, p1) {
-                return `form-${parseInt(p1) + 1}`;
-            }).replace(/lineas-(\d+)/g, function(match, p1) {
-                return `lineas-${parseInt(p1) + 1}`;
-            });
-
-            lineasAsientoDiv.insertAdjacentHTML('beforeend', newForm);
-            totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
+    let formIndex = {{ linea_formset.total_form_count|default:0 }};
+    
+    // Función para calcular totales
+    function calcularTotales() {
+        let totalDebitos = 0;
+        let totalCreditos = 0;
+        
+        document.querySelectorAll('[name*="debito"]').forEach(input => {
+            if (!input.name.includes('__prefix__')) {
+                totalDebitos += parseFloat(input.value) || 0;
+            }
         });
+        
+        document.querySelectorAll('[name*="credito"]').forEach(input => {
+            if (!input.name.includes('__prefix__')) {
+                totalCreditos += parseFloat(input.value) || 0;
+            }
+        });
+        
+        const diferencia = totalDebitos - totalCreditos;
+        
+        // Actualizar totales en pantalla
+        document.getElementById('total-debitos').textContent = `$${totalDebitos.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
+        document.getElementById('total-creditos').textContent = `$${totalCreditos.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
+        document.getElementById('diferencia').textContent = `$${Math.abs(diferencia).toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
+        
+        // Actualizar indicador de balance
+        const balanceIndicator = document.getElementById('balance-indicator');
+        const balanceText = document.getElementById('balance-text');
+        const diferenciaElement = document.getElementById('diferencia');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        if (Math.abs(diferencia) < 0.01) {
+            balanceIndicator.className = 'balance-indicator balanceado';
+            balanceText.textContent = '✓ Asiento Balanceado';
+            diferenciaElement.className = 'h4 text-success';
+            submitBtn.disabled = false;
+            balanceIndicator.style.display = 'block';
+        } else {
+            balanceIndicator.className = 'balance-indicator desbalanceado';
+            balanceText.textContent = `✗ Desbalanceado por $${Math.abs(diferencia).toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
+            diferenciaElement.className = 'h4 text-danger';
+            submitBtn.disabled = true;
+            balanceIndicator.style.display = 'block';
+        }
+    }
+    
+    // Función para agregar línea
+    function agregarLinea() {
+        const lineasContainer = document.getElementById('lineas-asiento');
+        const totalForms = document.querySelector('[name$="TOTAL_FORMS"]');
+        
+        const nuevaLinea = document.createElement('div');
+        nuevaLinea.className = 'linea-asiento-form nueva';
+        nuevaLinea.setAttribute('data-form-index', formIndex);
+        
+        nuevaLinea.innerHTML = `
+            <div class="delete-btn">
+                <button type="button" class="btn btn-danger btn-sm delete-linea" title="Eliminar línea">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_lineas-${formIndex}-cuenta">Cuenta:</label>
+                        <select name="lineas-${formIndex}-cuenta" class="form-control" id="id_lineas-${formIndex}-cuenta">
+                            <option value="">---------</option>
+                            {% for cuenta in form.fields.tercero.queryset %}
+                            <option value="{{ cuenta.pk }}">{{ cuenta }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="id_lineas-${formIndex}-descripcion">Descripción:</label>
+                        <input type="text" name="lineas-${formIndex}-descripcion" class="form-control" id="id_lineas-${formIndex}-descripcion">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="id_lineas-${formIndex}-debito">Débito:</label>
+                        <input type="number" name="lineas-${formIndex}-debito" step="0.01" min="0" class="form-control debito-input" id="id_lineas-${formIndex}-debito" value="0">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="id_lineas-${formIndex}-credito">Crédito:</label>
+                        <input type="number" name="lineas-${formIndex}-credito" step="0.01" min="0" class="form-control credito-input" id="id_lineas-${formIndex}-credito" value="0">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="id_lineas-${formIndex}-impuesto">Impuesto:</label>
+                        <select name="lineas-${formIndex}-impuesto" class="form-control" id="id_lineas-${formIndex}-impuesto">
+                            <option value="">---------</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_lineas-${formIndex}-tercero">Tercero:</label>
+                        <select name="lineas-${formIndex}-tercero" class="form-control" id="id_lineas-${formIndex}-tercero">
+                            <option value="">---------</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_lineas-${formIndex}-centro_costo">Centro de Costo:</label>
+                        <select name="lineas-${formIndex}-centro_costo" class="form-control" id="id_lineas-${formIndex}-centro_costo">
+                            <option value="">---------</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        lineasContainer.appendChild(nuevaLinea);
+        
+        // Actualizar total de formularios
+        totalForms.value = parseInt(totalForms.value) + 1;
+        formIndex++;
+        
+        // Agregar event listeners a los nuevos campos
+        agregarEventListeners(nuevaLinea);
+        
+        // Calcular totales
+        calcularTotales();
+    }
+    
+    // Función para eliminar línea
+    function eliminarLinea(button) {
+        const linea = button.closest('.linea-asiento-form');
+        const deleteInput = linea.querySelector('[name$="DELETE"]');
+        
+        if (deleteInput) {
+            deleteInput.checked = true;
+            linea.style.display = 'none';
+        } else {
+            linea.remove();
+        }
+        
+        calcularTotales();
+    }
+    
+    // Función para agregar event listeners
+    function agregarEventListeners(container = document) {
+        // Event listeners para calcular totales
+        container.querySelectorAll('[name*="debito"], [name*="credito"]').forEach(input => {
+            input.addEventListener('input', calcularTotales);
+        });
+        
+        // Event listeners para eliminar líneas
+        container.querySelectorAll('.delete-linea').forEach(button => {
+            button.addEventListener('click', function() {
+                eliminarLinea(this);
+            });
+        });
+    }
+    
+    // Botón agregar línea
+    document.getElementById('add-linea').addEventListener('click', agregarLinea);
+    
+    // Inicializar event listeners existentes
+    agregarEventListeners();
+    
+    // Calcular totales iniciales
+    calcularTotales();
     });
 </script>
 {% endblock %}

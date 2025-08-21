@@ -1,0 +1,144 @@
+{% extends "accounting/base.html" %}
+
+{% block title %}Análisis Financiero{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-chart-pie"></i> Análisis Financiero Avanzado</h1>
+        <p class="text-muted">Análisis integral del período {{ fecha_inicio|date:"d/m/Y" }} - {{ fecha_fin|date:"d/m/Y" }}</p>
+    </div>
+</div>
+
+<!-- Ratios Financieros -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-tint fa-2x text-primary mb-2"></i>
+                <h6>Ratio de Liquidez</h6>
+                <h4 class="{% if ratio_liquidez >= 1.5 %}text-success{% elif ratio_liquidez >= 1 %}text-warning{% else %}text-danger{% endif %}">
+                    {{ ratio_liquidez|floatformat:2 }}
+                </h4>
+                <small class="text-muted">Activo/Pasivo Corriente</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-percentage fa-2x text-success mb-2"></i>
+                <h6>Margen Neto</h6>
+                <h4 class="{% if margen_neto >= 10 %}text-success{% elif margen_neto >= 5 %}text-warning{% else %}text-danger{% endif %}">
+                    {{ margen_neto|floatformat:2 }}%
+                </h4>
+                <small class="text-muted">Utilidad/Ingresos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                <h6>ROA</h6>
+                <h4 class="{% if roa >= 15 %}text-success{% elif roa >= 5 %}text-warning{% else %}text-danger{% endif %}">
+                    {{ roa|floatformat:2 }}%
+                </h4>
+                <small class="text-muted">Return on Assets</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-sync fa-2x text-warning mb-2"></i>
+                <h6>Rotación Inventario</h6>
+                <h4 class="text-primary">{{ rotacion_inventario|floatformat:1 }}x</h4>
+                <small class="text-muted">{{ dias_inventario|floatformat:0 }} días</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Composición Financiera -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-bar"></i> Composición de Activos</h6>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-2" style="height: 30px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%">
+                        Activos Corrientes: ${{ activo_corriente|floatformat:0 }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-bar"></i> Composición de Pasivos</h6>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-2" style="height: 30px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 100%">
+                        Pasivos Corrientes: ${{ pasivo_corriente|floatformat:0 }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tendencias -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-trending-up"></i> Tendencias de los últimos 6 meses</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th class="text-right">Ingresos</th>
+                                <th class="text-right">Gastos</th>
+                                <th class="text-right">Utilidad</th>
+                                <th class="text-right">Margen %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mes in tendencias %}
+                            <tr>
+                                <td>{{ mes.mes }}</td>
+                                <td class="text-right text-success">${{ mes.ingresos|floatformat:0 }}</td>
+                                <td class="text-right text-danger">${{ mes.gastos|floatformat:0 }}</td>
+                                <td class="text-right {% if mes.utilidad >= 0 %}text-primary{% else %}text-danger{% endif %}">
+                                    ${{ mes.utilidad|floatformat:0 }}
+                                </td>
+                                <td class="text-right">
+                                    {% with margen=mes.utilidad|div:mes.ingresos|mul:100 %}
+                                        {{ margen|floatformat:1 }}%
+                                    {% endwith %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'accounting:reportes' %}" class="btn btn-secondary">Volver</a>
+        <button onclick="window.print()" class="btn btn-primary">Imprimir</button>
+    </div>
+</div>
+{% endblock %}

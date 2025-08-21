@@ -107,4 +107,29 @@ urlpatterns = [
     path('reportes-fiscales/<int:pk>/', views.ReporteFiscalDetailView.as_view(), name='reportefiscal_detail'),
     path('reportes-fiscales/<int:pk>/editar/', views.ReporteFiscalUpdateView.as_view(), name='reportefiscal_update'),
     path('reportes-fiscales/<int:pk>/eliminar/', views.ReporteFiscalDeleteView.as_view(), name='reportefiscal_delete'),
+    
+    # Gestión Geográfica
+    # País
+    path('paises/', views.PaisListView.as_view(), name='pais_list'),
+    path('paises/crear/', views.PaisCreateView.as_view(), name='pais_create'),
+    path('paises/<int:pk>/editar/', views.PaisUpdateView.as_view(), name='pais_edit'),
+    path('paises/<int:pk>/eliminar/', views.PaisDeleteView.as_view(), name='pais_delete'),
+    
+    # Departamento
+    path('departamentos/', views.DepartamentoListView.as_view(), name='departamento_list'),
+    path('departamentos/crear/', views.DepartamentoCreateView.as_view(), name='departamento_create'),
+    path('departamentos/<int:pk>/editar/', views.DepartamentoUpdateView.as_view(), name='departamento_edit'),
+    path('departamentos/<int:pk>/eliminar/', views.DepartamentoDeleteView.as_view(), name='departamento_delete'),
+    
+    # Ciudad
+    path('ciudades/', views.CiudadListView.as_view(), name='ciudad_list'),
+    path('ciudades/crear/', views.CiudadCreateView.as_view(), name='ciudad_create'),
+    path('ciudades/<int:pk>/editar/', views.CiudadUpdateView.as_view(), name='ciudad_edit'),
+    path('ciudades/<int:pk>/eliminar/', views.CiudadDeleteView.as_view(), name='ciudad_delete'),
+    
+    # Reportes Avanzados
+    path('reportes/balance-general/', views.BalanceGeneralView.as_view(), name='balance_general'),
+    path('reportes/estado-resultados/', views.EstadoResultadosView.as_view(), name='estado_resultados'),
+    path('reportes/flujo-efectivo/', views.FlujoEfectivoView.as_view(), name='flujo_efectivo'),
+    path('reportes/analisis-financiero/', views.AnalisisFinancieroView.as_view(), name='analisis_financiero'),
 ] 

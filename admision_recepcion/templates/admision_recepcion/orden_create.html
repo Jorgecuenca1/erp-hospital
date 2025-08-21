@@ -1,0 +1,459 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ module_name }} - Crear Orden{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+<style>
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #e3e6f0;
+    }
+
+    .form-section h5 {
+        color: #5a5c69;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .required-field {
+        color: #e74a3b;
+    }
+
+    .file-upload-area {
+        border: 2px dashed #d1d3e2;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        background: #fff;
+        margin: 10px 0;
+    }
+
+    .file-upload-area:hover {
+        border-color: #4e73df;
+        background: #f8f9fc;
+    }
+
+    .services-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:orden_list' %}">Órdenes de Servicios</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Nueva Orden</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">📋 {{ module_name }}</h1>
+            <p class="mb-0 text-muted">Complete todos los campos requeridos para crear la orden de servicio</p>
+        </div>
+        <div>
+            <a href="{% url 'admision_recepcion:orden_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver a Lista
+            </a>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form method="post" enctype="multipart/form-data" id="ordenForm">
+        {% csrf_token %}
+
+        <!-- Información de la Orden -->
+        <div class="form-section">
+            <h5><i class="fas fa-info-circle me-2"></i>Información de la Orden</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        {{ form.numero_orden|as_crispy_field }}
+                        <small class="text-muted">Se genera automáticamente</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    {{ form.fecha_orden|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.estado_orden|as_crispy_field }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos Personales -->
+        <div class="form-section">
+            <h5><i class="fas fa-user me-2"></i>Datos Personales <span class="required-field">*</span></h5>
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form.tipo_documento|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.numero_identificacion|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.ciudad_nacimiento|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.fecha_nacimiento|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form.primer_apellido|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.segundo_apellido|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.primer_nombre|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.otros_nombres|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form.genero|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.estado_civil|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.nivel_educativo|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.correo_electronico|as_crispy_field }}
+                    <small class="text-muted">Opcional</small>
+                </div>
+            </div>
+
+            <!-- Archivos -->
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label class="form-label">Foto</label>
+                    <div class="file-upload-area">
+                        <i class="fas fa-camera fa-2x text-muted mb-2"></i>
+                        <p class="mb-2">Hacer clic aquí para tomar la foto</p>
+                        {{ form.foto }}
+                        <small class="text-muted d-block">Haz clic aquí para tomar la foto</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Huella</label>
+                    <div class="file-upload-area">
+                        <i class="fas fa-fingerprint fa-2x text-muted mb-2"></i>
+                        <p class="mb-2">Subir huella</p>
+                        {{ form.huella }}
+                        <small class="text-muted d-block">Haz clic aquí para tomar huella dactilar</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Firma</label>
+                    <div class="file-upload-area">
+                        <i class="fas fa-signature fa-2x text-muted mb-2"></i>
+                        <p class="mb-2">Subir firma</p>
+                        {{ form.firma }}
+                        <small class="text-muted d-block">Haz clic aquí para firmar documento</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos de Ubicación -->
+        <div class="form-section">
+            <h5><i class="fas fa-map-marker-alt me-2"></i>Datos de Ubicación <span class="required-field">*</span></h5>
+            <div class="row">
+                <div class="col-md-2">
+                    {{ form.zona|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.direccion|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.barrio|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.localidad|as_crispy_field }}
+                    <small class="text-muted">Opcional</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form.sede|as_crispy_field }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.estrato|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.municipio|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.celulares|as_crispy_field }}
+                    <small class="text-muted">Opcional</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form.telefonos|as_crispy_field }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos de Trabajo -->
+        <div class="form-section">
+            <h5><i class="fas fa-briefcase me-2"></i>Datos de Trabajo <span class="required-field">*</span></h5>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.profesion_cargo|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.tipo_evaluacion|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form.funciones_cargo|as_crispy_field }}
+                    <small class="text-muted">Aplica para Salud Ocupacional</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.convenio|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.empresa_mision|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    {{ form.eps|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.afp|as_crispy_field }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.arl|as_crispy_field }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Servicios -->
+        <div class="form-section">
+            <h5><i class="fas fa-stethoscope me-2"></i>Servicios Solicitados</h5>
+            <div class="services-table p-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">Lista de Servicios</h6>
+                    <button type="button" class="btn btn-sm btn-success" id="addService">
+                        <i class="fas fa-plus me-1"></i>Agregar Servicio
+                    </button>
+                </div>
+
+                {{ formset.management_form }}
+                <div class="table-responsive">
+                    <table class="table table-striped" id="servicesTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Cant.</th>
+                                <th>Nombre del Producto o Servicio</th>
+                                <th>Prestador del Servicio</th>
+                                <th>Vr. Unitario</th>
+                                <th>Forma de Pago</th>
+                                <th>Vr. Pagar</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for form in formset %}
+                            {% if form.non_field_errors %}
+                            <tr>
+                                <td colspan="7">
+                                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            <tr class="service-row">
+                                <td style="display: none;">
+                                    {{ form.id }}
+                                    {{ form.DELETE }}
+                                </td>
+                                <td>{{ form.cantidad }}</td>
+                                <td>{{ form.servicio }}</td>
+                                <td>{{ form.prestador }}</td>
+                                <td>{{ form.valor_unitario }}</td>
+                                <td>{{ form.forma_pago }}</td>
+                                <td>{{ form.valor_pagar }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-danger delete-service" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones y Totales -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="form-section">
+                    <h5><i class="fas fa-comment-alt me-2"></i>Observaciones</h5>
+                    <div class="row">
+                        <div class="col-md-8">
+                            {{ form.observaciones|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.fecha_solicitud|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-section">
+                    <h5><i class="fas fa-calculator me-2"></i>Totales</h5>
+                    {{ form.total_orden|as_crispy_field }}
+                    {{ form.total_pagar|as_crispy_field }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="text-center mb-4">
+            <button type="submit" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-save me-2"></i>Guardar Orden de Servicio
+            </button>
+            <a href="{% url 'admision_recepcion:orden_list' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times me-2"></i>Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Inicializar Select2
+        $('.select2').select2({
+            theme: 'bootstrap-5'
+        });
+
+        // Calcular totales automáticamente
+        function calculateTotals() {
+            let total = 0;
+            $('.service-row:visible').each(function () {
+                let cantidad = parseFloat($(this).find('[name$="-cantidad"]').val()) || 0;
+                let valorUnitario = parseFloat($(this).find('[name$="-valor_unitario"]').val()) || 0;
+                let valorTotal = cantidad * valorUnitario;
+
+                // Actualizar valor_pagar si no está establecido
+                let valorPagar = $(this).find('[name$="-valor_pagar"]');
+                if (!valorPagar.val()) {
+                    valorPagar.val(valorTotal.toFixed(2));
+                }
+
+                total += parseFloat(valorPagar.val()) || 0;
+            });
+
+            $('#id_total_orden').val(total.toFixed(2));
+            $('#id_total_pagar').val(total.toFixed(2));
+        }
+
+        // Eventos para recalcular totales
+        $(document).on('change', '[name$="-cantidad"], [name$="-valor_unitario"], [name$="-valor_pagar"]', calculateTotals);
+
+        // Agregar nuevo servicio
+        $('#addService').click(function () {
+            let totalForms = $('#id_form-TOTAL_FORMS');
+            let formNum = parseInt(totalForms.val());
+
+            let newRow = `
+            <tr class="service-row">
+                <td style="display: none;">
+                    <input type="hidden" name="form-${formNum}-id" id="id_form-${formNum}-id">
+                    <input type="checkbox" name="form-${formNum}-DELETE" id="id_form-${formNum}-DELETE" style="display: none;">
+                </td>
+                <td><input type="number" name="form-${formNum}-cantidad" class="form-control" min="1" value="1"></td>
+                <td><select name="form-${formNum}-servicio" class="form-control select2"></select></td>
+                <td><select name="form-${formNum}-prestador" class="form-control select2"></select></td>
+                <td><input type="number" name="form-${formNum}-valor_unitario" class="form-control" step="0.01"></td>
+                <td><select name="form-${formNum}-forma_pago" class="form-control">
+                    <option value="CONTADO">Contado</option>
+                    <option value="CREDITO">Crédito</option>
+                    <option value="CONVENIO">Convenio</option>
+                    <option value="SEGURO">Seguro</option>
+                    <option value="MIXTO">Mixto</option>
+                </select></td>
+                <td><input type="number" name="form-${formNum}-valor_pagar" class="form-control" step="0.01"></td>
+                <td><button type="button" class="btn btn-sm btn-danger delete-service"><i class="fas fa-trash"></i></button></td>
+            </tr>
+        `;
+
+            $('#servicesTable tbody').append(newRow);
+            totalForms.val(formNum + 1);
+
+            // Reinicializar Select2 para nuevos elementos
+            $('.select2').select2({
+                theme: 'bootstrap-5'
+            });
+        });
+
+        // Eliminar servicio
+        $(document).on('click', '.delete-service', function () {
+            let row = $(this).closest('tr');
+            let deleteInput = row.find('[name$="-DELETE"]');
+
+            if (deleteInput.length) {
+                deleteInput.prop('checked', true);
+                row.hide();
+            } else {
+                row.remove();
+            }
+
+            calculateTotals();
+        });
+
+        // Cargar valor base del servicio al seleccionar
+        $(document).on('change', '[name$="-servicio"]', function () {
+            let servicioId = $(this).val();
+            if (servicioId) {
+                let row = $(this).closest('tr');
+                $.ajax({
+                    url: '{% url "admision_recepcion:ajax_buscar_servicio" %}',
+                    data: { 'servicio_id': servicioId },
+                    success: function (data) {
+                        if (data.valor_base) {
+                            row.find('[name$="-valor_unitario"]').val(data.valor_base);
+                            calculateTotals();
+                        }
+                    }
+                });
+            }
+        });
+
+        // Calcular totales inicial
+        calculateTotals();
+    });
+</script>
+{% endblock %}

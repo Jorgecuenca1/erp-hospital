@@ -1,258 +1,265 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard de Compras - Sistema ERP{% endblock %}
+{% block title %}Dashboard de Compras - Hospital{% endblock %}
+
+{% block extra_css %}
+<style>
+    .purchases-dashboard {
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+
+    .stat-card {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .urgent-alert {
+        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1 class="h3 mb-0 text-gray-800">
-                    <i class="fas fa-shopping-cart text-primary"></i> Dashboard de Compras
-                </h1>
-                <div class="btn-group">
-                    <a href="{% url 'purchases:proveedor_create' %}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Nuevo Proveedor
-                    </a>
-                    <a href="{% url 'purchases:ordencompra_create' %}" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Nueva Orden
-                    </a>
-                    <a href="{% url 'purchases:facturacompra_create' %}" class="btn btn-info">
-                        <i class="fas fa-file-invoice"></i> Nueva Factura
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Estadísticas principales -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Compras del Mes
+<div class="purchases-dashboard">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h2 class="mb-2">
+                                    <i class="fas fa-truck me-3"></i>
+                                    Dashboard de Compras
+                                </h2>
+                                <p class="mb-0">Sistema de Gestión de Compras y Proveedores</p>
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                ${{ compras_mes|floatformat:2 }}
+                            <div class="col-md-4 text-center">
+                                <h4 class="mb-0">${{ compras_mes|floatformat:2|default:"0.00" }}</h4>
+                                <small>Compras del mes</small>
                             </div>
-                            {% if crecimiento_compras > 0 %}
-                                <div class="text-success small">
-                                    <i class="fas fa-arrow-up"></i> {{ crecimiento_compras|floatformat:1 }}%
-                                </div>
-                            {% elif crecimiento_compras < 0 %}
-                                <div class="text-danger small">
-                                    <i class="fas fa-arrow-down"></i> {{ crecimiento_compras|floatformat:1 }}%
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Proveedores Activos
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_proveedores }}</div>
+        <!-- Alerta de productos que necesitan compra -->
+        {% if productos_necesitan_compra > 0 %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="urgent-alert">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-2">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                ¡Atención! Productos con Stock Bajo
+                            </h5>
+                            <p class="mb-0">Hay {{ productos_necesitan_compra }} productos que necesitan reposición
+                                urgente.</p>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-truck fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Órdenes Pendientes
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ ordenes_pendientes }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clock fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Productos Necesitan Compra
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ productos_necesitan_compra }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gráficos y contenido principal -->
-    <div class="row">
-        <!-- Gráfico de compras por mes -->
-        <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Compras por Mes</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="comprasChart" width="400" height="200"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Gráfico de compras por estado -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Compras por Estado</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="estadoChart" width="400" height="200"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tablas de información -->
-    <div class="row">
-        <!-- Facturas recientes -->
-        <div class="col-lg-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Facturas Recientes</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>Número</th>
-                                    <th>Proveedor</th>
-                                    <th>Total</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for factura in facturas_recientes %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'purchases:facturacompra_detail' factura.pk %}">
-                                            {{ factura.numero_factura }}
-                                        </a>
-                                    </td>
-                                    <td>{{ factura.proveedor.nombre }}</td>
-                                    <td>${{ factura.total|floatformat:2 }}</td>
-                                    <td>
-                                        <span class="badge badge-{% if factura.estado == 'PAGADA' %}success{% elif factura.estado == 'RECIBIDA' %}warning{% else %}secondary{% endif %}">
-                                            {{ factura.get_estado_display }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center">No hay facturas recientes</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Top proveedores -->
-        <div class="col-lg-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Top Proveedores</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>Proveedor</th>
-                                    <th>Total Compras</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for proveedor in top_proveedores %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'purchases:proveedor_detail' proveedor.pk %}">
-                                            {{ proveedor.nombre }}
-                                        </a>
-                                    </td>
-                                    <td>${{ proveedor.total_compras|floatformat:2 }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="2" class="text-center">No hay datos de proveedores</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Enlaces rápidos -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Acciones Rápidas</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'purchases:proveedor_list' %}" class="btn btn-outline-primary btn-block">
-                                <i class="fas fa-truck"></i> Gestionar Proveedores
+                        <div class="col-md-4 text-center">
+                            <a href="#" class="btn btn-light btn-lg">
+                                <i class="fas fa-eye me-2"></i>Ver Productos
                             </a>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'purchases:ordencompra_list' %}" class="btn btn-outline-success btn-block">
-                                <i class="fas fa-shopping-cart"></i> Órdenes de Compra
-                            </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Estadísticas principales -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-warning mb-3">
+                            <i class="fas fa-truck fa-3x"></i>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'purchases:facturacompra_list' %}" class="btn btn-outline-info btn-block">
-                                <i class="fas fa-file-invoice"></i> Facturas
-                            </a>
+                        <h4 class="fw-bold text-warning">{{ total_proveedores|default:"0" }}</h4>
+                        <p class="text-muted mb-0">Proveedores Activos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-primary mb-3">
+                            <i class="fas fa-shopping-cart fa-3x"></i>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'purchases:reports' %}" class="btn btn-outline-warning btn-block">
-                                <i class="fas fa-chart-bar"></i> Reportes
-                            </a>
+                        <h4 class="fw-bold text-primary">{{ ordenes_pendientes|default:"0" }}</h4>
+                        <p class="text-muted mb-0">Órdenes Pendientes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-danger mb-3">
+                            <i class="fas fa-file-invoice fa-3x"></i>
+                        </div>
+                        <h4 class="fw-bold text-danger">{{ facturas_pendientes|default:"0" }}</h4>
+                        <p class="text-muted mb-0">Facturas por Pagar</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card h-100">
+                    <div class="card-body text-center">
+                        <div class="text-success mb-3">
+                            <i class="fas fa-boxes fa-3x"></i>
+                        </div>
+                        <h4 class="fw-bold text-success">{{ total_productos|default:"0" }}</h4>
+                        <p class="text-muted mb-0">Productos de Compra</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bolt me-2 text-warning"></i>
+                            Acciones Rápidas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="{% url 'purchases:proveedor_create' %}"
+                                    class="btn btn-outline-warning w-100 d-flex flex-column align-items-center p-3">
+                                    <i class="fas fa-truck fa-2x mb-2"></i>
+                                    <span>Nuevo Proveedor</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="{% url 'purchases:ordencompra_create' %}"
+                                    class="btn btn-outline-primary w-100 d-flex flex-column align-items-center p-3">
+                                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                                    <span>Nueva Orden</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="{% url 'purchases:facturacompra_create' %}"
+                                    class="btn btn-outline-danger w-100 d-flex flex-column align-items-center p-3">
+                                    <i class="fas fa-file-invoice fa-2x mb-2"></i>
+                                    <span>Nueva Factura</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="{% url 'purchases:proveedor_list' %}"
+                                    class="btn btn-outline-info w-100 d-flex flex-column align-items-center p-3">
+                                    <i class="fas fa-truck fa-2x mb-2"></i>
+                                    <span>Ver Proveedores</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="{% url 'purchases:ordencompra_list' %}"
+                                    class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center p-3">
+                                    <i class="fas fa-list fa-2x mb-2"></i>
+                                    <span>Ver Órdenes</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <a href="{% url 'purchases:facturacompra_list' %}"
+                                    class="btn btn-outline-dark w-100 d-flex flex-column align-items-center p-3">
+                                    <i class="fas fa-file-invoice-dollar fa-2x mb-2"></i>
+                                    <span>Ver Facturas</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos y Tablas -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="chart-container">
+                    <h6 class="mb-3">Compras por Mes</h6>
+                    <canvas id="purchasesChart" height="300"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Top Proveedores</h6>
+                    </div>
+                    <div class="card-body">
+                        {% for proveedor in top_proveedores %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ proveedor.nombre }}</strong>
+                            </div>
+                            <span class="badge bg-warning">${{ proveedor.total_compras|floatformat:0 }}</span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">No hay datos disponibles</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enlaces rápidos -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-link me-2 text-secondary"></i>
+                            Enlaces Rápidos
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="/dashboard/" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                                    <i class="fas fa-home me-2"></i>Dashboard Principal
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/sales/" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                                    <i class="fas fa-chart-line me-2"></i>Módulo de Ventas
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/inventories/" class="btn btn-outline-success btn-sm w-100 mb-2">
+                                    <i class="fas fa-boxes me-2"></i>Inventarios
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="/accounting/" class="btn btn-outline-info btn-sm w-100 mb-2">
+                                    <i class="fas fa-calculator me-2"></i>Contabilidad
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -260,30 +267,36 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Scripts para gráficos -->
+{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Gráfico de compras por mes
-const comprasCtx = document.getElementById('comprasChart').getContext('2d');
-const comprasLabels = [{% for mes in compras_por_mes %}'{{ mes.mes }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
-const comprasData = [{% for mes in compras_por_mes %}{{ mes.total }}{% if not forloop.last %}, {% endif %}{% endfor %}];
-
-const comprasChart = new Chart(comprasCtx, {
-    type: 'line',
-    data: {
-        labels: comprasLabels,
-        datasets: [{
-            label: 'Compras ($)',
-            data: comprasData,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            tension: 0.1
+    // Gráfico de compras
+    const ctx = document.getElementById('purchasesChart').getContext('2d');
+    const purchasesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for compra in compras_por_mes %}
+                '{{ compra.mes }}'{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+        ],
+    datasets: [{
+        label: 'Compras ($)',
+        data: [
+            {% for compra in compras_por_mes %}
+                    {{ compra.total |default: 0 }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+            ],
+    borderColor: 'rgb(255, 193, 7)',
+        backgroundColor: 'rgba(255, 193, 7, 0.2)',
         }]
     },
     options: {
         responsive: true,
-        scales: {
+            maintainAspectRatio: false,
+                scales: {
             y: {
                 beginAtZero: true
             }
@@ -291,33 +304,6 @@ const comprasChart = new Chart(comprasCtx, {
     }
 });
 
-// Gráfico de compras por estado
-const estadoCtx = document.getElementById('estadoChart').getContext('2d');
-const estadoLabels = [{% for estado in compras_por_estado %}'{{ estado.estado }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
-const estadoData = [{% for estado in compras_por_estado %}{{ estado.count }}{% if not forloop.last %}, {% endif %}{% endfor %}];
-
-const estadoChart = new Chart(estadoCtx, {
-    type: 'doughnut',
-    data: {
-        labels: estadoLabels,
-        datasets: [{
-            data: estadoData,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 205, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)'
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'bottom'
-            }
-        }
-    }
-});
+    console.log('✅ Dashboard de compras cargado');
 </script>
 {% endblock %}

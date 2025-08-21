@@ -4,7 +4,8 @@ from django.db.models import Count, Avg
 from .models import (
     OnlineAppointmentProfile, DoctorAvailability, OnlineAppointmentSlot,
     OnlineAppointment, AppointmentReminder, OnlineAppointmentSettings,
-    AppointmentFeedback, WaitingList
+    AppointmentFeedback, WaitingList, AgendaElectronicaDisponibilidad,
+    DisponibilidadDetalle
 )
 
 
@@ -310,6 +311,112 @@ class WaitingListAdmin(admin.ModelAdmin):
             obj.get_status_display()
         )
     colored_status.short_description = 'Status'
+
+
+@admin.register(AgendaElectronicaDisponibilidad)
+class AgendaElectronicaDisponibilidadAdmin(admin.ModelAdmin):
+    list_display = ['profesional', 'get_periodo', 'get_horarios', 'get_dias_semana', 'sede', 'status', 'slots_generados', 'created_at']
+    list_filter = ['status', 'sede', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo', 'habilitar_agenda_tus_citas', 'habilitar_doctoralia']
+    search_fields = ['profesional__user__first_name', 'profesional__user__last_name', 'profesional__user__username']
+    readonly_fields = ['slots_generados', 'created_at', 'updated_at']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Información del Profesional', {
+            'fields': ('profesional', 'created_by')
+        }),
+        ('Rango de Fechas', {
+            'fields': ('fecha_desde', 'fecha_hasta')
+        }),
+        ('Horarios de Mañana', {
+            'fields': ('hora_inicio_am', 'hora_fin_am'),
+            'classes': ('collapse',)
+        }),
+        ('Horarios de Tarde', {
+            'fields': ('hora_inicio_pm', 'hora_fin_pm'),
+            'classes': ('collapse',)
+        }),
+        ('Configuración', {
+            'fields': ('dividir_en', 'sede')
+        }),
+        ('Días de la Semana', {
+            'fields': ('lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo')
+        }),
+        ('Integraciones Externas', {
+            'fields': ('habilitar_agenda_tus_citas', 'habilitar_doctoralia')
+        }),
+        ('Estado y Seguimiento', {
+            'fields': ('status', 'slots_generados')
+        }),
+        ('Auditoría', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    def get_periodo(self, obj):
+        return f"{obj.fecha_desde.strftime('%d/%m/%Y')} - {obj.fecha_hasta.strftime('%d/%m/%Y')}"
+    get_periodo.short_description = 'Período'
+    
+    def get_horarios(self, obj):
+        horarios = []
+        if obj.tiene_horario_manana():
+            horarios.append(f"AM: {obj.hora_inicio_am}-{obj.hora_fin_am}")
+        if obj.tiene_horario_tarde():
+            horarios.append(f"PM: {obj.hora_inicio_pm}-{obj.hora_fin_pm}")
+        return " | ".join(horarios)
+    get_horarios.short_description = 'Horarios'
+    
+    def get_dias_semana(self, obj):
+        dias = obj.get_dias_seleccionados()
+        return ", ".join(dias[:3]) + (f" +{len(dias)-3}" if len(dias) > 3 else "")
+    get_dias_semana.short_description = 'Días'
+    
+    actions = ['generar_slots', 'activar_disponibilidad', 'desactivar_disponibilidad']
+    
+    def generar_slots(self, request, queryset):
+        for agenda in queryset:
+            slots_creados = agenda.generar_slots_disponibilidad()
+            self.message_user(request, f"Se generaron {slots_creados} slots para {agenda.profesional.user.get_full_name()}")
+    generar_slots.short_description = "Regenerar slots de disponibilidad"
+    
+    def activar_disponibilidad(self, request, queryset):
+        updated = queryset.update(status='active')
+        self.message_user(request, f"{updated} disponibilidades activadas.")
+    activar_disponibilidad.short_description = "Activar disponibilidades seleccionadas"
+    
+    def desactivar_disponibilidad(self, request, queryset):
+        updated = queryset.update(status='inactive')
+        self.message_user(request, f"{updated} disponibilidades desactivadas.")
+    desactivar_disponibilidad.short_description = "Desactivar disponibilidades seleccionadas"
+
+
+@admin.register(DisponibilidadDetalle)
+class DisponibilidadDetalleAdmin(admin.ModelAdmin):
+    list_display = ['agenda_disponibilidad', 'fecha_disponibilidad', 'hora_inicio', 'hora_terminacion', 'agenda_tus_citas', 'doctoralia', 'is_available']
+    list_filter = ['agenda_tus_citas', 'doctoralia', 'is_available', 'is_booked', 'fecha_disponibilidad']
+    search_fields = ['agenda_disponibilidad__profesional__user__first_name', 'agenda_disponibilidad__profesional__user__last_name']
+    readonly_fields = ['created_at']
+    date_hierarchy = 'fecha_disponibilidad'
+    
+    fieldsets = (
+        ('Información de la Disponibilidad', {
+            'fields': ('agenda_disponibilidad', 'fecha_disponibilidad')
+        }),
+        ('Horario', {
+            'fields': ('hora_inicio', 'hora_terminacion')
+        }),
+        ('Integraciones', {
+            'fields': ('agenda_tus_citas', 'doctoralia')
+        }),
+        ('Estado', {
+            'fields': ('is_available', 'is_booked')
+        }),
+        ('Auditoría', {
+            'fields': ('created_at',),
+            'classes': ('collapse',)
+        })
+    )
 
 
 # Dashboard customization

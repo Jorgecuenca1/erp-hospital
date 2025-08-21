@@ -13,7 +13,7 @@
         <div>
             <h1>Consultas</h1>
             {% if historia_clinica %}
-                <h4 class="text-muted">Paciente: <a href="{% url 'paciente_detail' historia_clinica.paciente.pk %}">{{ historia_clinica.paciente.nombres }} {{ historia_clinica.paciente.apellidos }}</a></h4>
+                <h4 class="text-muted">Paciente: <a href="{% url 'patients:paciente_detail' historia_clinica.paciente.pk %}">{{ historia_clinica.paciente.nombres }} {{ historia_clinica.paciente.apellidos }}</a></h4>
             {% endif %}
         </div>
         {% if historia_clinica %}

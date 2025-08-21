@@ -1,10 +1,21 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView)
+from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Cargo, Empleado, Contrato, Nomina
 from .forms import CargoForm, EmpleadoForm, ContratoForm, NominaForm
 
 # Create your views here.
+
+class HRDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal de recursos humanos"""
+    template_name = 'hr/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'Recursos Humanos'
+        context['empleados_total'] = Empleado.objects.count()
+        return context
 
 # Vistas para Cargo
 class CargoListView(ListView):

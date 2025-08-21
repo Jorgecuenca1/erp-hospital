@@ -1,0 +1,101 @@
+{% extends 'base_hms.html' %}
+
+{% block title %}Citas de Pacientes - HMetaHIS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-calendar text-primary"></i> {{ title }}
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="/appointments/" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nueva Cita
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas de citas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Citas Hoy</h6>
+                            <h3 class="mb-0">25</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-day fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Confirmadas</h6>
+                            <h3 class="mb-0">18</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Pendientes</h6>
+                            <h3 class="mb-0">5</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title">Canceladas</h6>
+                            <h3 class="mb-0">2</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-times-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación a módulo de citas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Sistema de Citas Médicas</h5>
+                    <p class="card-text">Gestiona todas las citas médicas desde el módulo especializado</p>
+                    <a href="/appointments/" class="btn btn-primary">
+                        <i class="fas fa-external-link-alt"></i> Ir al Módulo de Citas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

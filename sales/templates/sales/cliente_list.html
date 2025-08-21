@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Clientes - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-users me-2 text-primary"></i>
+                        Lista de Clientes
+                    </h4>
+                    <div>
+                        <a href="{% url 'sales:cliente_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Cliente
+                        </a>
+                        <a href="{% url 'sales:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Búsqueda -->
+                    <form method="get" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <input type="text" name="search" class="form-control"
+                                    placeholder="Buscar por nombre, identificación o email..."
+                                    value="{{ request.GET.search }}">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Tabla de clientes -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Identificación</th>
+                                    <th>Contacto</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Crédito</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cliente in clientes %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ cliente.nombre }}</strong>
+                                        </div>
+                                        <small class="text-muted">{{ cliente.contacto_principal|default:"Sin contacto"
+                                            }}</small>
+                                    </td>
+                                    <td>{{ cliente.identificacion }}</td>
+                                    <td>
+                                        <div>{{ cliente.telefono|default:"--" }}</div>
+                                        <small class="text-muted">{{ cliente.email|default:"Sin email" }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ cliente.get_tipo_cliente_display }}</span>
+                                    </td>
+                                    <td>
+                                        {% if cliente.estado == 'ACTIVO' %}
+                                        <span class="badge bg-success">Activo</span>
+                                        {% elif cliente.estado == 'INACTIVO' %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Suspendido</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="small">
+                                            <div>Límite: ${{ cliente.limite_credito|floatformat:2 }}</div>
+                                            <div>Saldo: ${{ cliente.saldo_actual|floatformat:2 }}</div>
+                                            <div
+                                                class="{% if cliente.credito_disponible < 0 %}text-danger{% else %}text-success{% endif %}">
+                                                Disponible: ${{ cliente.credito_disponible|floatformat:2 }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'sales:cliente_detail' cliente.pk %}"
+                                                class="btn btn-sm btn-outline-primary" title="Ver">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'sales:cliente_update' cliente.pk %}"
+                                                class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'sales:cliente_delete' cliente.pk %}"
+                                                class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                                onclick="return confirm('¿Está seguro?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-users fa-3x mb-3"></i>
+                                            <h5>No hay clientes registrados</h5>
+                                            <p>Haga clic en "Nuevo Cliente" para agregar el primer cliente.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginación">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                            </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        console.log('✅ Lista de clientes cargada');
+    });
+</script>
+{% endblock %}
+
+
+

@@ -30,9 +30,9 @@
                     {% if form.instance.pk %}
                         <a href="{% url 'consulta_detail' form.instance.pk %}" class="btn btn-secondary">Cancelar</a>
                     {% elif form.initial.historia_clinica %}
-                         <a href="{% url 'paciente_detail' form.initial.historia_clinica.paciente.pk %}" class="btn btn-secondary">Cancelar</a>
+                         <a href="{% url 'patients:paciente_detail' form.initial.historia_clinica.paciente.pk %}" class="btn btn-secondary">Cancelar</a>
                     {% else %}
-                        <a href="{% url 'paciente_list' %}" class="btn btn-secondary">Cancelar</a>
+                        <a href="{% url 'patients:paciente_list' %}" class="btn btn-secondary">Cancelar</a>
                     {% endif %}
                 </div>
             </form>

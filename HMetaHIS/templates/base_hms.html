@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}HMetaHIS - Hospital Management System{% endblock %}</title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -21,23 +22,23 @@
             --light-color: #ecf0f1;
             --dark-color: #2c3e50;
         }
-        
+
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .navbar-brand {
             font-weight: bold;
             color: var(--primary-color) !important;
         }
-        
+
         .sidebar {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             min-height: 100vh;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .sidebar .nav-link {
             color: white;
             padding: 12px 20px;
@@ -45,50 +46,50 @@
             margin: 2px 10px;
             transition: all 0.3s ease;
         }
-        
+
         .sidebar .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.1);
             transform: translateX(5px);
         }
-        
+
         .sidebar .nav-link.active {
-            background-color: rgba(255,255,255,0.2);
+            background-color: rgba(255, 255, 255, 0.2);
             border-left: 4px solid var(--accent-color);
         }
-        
+
         .main-content {
             padding: 20px;
         }
-        
+
         .card {
             border: none;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s ease;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
         }
-        
+
         .card-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border-radius: 15px 15px 0 0 !important;
             border: none;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             border: none;
             border-radius: 8px;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
+
         .stats-card {
             background: linear-gradient(135deg, var(--success-color), var(--info-color));
             color: white;
@@ -96,83 +97,86 @@
             padding: 20px;
             margin-bottom: 20px;
         }
-        
+
         .module-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
-        
+
         .module-card {
             background: white;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
             text-decoration: none;
             color: inherit;
         }
-        
+
         .module-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             text-decoration: none;
             color: inherit;
         }
-        
+
         .module-icon {
             font-size: 3rem;
             margin-bottom: 15px;
             color: var(--secondary-color);
         }
-        
+
         .breadcrumb {
             background: transparent;
             padding: 0;
             margin-bottom: 20px;
         }
-        
+
         .breadcrumb-item a {
             color: var(--secondary-color);
             text-decoration: none;
         }
-        
+
         .table {
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
-        
+
         .table thead th {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
         }
-        
+
         .badge {
             border-radius: 20px;
             padding: 8px 12px;
         }
-        
+
         .alert {
             border-radius: 10px;
             border: none;
         }
-        
-        .form-control, .form-select {
+
+        .form-control,
+        .form-select {
             border-radius: 8px;
             border: 2px solid #e9ecef;
         }
-        
-        .form-control:focus, .form-select:focus {
+
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
         }
     </style>
-    
+
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -181,11 +185,11 @@
                 <i class="fas fa-hospital-alt me-2"></i>
                 HMetaHIS
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -203,31 +207,63 @@
                             <i class="fas fa-user-md me-1"></i>HMS
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/hms/"><i class="fas fa-hospital me-2"></i>Base HMS</a></li>
-                            <li><a class="dropdown-item" href="/hms/gynecology/"><i class="fas fa-female me-2"></i>Ginecología</a></li>
-                            <li><a class="dropdown-item" href="/hms/ophthalmology/"><i class="fas fa-eye me-2"></i>Oftalmología</a></li>
-                            <li><a class="dropdown-item" href="/hms/pediatrics/"><i class="fas fa-baby me-2"></i>Pediatría</a></li>
-                            <li><a class="dropdown-item" href="/hms/aesthetic/"><i class="fas fa-spa me-2"></i>Estética</a></li>
-                            <li><a class="dropdown-item" href="/hms/dental/"><i class="fas fa-tooth me-2"></i>Dental</a></li>
-                            <li><a class="dropdown-item" href="/hms/surgery/"><i class="fas fa-procedures me-2"></i>Cirugía</a></li>
-                            <li><a class="dropdown-item" href="/hms/operation-theater/"><i class="fas fa-bed me-2"></i>Quirófanos</a></li>
-                            <li><a class="dropdown-item" href="/hms/laboratory/"><i class="fas fa-flask me-2"></i>Laboratorio</a></li>
-                            <li><a class="dropdown-item" href="/hms/radiology/"><i class="fas fa-x-ray me-2"></i>Radiología</a></li>
-                            <li><a class="dropdown-item" href="/hms/emergency/"><i class="fas fa-ambulance me-2"></i>Emergencias</a></li>
-                            <li><a class="dropdown-item" href="/hms/nursing/"><i class="fas fa-user-nurse me-2"></i>Enfermería</a></li>
-                            <li><a class="dropdown-item" href="/hms/blood-bank/"><i class="fas fa-tint me-2"></i>Banco de Sangre</a></li>
-                            <li><a class="dropdown-item" href="/hms/hospitalization/"><i class="fas fa-procedures me-2"></i>Hospitalización</a></li>
-                            <li><a class="dropdown-item" href="/hms/patient-portal/"><i class="fas fa-user me-2"></i>Portal Paciente</a></li>
-                            <li><a class="dropdown-item" href="/hms/pharmacy/"><i class="fas fa-pills me-2"></i>Farmacia</a></li>
-                            <li><a class="dropdown-item" href="/hms/online-appointment/"><i class="fas fa-calendar-check me-2"></i>Citas Online</a></li>
-                            <li><a class="dropdown-item" href="/hms/webcam/"><i class="fas fa-video me-2"></i>Webcam</a></li>
-                            <li><a class="dropdown-item" href="/hms/video-call/"><i class="fas fa-phone me-2"></i>Video Call</a></li>
-                            <li><a class="dropdown-item" href="/hms/consent-form/"><i class="fas fa-file-signature me-2"></i>Consentimientos</a></li>
-                            <li><a class="dropdown-item" href="/hms/subscription/"><i class="fas fa-credit-card me-2"></i>Suscripciones</a></li>
-                            <li><a class="dropdown-item" href="/hms/insurance/"><i class="fas fa-shield-alt me-2"></i>Seguros</a></li>
-                            <li><a class="dropdown-item" href="/hms/commission/"><i class="fas fa-percentage me-2"></i>Comisiones</a></li>
-                            <li><a class="dropdown-item" href="/hms/certification/"><i class="fas fa-certificate me-2"></i>Certificaciones</a></li>
-                            <li><a class="dropdown-item" href="/hms/waiting-screen/"><i class="fas fa-tv me-2"></i>Pantalla Espera</a></li>
+                            <li><a class="dropdown-item" href="/hms/"><i class="fas fa-hospital me-2"></i>Base HMS</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/hms/gynecology/"><i
+                                        class="fas fa-female me-2"></i>Ginecología</a></li>
+                            <li><a class="dropdown-item" href="/hms/ophthalmology/"><i
+                                        class="fas fa-eye me-2"></i>Oftalmología</a></li>
+                            <li><a class="dropdown-item" href="/hms/pediatrics/"><i
+                                        class="fas fa-baby me-2"></i>Pediatría</a></li>
+                            <li><a class="dropdown-item" href="/hms/aesthetic/"><i
+                                        class="fas fa-spa me-2"></i>Estética</a></li>
+                            <li><a class="dropdown-item" href="/hms/dental/"><i class="fas fa-tooth me-2"></i>Dental</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/hms/surgery/"><i
+                                        class="fas fa-procedures me-2"></i>Cirugía</a></li>
+                            <li><a class="dropdown-item" href="/hms/operation-theater/"><i
+                                        class="fas fa-bed me-2"></i>Quirófanos</a></li>
+                            <li><a class="dropdown-item" href="/hms/laboratory/"><i
+                                        class="fas fa-flask me-2"></i>Laboratorio</a></li>
+                            <li><a class="dropdown-item" href="/hms/radiology/"><i
+                                        class="fas fa-x-ray me-2"></i>Radiología</a></li>
+                            <li><a class="dropdown-item" href="/hms/emergency/"><i
+                                        class="fas fa-ambulance me-2"></i>Emergencias</a></li>
+                            <li><a class="dropdown-item" href="/hms/nursing/"><i
+                                        class="fas fa-user-nurse me-2"></i>Enfermería</a></li>
+                            <li><a class="dropdown-item" href="/hms/blood-bank/"><i class="fas fa-tint me-2"></i>Banco
+                                    de Sangre</a></li>
+                            <li><a class="dropdown-item" href="/hms/hospitalization/"><i
+                                        class="fas fa-procedures me-2"></i>Hospitalización</a></li>
+                            <li><a class="dropdown-item" href="/hms/patient-portal/"><i
+                                        class="fas fa-user me-2"></i>Portal Paciente</a></li>
+                            <li><a class="dropdown-item" href="/hms/pharmacy/"><i
+                                        class="fas fa-pills me-2"></i>Farmacia</a></li>
+                            <li><a class="dropdown-item" href="/hms/online-appointment/"><i
+                                        class="fas fa-calendar-check me-2"></i>Citas Online</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/admision/"><i
+                                        class="fas fa-clipboard-list me-2"></i>Admisión - Recepción</a></li>
+                            <li><a class="dropdown-item" href="/admision/seguimiento/"><i
+                                        class="fas fa-user-check me-2"></i>Seguimiento Pacientes</a></li>
+                            <li><a class="dropdown-item" href="/hms/webcam/"><i class="fas fa-video me-2"></i>Webcam</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/hms/video-call/"><i class="fas fa-phone me-2"></i>Video
+                                    Call</a></li>
+                            <li><a class="dropdown-item" href="/hms/consent-form/"><i
+                                        class="fas fa-file-signature me-2"></i>Consentimientos</a></li>
+                            <li><a class="dropdown-item" href="/hms/subscription/"><i
+                                        class="fas fa-credit-card me-2"></i>Suscripciones</a></li>
+                            <li><a class="dropdown-item" href="/hms/insurance/"><i
+                                        class="fas fa-shield-alt me-2"></i>Seguros</a></li>
+                            <li><a class="dropdown-item" href="/hms/commission/"><i
+                                        class="fas fa-percentage me-2"></i>Comisiones</a></li>
+                            <li><a class="dropdown-item" href="/hms/certification/"><i
+                                        class="fas fa-certificate me-2"></i>Certificaciones</a></li>
+                            <li><a class="dropdown-item" href="/hms/waiting-screen/"><i
+                                        class="fas fa-tv me-2"></i>Pantalla Espera</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -235,40 +271,73 @@
                             <i class="fas fa-building me-1"></i>ERP
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/patients/"><i class="fas fa-users me-2"></i>Pacientes</a></li>
-                            <li><a class="dropdown-item" href="/professionals/"><i class="fas fa-user-md me-2"></i>Profesionales</a></li>
-                            <li><a class="dropdown-item" href="/appointments/"><i class="fas fa-calendar me-2"></i>Citas</a></li>
-                            <li><a class="dropdown-item" href="/medical_records/"><i class="fas fa-file-medical me-2"></i>Historias Clínicas</a></li>
-                            <li><a class="dropdown-item" href="/hospital_profile/"><i class="fas fa-hospital me-2"></i>Perfil Hospital</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/accounting/"><i class="fas fa-calculator me-2"></i>Contabilidad</a></li>
-                            <li><a class="dropdown-item" href="/billing/"><i class="fas fa-file-invoice-dollar me-2"></i>Facturación</a></li>
-                            <li><a class="dropdown-item" href="/sales/"><i class="fas fa-chart-line me-2"></i>Ventas</a></li>
-                            <li><a class="dropdown-item" href="/purchases/"><i class="fas fa-shopping-cart me-2"></i>Compras</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/inventories/"><i class="fas fa-boxes me-2"></i>Inventarios</a></li>
-                            <li><a class="dropdown-item" href="/pharmacy/"><i class="fas fa-pills me-2"></i>Farmacia</a></li>
-                            <li><a class="dropdown-item" href="/laboratories/"><i class="fas fa-flask me-2"></i>Laboratorio</a></li>
-                            <li><a class="dropdown-item" href="/asset_management/"><i class="fas fa-tools me-2"></i>Activos</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/hr/"><i class="fas fa-users-cog me-2"></i>Recursos Humanos</a></li>
-                            <li><a class="dropdown-item" href="/quality_management/"><i class="fas fa-award me-2"></i>Calidad</a></li>
-                            <li><a class="dropdown-item" href="/reports/"><i class="fas fa-chart-bar me-2"></i>Reportes</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/pos/"><i class="fas fa-cash-register me-2"></i>Punto de Venta</a></li>
-                            <li><a class="dropdown-item" href="/ecommerce/"><i class="fas fa-shopping-bag me-2"></i>E-commerce</a></li>
+                            <li><a class="dropdown-item" href="/patients/"><i
+                                        class="fas fa-users me-2"></i>Pacientes</a></li>
+                            <li><a class="dropdown-item" href="/professionals/"><i
+                                        class="fas fa-user-md me-2"></i>Profesionales</a></li>
+                            <li><a class="dropdown-item" href="/appointments/"><i
+                                        class="fas fa-calendar me-2"></i>Citas</a></li>
+                            <li><a class="dropdown-item" href="/medical_records/"><i
+                                        class="fas fa-file-medical me-2"></i>Historias Clínicas</a></li>
+                            <li><a class="dropdown-item" href="/hospital_profile/"><i
+                                        class="fas fa-hospital me-2"></i>Perfil Hospital</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/accounting/"><i
+                                        class="fas fa-calculator me-2"></i>Contabilidad</a></li>
+                            <li><a class="dropdown-item" href="/billing/"><i
+                                        class="fas fa-file-invoice-dollar me-2"></i>Facturación</a></li>
+                            <li><a class="dropdown-item" href="/sales/"><i class="fas fa-chart-line me-2"></i>Ventas</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/purchases/"><i
+                                        class="fas fa-shopping-cart me-2"></i>Compras</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/inventories/"><i
+                                        class="fas fa-boxes me-2"></i>Inventarios</a></li>
+                            <li><a class="dropdown-item" href="/pharmacy/"><i class="fas fa-pills me-2"></i>Farmacia</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/laboratories/"><i
+                                        class="fas fa-flask me-2"></i>Laboratorio</a></li>
+                            <li><a class="dropdown-item" href="/asset_management/"><i
+                                        class="fas fa-tools me-2"></i>Activos</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/hr/"><i class="fas fa-users-cog me-2"></i>Recursos
+                                    Humanos</a></li>
+                            <li><a class="dropdown-item" href="/quality_management/"><i
+                                        class="fas fa-award me-2"></i>Calidad</a></li>
+                            <li><a class="dropdown-item" href="/reports/"><i
+                                        class="fas fa-chart-bar me-2"></i>Reportes</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/pos/"><i class="fas fa-cash-register me-2"></i>Punto de
+                                    Venta</a></li>
+                            <li><a class="dropdown-item" href="/ecommerce/"><i
+                                        class="fas fa-shopping-bag me-2"></i>E-commerce</a></li>
                             <li><a class="dropdown-item" href="/crm/"><i class="fas fa-handshake me-2"></i>CRM</a></li>
-                            <li><a class="dropdown-item" href="/subscriptions/"><i class="fas fa-credit-card me-2"></i>Suscripciones</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/website/"><i class="fas fa-globe me-2"></i>Sitio Web</a></li>
+                            <li><a class="dropdown-item" href="/subscriptions/"><i
+                                        class="fas fa-credit-card me-2"></i>Suscripciones</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/website/"><i class="fas fa-globe me-2"></i>Sitio Web</a>
+                            </li>
                             <li><a class="dropdown-item" href="/blog/"><i class="fas fa-blog me-2"></i>Blog</a></li>
-                            <li><a class="dropdown-item" href="/forum/"><i class="fas fa-comments me-2"></i>Foro</a></li>
-                            <li><a class="dropdown-item" href="/elearning/"><i class="fas fa-graduation-cap me-2"></i>E-learning</a></li>
-                            <li><a class="dropdown-item" href="/livechat/"><i class="fas fa-comments me-2"></i>Live Chat</a></li>
+                            <li><a class="dropdown-item" href="/forum/"><i class="fas fa-comments me-2"></i>Foro</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/elearning/"><i
+                                        class="fas fa-graduation-cap me-2"></i>E-learning</a></li>
+                            <li><a class="dropdown-item" href="/livechat/"><i class="fas fa-comments me-2"></i>Live
+                                    Chat</a></li>
                         </ul>
                     </li>
                 </ul>
-                
+
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -276,8 +345,11 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/admin/"><i class="fas fa-cog me-2"></i>Admin</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/admin/logout/"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/admin/logout/"><i
+                                        class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -317,7 +389,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
-</html> 
+
+</html>

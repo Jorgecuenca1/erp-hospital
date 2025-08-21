@@ -1,7 +1,11 @@
 from django.urls import path
 from . import views
 
+app_name = 'laboratories'
+
 urlpatterns = [
+    # Dashboard principal
+    path('', views.LaboratoriesDashboardView.as_view(), name='dashboard'),
     # URLs para TipoExamen
     path('tipos-examen/', views.TipoExamenListView.as_view(), name='tipo_examen_list'),
     path('tipos-examen/new/', views.TipoExamenCreateView.as_view(), name='tipo_examen_create'),

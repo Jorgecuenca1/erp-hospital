@@ -8,12 +8,12 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3>Orden de Dispensación #{{ orden.pk }}</h3>
             <div>
-                <a href="{% url 'orden_update' orden.pk %}" class="btn btn-primary">Editar Orden</a>
-                <a href="{% url 'orden_delete' orden.pk %}" class="btn btn-danger">Eliminar Orden</a>
+                <a href="{% url 'admision_recepcion:orden_update' orden.pk %}" class="btn btn-primary">Editar Orden</a>
+                <a href="{% url 'admision_recepcion:orden_delete' orden.pk %}" class="btn btn-danger">Eliminar Orden</a>
             </div>
         </div>
         <div class="card-body">
-            <p><strong>Paciente:</strong> <a href="{% url 'paciente_detail' orden.paciente.pk %}">{{ orden.paciente.nombres }} {{ orden.paciente.apellidos }}</a></p>
+            <p><strong>Paciente:</strong> <a href="{% url 'patients:paciente_detail' orden.paciente.pk %}">{{ orden.paciente.nombres }} {{ orden.paciente.apellidos }}</a></p>
             <p><strong>Fecha de Dispensación:</strong> {{ orden.fecha_dispensacion|date:"d M, Y H:i" }}</p>
             <p><strong>Observaciones:</strong> {{ orden.observaciones|default:"Sin observaciones." }}</p>
         </div>
@@ -39,7 +39,7 @@
     </div>
     
     <div class="mt-4">
-        <a href="{% url 'orden_list' %}" class="btn btn-secondary">Volver a las Órdenes de Dispensación</a>
+        <a href="{% url 'admision_recepcion:orden_list' %}" class="btn btn-secondary">Volver a las Órdenes de Dispensación</a>
     </div>
 </div>
 {% endblock %} 

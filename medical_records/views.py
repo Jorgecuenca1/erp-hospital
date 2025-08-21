@@ -1,11 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView, View)
+from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView, View, TemplateView)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Consulta, Diagnostico, Procedimiento, SignosVitales, NotaEvolucion, DocumentoAdjunto
 from .forms import ConsultaForm, DiagnosticoForm, ProcedimientoForm, SignosVitalesForm, NotaEvolucionForm, DocumentoAdjuntoForm
 from patients.models import HistoriaClinica
 
 # Create your views here.
+
+class MedicalRecordsDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal de historias clínicas"""
+    template_name = 'medical_records/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'Historias Clínicas'
+        context['consultas_total'] = Consulta.objects.count()
+        return context
 
 # Vistas para Consulta
 class ConsultaListView(ListView):

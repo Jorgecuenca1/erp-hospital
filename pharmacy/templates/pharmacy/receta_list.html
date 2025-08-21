@@ -13,7 +13,7 @@
         {% for receta in recetas %}
         <a href="{% url 'receta_detail' receta.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">
             <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">Receta para <a href="{% url 'paciente_detail' receta.paciente.pk %}">{{ receta.paciente.nombres }} {{ receta.paciente.apellidos }}</a></h5>
+                <h5 class="mb-1">Receta para <a href="{% url 'patients:paciente_detail' receta.paciente.pk %}">{{ receta.paciente.nombres }} {{ receta.paciente.apellidos }}</a></h5>
                 <small class="text-muted">Fecha de Emisión: {{ receta.fecha_emision|date:"d M, Y" }}</small>
             </div>
             <p class="mb-1">Prescrita por: {{ receta.profesional_prescriptor.nombres }} {{ receta.profesional_prescriptor.apellidos|default:"N/A" }}</p>

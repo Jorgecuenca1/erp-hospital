@@ -1,0 +1,85 @@
+{% extends "accounting/base.html" %}
+
+{% block title %}Flujo de Efectivo{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1><i class="fas fa-exchange-alt"></i> Flujo de Efectivo</h1>
+        <p class="text-muted">Período: {{ fecha_inicio|date:"d/m/Y" }} - {{ fecha_fin|date:"d/m/Y" }}</p>
+    </div>
+    <div class="col-md-4 text-right">
+        <form method="get" class="form-inline">
+            <div class="form-group mr-2">
+                <input type="date" name="fecha_inicio" value="{{ fecha_inicio|date:'Y-m-d' }}" class="form-control form-control-sm">
+            </div>
+            <div class="form-group mr-2">
+                <input type="date" name="fecha_fin" value="{{ fecha_fin|date:'Y-m-d' }}" class="form-control form-control-sm">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-water"></i> Flujo de Efectivo</h5>
+            </div>
+            <div class="card-body">
+                <!-- Flujo Operativo -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h6>Flujo Operativo</h6>
+                                <h4>${{ flujo_neto_operacion|floatformat:2 }}</h4>
+                                <small>Ingresos: ${{ ingresos_operacion|floatformat:2 }}</small><br>
+                                <small>Gastos: ${{ gastos_operacion|floatformat:2 }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-warning text-dark">
+                            <div class="card-body text-center">
+                                <h6>Flujo Inversión</h6>
+                                <h4>${{ flujo_neto_inversion|floatformat:2 }}</h4>
+                                <small>Inversiones: ${{ inversiones|floatformat:2 }}</small><br>
+                                <small>Desinversiones: ${{ desinversiones|floatformat:2 }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h6>Flujo Financiación</h6>
+                                <h4>${{ flujo_neto_financiacion|floatformat:2 }}</h4>
+                                <small>Préstamos: ${{ prestamos|floatformat:2 }}</small><br>
+                                <small>Pagos: ${{ pagos_prestamo|floatformat:2 }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flujo Total -->
+                <div class="text-center">
+                    <div class="card {% if flujo_total >= 0 %}bg-primary{% else %}bg-danger{% endif %} text-white">
+                        <div class="card-body">
+                            <h5>FLUJO NETO TOTAL</h5>
+                            <h2>${{ flujo_total|floatformat:2 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'accounting:reportes' %}" class="btn btn-secondary">Volver</a>
+        <button onclick="window.print()" class="btn btn-primary">Imprimir</button>
+    </div>
+</div>
+{% endblock %}

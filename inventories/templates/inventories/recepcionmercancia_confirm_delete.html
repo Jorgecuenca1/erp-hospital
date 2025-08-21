@@ -1,0 +1,48 @@
+{%% extends "inventories/base.html" %%}
+
+{%% block title %%}Eliminar - Eliminar Recepción{%% endblock %%}
+
+{%% block content %%}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirmar Eliminación
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                </div>
+
+                <p>¿Está seguro que desea eliminar el siguiente registro?</p>
+                
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <strong>{{ object.nombre }}</strong><br>
+                        <small class="text-muted">Código: {{ object.codigo }}</small>
+                    </div>
+                </div>
+
+                <form method="post" class="mt-4">
+                    {%% csrf_token %%}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{%% url 'inventories:recepcionmercancia_list' %%}" class="btn btn-secondary btn-block">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-danger btn-block">
+                                <i class="fas fa-trash"></i> Sí, Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{%% endblock %%}

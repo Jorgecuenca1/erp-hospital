@@ -1,0 +1,603 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Seguimiento a Pacientes - Admisión{% endblock %}
+
+{% block extra_css %}
+<style>
+    .patient-status-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    }
+
+    .patient-status-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-en-espera {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border-left: 5px solid #f39c12;
+    }
+
+    .status-en-atencion {
+        background: linear-gradient(135deg, #d4edda 0%, #00b894 100%);
+        border-left: 5px solid #00b894;
+    }
+
+    .status-atendido {
+        background: linear-gradient(135deg, #cce5ff 0%, #74b9ff 100%);
+        border-left: 5px solid #0984e3;
+    }
+
+    .status-indicator {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .status-espera {
+        background-color: #f39c12;
+    }
+
+    .status-atencion {
+        background-color: #00b894;
+    }
+
+    .status-atendido {
+        background-color: #0984e3;
+    }
+
+    .filter-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid #e3e6f0;
+    }
+
+    .convention-legend {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        border: 1px solid #e3e6f0;
+        margin-bottom: 20px;
+    }
+
+    .convention-item {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 20px;
+        font-weight: 600;
+    }
+
+    .patients-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .patient-row {
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .patient-row:hover {
+        background-color: #f8f9fc;
+    }
+
+    .service-badge {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        margin: 2px;
+        display: inline-block;
+    }
+
+    .auto-refresh-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .auto-refresh-indicator.show {
+        opacity: 1;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Seguimiento a Pacientes</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:dashboard' %}">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_create' %}">
+        <i class="fas fa-plus-circle me-2"></i>Nueva Orden
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_list' %}">
+        <i class="fas fa-file-medical-alt me-2"></i>Órdenes de Servicios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'admision_recepcion:seguimiento_pacientes' %}">
+        <i class="fas fa-user-check me-2"></i>Seguimiento Pacientes
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">👥 Seguimiento a Pacientes</h1>
+            <p class="mb-0 text-muted">de la sección Admisión - Recepción
+                <a href="#" class="text-primary ms-2" data-bs-toggle="modal" data-bs-target="#instructionsModal">
+                    👉🏼 De clic aquí para aprender o ver los instructivos <i class="fas fa-info-circle"></i>
+                </a>
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-outline-success me-2" id="refreshBtn">
+                <i class="fas fa-sync-alt me-1"></i>Actualizar
+            </button>
+            <div class="form-check form-switch d-inline-block">
+                <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                <label class="form-check-label" for="autoRefresh">Auto-actualizar</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-section">
+        <form method="get" id="filterForm">
+            <div class="row align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Fecha:</label>
+                    <input type="date" name="fecha" class="form-control" value="{{ request.GET.fecha|default:today }}"
+                        id="fechaFilter">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Sedes:</label>
+                    <select name="sede" class="form-control" id="sedeFilter">
+                        <option value="">Todas las Sedes</option>
+                        <option value="PRINCIPAL" {% if request.GET.sede == "PRINCIPAL" %}selected{% endif %}>PRINCIPAL
+                        </option>
+                        <option value="SUCURSAL_1" {% if request.GET.sede == "SUCURSAL_1" %}selected{% endif %}>SUCURSAL 1
+                        </option>
+                        <option value="SUCURSAL_2" {% if request.GET.sede == "SUCURSAL_2" %}selected{% endif %}>SUCURSAL 2
+                        </option>
+                        <option value="CONSULTORIO_EXTERNO" {% if request.GET.sede == "CONSULTORIO_EXTERNO" %}selected{% endif %}>CONSULTORIO EXTERNO</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Estado:</label>
+                    <select name="estado" class="form-control" id="estadoFilter">
+                        <option value="">Todos los Estados</option>
+                        <option value="EN_ESPERA" {% if request.GET.estado == "EN_ESPERA" %}selected{% endif %}>En Espera
+                        </option>
+                        <option value="EN_ATENCION" {% if request.GET.estado == "EN_ATENCION" %}selected{% endif %}>En
+                            Atención</option>
+                        <option value="ATENDIDO" {% if request.GET.estado == "ATENDIDO" %}selected{% endif %}>Atendido
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-1"></i>Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Convenciones -->
+    <div class="convention-legend">
+        <h6 class="mb-3 fw-bold">Convenciones</h6>
+        <div class="d-flex flex-wrap">
+            <div class="convention-item">
+                <span class="status-indicator status-espera"></span>
+                En Espera
+            </div>
+            <div class="convention-item">
+                <span class="status-indicator status-atencion"></span>
+                En Atención
+            </div>
+            <div class="convention-item">
+                <span class="status-indicator status-atendido"></span>
+                Atendido
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Pacientes -->
+    <div class="patients-table">
+        <table class="table table-hover mb-0">
+            <thead class="table-header">
+                <tr>
+                    <th style="width: 8%;">N°</th>
+                    <th style="width: 46%;">Pacientes</th>
+                    <th style="width: 46%;">Servicios Prestados</th>
+                </tr>
+            </thead>
+            <tbody id="patientsTableBody">
+                {% if ordenes %}
+                {% for orden in ordenes %}
+                <tr class="patient-row" data-orden-id="{{ orden.id }}" onclick="showPatientDetails({{ orden.id }})">
+                    <td class="text-center align-middle">
+                        <div class="d-flex flex-column align-items-center">
+                            <strong class="mb-1">{{ forloop.counter }}</strong>
+                            {% with ultimo_seguimiento=orden.seguimientos.first %}
+                            {% if ultimo_seguimiento.estado == 'EN_ESPERA' %}
+                            <span class="status-indicator status-espera" title="En Espera"></span>
+                            {% elif ultimo_seguimiento.estado == 'EN_ATENCION' %}
+                            <span class="status-indicator status-atencion" title="En Atención"></span>
+                            {% elif ultimo_seguimiento.estado == 'ATENDIDO' %}
+                            <span class="status-indicator status-atendido" title="Atendido"></span>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </td>
+                    <td class="align-middle">
+                        <div class="d-flex flex-column">
+                            <div class="mb-2">
+                                <strong class="text-primary">{{ orden.nombre_completo }}</strong>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-id-card me-1"></i>{{ orden.get_tipo_documento_display }} {{ orden.numero_identificacion }}
+                                </small>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-file-medical me-1"></i>
+                                    <strong>Orden:</strong> {{ orden.numero_orden }} |
+                                    <i class="fas fa-calendar me-1"></i>{{ orden.fecha_orden|date:"d/m/Y" }}
+                                </small>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-building me-1"></i>
+                                    <strong>Sede:</strong> {{ orden.get_sede_display }} |
+                                    <i class="fas fa-briefcase me-1"></i>{{ orden.empresa_mision.razon_social }}
+                                </small>
+                            </div>
+                            {% with ultimo_seguimiento=orden.seguimientos.first %}
+                            {% if ultimo_seguimiento %}
+                            <div>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    <strong>Último estado:</strong>
+                                    {% if ultimo_seguimiento.estado == 'EN_ESPERA' %}
+                                    <span class="badge bg-warning">En Espera</span>
+                                    {% elif ultimo_seguimiento.estado == 'EN_ATENCION' %}
+                                    <span class="badge bg-success">En Atención</span>
+                                    {% elif ultimo_seguimiento.estado == 'ATENDIDO' %}
+                                    <span class="badge bg-info">Atendido</span>
+                                    {% endif %}
+                                    - {{ ultimo_seguimiento.fecha_estado|date:"H:i" }}
+                                </small>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </td>
+                    <td class="align-middle">
+                        <div class="d-flex flex-wrap">
+                            {% for detalle in orden.detalles.all %}
+                            <span class="service-badge" title="{{ detalle.servicio.descripcion }}">
+                                <i class="fas fa-stethoscope me-1"></i>{{ detalle.servicio.nombre }}
+                                {% if detalle.prestador %}
+                                <br><small class="text-muted">{{ detalle.prestador.nombre }}</small>
+                                {% endif %}
+                            </span>
+                            {% empty %}
+                            <small class="text-muted">No hay servicios asignados</small>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <strong>Total servicios:</strong> {{ orden.detalles.count }} |
+                                <strong>Valor:</strong> ${{ orden.total_pagar|floatformat:0 }}
+                            </small>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="3">
+                        <div class="empty-state">
+                            <i class="fas fa-user-clock"></i>
+                            <h5>No hay pacientes en seguimiento</h5>
+                            <p>No se encontraron pacientes para los filtros seleccionados.</p>
+                            <a href="{% url 'admision_recepcion:orden_create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Crear Nueva Orden
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Estadísticas resumidas -->
+    {% if ordenes %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-chart-bar me-2"></i>Resumen del Día
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="h4 text-warning">{{ stats.en_espera|default:0 }}</span>
+                                <small class="text-muted">En Espera</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="h4 text-success">{{ stats.en_atencion|default:0 }}</span>
+                                <small class="text-muted">En Atención</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="h4 text-info">{{ stats.atendidos|default:0 }}</span>
+                                <small class="text-muted">Atendidos</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <span class="h4 text-primary">{{ ordenes.count }}</span>
+                                <small class="text-muted">Total Pacientes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Auto-refresh Indicator -->
+<div class="auto-refresh-indicator" id="refreshIndicator">
+    <i class="fas fa-sync-alt fa-spin me-1"></i>Actualizando...
+</div>
+
+<!-- Modal de Instrucciones -->
+<div class="modal fade" id="instructionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Instrucciones - Seguimiento a Pacientes
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="fw-bold mb-3">🎯 Objetivo del Módulo</h6>
+                        <p>Este módulo permite monitorear en tiempo real el estado de los pacientes durante su proceso
+                            de atención en el hospital.</p>
+
+                        <h6 class="fw-bold mb-3">🔧 Funcionalidades</h6>
+                        <ul>
+                            <li><strong>Filtros:</strong> Por fecha, sede y estado del paciente</li>
+                            <li><strong>Estados:</strong> En Espera, En Atención, Atendido</li>
+                            <li><strong>Auto-actualización:</strong> Datos actualizados cada 30 segundos</li>
+                            <li><strong>Información completa:</strong> Datos del paciente, servicios y estado actual
+                            </li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">🎨 Convenciones de Color</h6>
+                        <div class="d-flex flex-column gap-2">
+                            <div><span class="status-indicator status-espera"></span> <strong>Amarillo:</strong>
+                                Paciente en espera de atención</div>
+                            <div><span class="status-indicator status-atencion"></span> <strong>Verde:</strong> Paciente
+                                siendo atendido</div>
+                            <div><span class="status-indicator status-atendido"></span> <strong>Azul:</strong> Paciente
+                                ya atendido</div>
+                        </div>
+
+                        <h6 class="fw-bold mb-3 mt-3">📱 Uso</h6>
+                        <ol>
+                            <li>Seleccione la fecha y sede que desea monitorear</li>
+                            <li>Use los filtros para ver estados específicos</li>
+                            <li>Haga clic en cualquier paciente para ver más detalles</li>
+                            <li>El sistema se actualiza automáticamente cada 30 segundos</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        let autoRefreshInterval;
+        let isAutoRefreshing = $('#autoRefresh').is(':checked');
+
+        // Auto-refresh functionality
+        function startAutoRefresh() {
+            if (isAutoRefreshing) {
+                autoRefreshInterval = setInterval(function () {
+                    refreshData();
+                }, 30000); // 30 segundos
+            }
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        }
+
+        function refreshData() {
+            $('#refreshIndicator').addClass('show');
+
+            $.get(window.location.href, function (data) {
+                // Extraer solo el contenido de la tabla
+                const newTableBody = $(data).find('#patientsTableBody').html();
+                $('#patientsTableBody').html(newTableBody);
+
+                setTimeout(function () {
+                    $('#refreshIndicator').removeClass('show');
+                }, 1000);
+            }).fail(function () {
+                $('#refreshIndicator').removeClass('show');
+            });
+        }
+
+        // Toggle auto-refresh
+        $('#autoRefresh').change(function () {
+            isAutoRefreshing = $(this).is(':checked');
+            if (isAutoRefreshing) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        });
+
+        // Manual refresh
+        $('#refreshBtn').click(function () {
+            refreshData();
+        });
+
+        // Filter change triggers refresh
+        $('#filterForm').on('change', 'select, input', function () {
+            $(this).closest('form').submit();
+        });
+
+        // Start auto-refresh if enabled
+        startAutoRefresh();
+
+        // Stop auto-refresh when page is not visible
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                stopAutoRefresh();
+            } else if (isAutoRefreshing) {
+                startAutoRefresh();
+            }
+        });
+    });
+
+    // Function to show patient details
+    function showPatientDetails(ordenId) {
+        window.location.href = `/admision/ordenes/${ordenId}/`;
+    }
+
+    // Update patient status via AJAX
+    function updatePatientStatus(ordenId, newStatus) {
+        $.post(`/admision/ajax/cambiar-estado/${ordenId}/`, {
+            'estado': newStatus,
+            'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+        }, function (response) {
+            if (response.success) {
+                // Refresh the data
+                refreshData();
+                // Show success message
+                showToast('Estado actualizado correctamente', 'success');
+            } else {
+                showToast('Error al actualizar estado', 'error');
+            }
+        });
+    }
+
+    // Show toast notifications
+    function showToast(message, type) {
+        const toast = $(`
+        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `);
+
+        $('.toast-container').append(toast);
+        const bsToast = new bootstrap.Toast(toast[0]);
+        bsToast.show();
+
+        // Remove toast after it's hidden
+        toast.on('hidden.bs.toast', function () {
+            $(this).remove();
+        });
+    }
+</script>
+{% endblock %}

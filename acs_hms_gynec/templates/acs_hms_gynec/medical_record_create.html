@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Nuevo Registro Médico{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-medical text-primary"></i>
+                        Nuevo Registro Médico Ginecológico
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'gynec:medical_record_list' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver a Lista
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="row">
+                        {% csrf_token %}
+
+                        <div class="col-12">
+                            <h5 class="text-primary">
+                                <i class="fas fa-edit"></i> Información del Registro Médico
+                            </h5>
+
+                            <!-- Renderizado automático de todos los campos del formulario -->
+                            {% for field in form %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                <div class="text-danger">{{ field.errors.0 }}</div>
+                                {% endif %}
+                                {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Guardar Registro Médico
+                            </button>
+                            <a href="{% url 'gynec:medical_record_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Agregar clases de Bootstrap a los campos del formulario
+        $('input, select, textarea').addClass('form-control');
+        $('input[type="checkbox"], input[type="radio"]').removeClass('form-control').addClass('form-check-input');
+    });
+</script>
+{% endblock %}
+
+
+

@@ -1,10 +1,21 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView)
+from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import TipoExamen, EquipoLaboratorio, OrdenExamen, ResultadoExamen
 from .forms import TipoExamenForm, EquipoLaboratorioForm, OrdenExamenForm, ResultadoExamenForm
 
 # Create your views here.
+
+class LaboratoriesDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal de laboratorios"""
+    template_name = 'laboratories/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'Laboratorios'
+        context['examenes_total'] = OrdenExamen.objects.count()
+        return context
 
 # Vistas para TipoExamen
 class TipoExamenListView(ListView):

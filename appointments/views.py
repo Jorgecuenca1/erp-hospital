@@ -1,10 +1,22 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView)
+from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Cita
 from .forms import CitaForm
 
 # Create your views here.
+
+class AppointmentsDashboardView(LoginRequiredMixin, TemplateView):
+    """Dashboard principal de citas"""
+    template_name = 'appointments/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['module_name'] = 'Citas'
+        context['citas_hoy'] = Cita.objects.count()  # Simple count for now
+        context['citas_total'] = Cita.objects.count()
+        return context
 
 # Vistas para Cita
 class CitaListView(ListView):

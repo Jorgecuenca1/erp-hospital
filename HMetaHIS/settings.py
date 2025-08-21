@@ -129,6 +129,9 @@ INSTALLED_APPS = [
     'esg_reporting',
     'carbon_footprint',
     'social_metrics',
+    
+    # ========== ADMISSION AND RECEPTION ==========
+    'admision_recepcion',
 ]
 
 MIDDLEWARE = [

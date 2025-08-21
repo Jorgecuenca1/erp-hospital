@@ -1,0 +1,897 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Examen Visual - {{ ficha.nombre_trabajador }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .visual-exam-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+        margin-bottom: 0;
+    }
+
+    .exam-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+        padding: 15px 20px;
+        border-bottom: 1px solid #e3e6f0;
+        font-weight: 600;
+        color: #5a5c69;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .section-content {
+        padding: 20px;
+    }
+
+    .basic-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .info-field {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+    }
+
+    .info-field label {
+        font-weight: 600;
+        color: #5a5c69;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .info-field input,
+    .info-field select,
+    .info-field textarea {
+        border: none;
+        background: transparent;
+        font-weight: 500;
+        color: #2c3e50;
+        width: 100%;
+        padding: 5px 0;
+        font-size: 0.9rem;
+    }
+
+    .visual-acuity-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .visual-acuity-table th {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .visual-acuity-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e3e6f0;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .visual-acuity-table input {
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        width: 60px;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    .visual-acuity-table .eye-label {
+        background: #f8f9fa;
+        font-weight: 600;
+        text-align: left;
+        padding-left: 20px;
+    }
+
+    .antecedentes-visual-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .antecedentes-visual-table th {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+        padding: 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .antecedentes-visual-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e3e6f0;
+        vertical-align: middle;
+    }
+
+    .antecedentes-visual-table input,
+    .antecedentes-visual-table select {
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        width: 100%;
+        font-size: 0.85rem;
+    }
+
+    .tab-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .tab-headers {
+        display: flex;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e3e6f0;
+    }
+
+    .tab-header {
+        flex: 1;
+        padding: 15px 20px;
+        text-align: center;
+        cursor: pointer;
+        font-weight: 600;
+        color: #5a5c69;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .tab-header.active {
+        background: white;
+        color: #28a745;
+        border-bottom-color: #28a745;
+    }
+
+    .tab-content {
+        padding: 20px;
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .diagnostics-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 15px 0;
+    }
+
+    .diagnostic-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border-left: 4px solid #28a745;
+    }
+
+    .diagnostic-grid {
+        display: grid;
+        grid-template-columns: 150px 1fr 120px 1fr;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .diagnostic-grid input,
+    .diagnostic-grid select {
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    .recommendations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    .recommendations-column {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .recommendations-column h5 {
+        color: #28a745;
+        font-weight: 600;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #e3e6f0;
+    }
+
+    .checkbox-item:last-child {
+        border-bottom: none;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+
+    .checkbox-item label {
+        font-size: 0.9rem;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .save-section {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 20px;
+        border-top: 1px solid #e3e6f0;
+        text-align: center;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+
+    .worker-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+
+    .header-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .worker-details h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .worker-details p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+    }
+
+    .instructivo-alert {
+        background: #e3f2fd;
+        border: 1px solid #90caf9;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .instructivo-alert i {
+        color: #1976d2;
+        margin-right: 10px;
+    }
+
+    .instructivo-alert a {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .instructivo-alert a:hover {
+        text-decoration: underline;
+    }
+
+    .asintomatico-badge {
+        background: #d4edda;
+        color: #155724;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:fichas_clinicas' %}">Fichas Clínicas</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Examen Visual</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header del examen visual -->
+    <div class="visual-exam-header">
+        <div class="header-info">
+            <div class="worker-avatar">
+                👁️
+            </div>
+            <div class="worker-details">
+                <h3>Examen Visual - {{ ficha.nombre_trabajador }}</h3>
+                <p><strong>Ficha N°:</strong> {{ ficha.numero_ficha }} | <strong>Identificación:</strong> {{
+                    ficha.numero_identificacion }}</p>
+                <p><strong>Empresa:</strong> {% if ficha.empresa %}{{ ficha.empresa.razon_social }}{% else %}No
+                    especificada{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructivo -->
+    <div class="instructivo-alert">
+        <i class="fas fa-info-circle"></i>
+        <span>👉🏼 <a href="#" onclick="alert('Instructivo de Examen Visual - En desarrollo')">De clic aquí para
+                aprender o ver los instructivos</a></span>
+    </div>
+
+    <form method="post" id="examenVisualForm">
+        {% csrf_token %}
+
+        <!-- Información Básica del Examen -->
+        <div class="exam-section">
+            <div class="section-header">
+                <span>👁️ Información Básica del Examen Visual</span>
+            </div>
+            <div class="section-content">
+                <div class="basic-info-grid">
+                    <div class="info-field">
+                        <label>Tipo de Examen:</label>
+                        <select name="tipo_examen">
+                            <option value="EXAMEN_VISUAL">Examen Visual</option>
+                            <option value="CONTROL">Control</option>
+                            <option value="SEGUIMIENTO">Seguimiento</option>
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Municipio:</label>
+                        <input type="text" value="EL BANCO (MAGDALENA, COLOMBIA)" readonly>
+                    </div>
+                    <div class="info-field">
+                        <label>Fecha:</label>
+                        <input type="date" name="fecha_evaluacion" value="{{ ficha.fecha_evaluacion|date:'Y-m-d' }}"
+                            required>
+                    </div>
+                    <div class="info-field">
+                        <label>Tipo de Evaluación Médica:</label>
+                        <select name="tipo_evaluacion_medica">
+                            <option value="PREOCUPACIONAL">Pre-ocupacional</option>
+                            <option value="OCUPACIONAL">Ocupacional</option>
+                            <option value="POSTOCUPACIONAL">Post-ocupacional</option>
+                            <option value="OTRAS">Otras</option>
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Empresa en Misión:</label>
+                        <select name="empresa">
+                            <option value="">Seleccione</option>
+                            {% for empresa in empresas %}
+                            <option value="{{ empresa.id }}" {% if ficha.empresa_id==empresa.id %}selected{% endif %}>
+                                {{ empresa.razon_social }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Tipo:</label>
+                        <select name="tipo_documento">
+                            {% for codigo, nombre in ficha.TIPO_DOC_CHOICES %}
+                            <option value="{{ codigo }}" {% if ficha.tipo_documento==codigo %}selected{% endif %}>{{
+                                nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>N° de Identificación:</label>
+                        <input type="text" name="numero_identificacion" value="{{ ficha.numero_identificacion }}"
+                            required>
+                    </div>
+                    <div class="info-field">
+                        <label>Nombre:</label>
+                        <input type="text" name="nombre_trabajador" value="{{ ficha.nombre_trabajador }}" required>
+                    </div>
+                    <div class="info-field">
+                        <label>Edad:</label>
+                        <input type="number" name="edad" value="{{ ficha.edad }}" min="16" max="100">
+                    </div>
+                    <div class="info-field">
+                        <label>Cargo:</label>
+                        <input type="text" name="cargo" value="{{ ficha.cargo }}">
+                    </div>
+                    <div class="info-field">
+                        <label>EPS:</label>
+                        <input type="text" name="eps" value="{{ examen.eps|default:'' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>F. Último Examen:</label>
+                        <input type="text" name="ultimo_examen" value="{{ examen.ultimo_examen|default:'' }}"
+                            placeholder="Puede escribir texto libre">
+                    </div>
+                    <div class="info-field">
+                        <label>Lugar del Último Examen:</label>
+                        <input type="text" name="lugar_ultimo_examen"
+                            value="{{ examen.lugar_ultimo_examen|default:'' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>Motivo de Consulta:</label>
+                        <textarea name="motivo_consulta" rows="3">{{ examen.motivo_consulta|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistema de Tabs -->
+        <div class="tab-container">
+            <div class="tab-headers">
+                <div class="tab-header active" onclick="showTab('antecedentes')">Historia de Antecedentes</div>
+                <div class="tab-header" onclick="showTab('pruebas')">Pruebas Realizadas</div>
+                <div class="tab-header" onclick="showTab('diagnostico')">Diagnóstico y Recomendaciones</div>
+            </div>
+
+            <!-- Tab de Antecedentes -->
+            <div id="antecedentes" class="tab-content active">
+                <h5>Antecedentes Visuales</h5>
+                <table class="antecedentes-visual-table">
+                    <thead>
+                        <tr>
+                            <th>Antecedente en</th>
+                            <th>Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for antecedente in antecedentes_visuales %}
+                        <tr>
+                            <td>{{ antecedente.get_tipo_antecedente_display }}</td>
+                            <td>
+                                <input type="text" name="antecedente_{{ antecedente.tipo_antecedente }}"
+                                    value="{{ antecedente.observacion }}" class="form-control">
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td>ANTECEDENTES PERSONALES</td>
+                            <td><input type="text" name="antecedente_ANTECEDENTES_PERSONALES" value="NIEGA"
+                                    class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>ANTECEDENTES FAMILIARES</td>
+                            <td><input type="text" name="antecedente_ANTECEDENTES_FAMILIARES" value="NIEGA"
+                                    class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>ANTECEDENTES OCUPACIONALES</td>
+                            <td><input type="text" name="antecedente_ANTECEDENTES_OCUPACIONALES" value="NIEGA"
+                                    class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>EXPOSICIÓN LABORAL VISUAL</td>
+                            <td><input type="text" name="antecedente_EXPOSICION_LABORAL_VISUAL" value=""
+                                    class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>USA ANTEOJOS</td>
+                            <td><input type="text" name="antecedente_USA_ANTEOJOS" value="NO USA" class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MULTIFOCAL</td>
+                            <td><input type="text" name="antecedente_MULTIFOCAL" value="NO" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>LENTES DE CONTACTO</td>
+                            <td><input type="text" name="antecedente_LENTES_CONTACTO" value="NO USA"
+                                    class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>TRAE RX</td>
+                            <td><input type="text" name="antecedente_TRAE_RX" value="NO" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td>TIPO DE USO</td>
+                            <td><input type="text" name="antecedente_TIPO_USO" value="NO APLICA" class="form-control">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ÚLTIMO DIAGNÓSTICO</td>
+                            <td><input type="text" name="antecedente_ULTIMO_DIAGNOSTICO" value="" class="form-control">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab de Pruebas Realizadas -->
+            <div id="pruebas" class="tab-content">
+                <!-- Sintomatología -->
+                <div class="exam-section">
+                    <h5>SINTOMATOLOGÍA</h5>
+                    <div class="asintomatico-badge">
+                        ASINTOMÁTICO
+                    </div>
+                </div>
+
+                <!-- Agudeza Visual Sin Corrección -->
+                <div class="exam-section">
+                    <h5>AGUDEZA VISUAL SIN CORRECCIÓN</h5>
+                    <table class="visual-acuity-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 150px;">Ojo</th>
+                                <th>V.L. 20/</th>
+                                <th>V.P.</th>
+                                <th>PH</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="eye-label">OJO DERECHO</td>
+                                <td><input type="text" name="ojo_derecho_vl_sc"
+                                        value="{{ examen.ojo_derecho_vl_sc|default:'' }}"></td>
+                                <td><input type="text" name="ojo_derecho_vp_sc"
+                                        value="{{ examen.ojo_derecho_vp_sc|default:'' }}"></td>
+                                <td><input type="text" name="ojo_derecho_ph_sc"
+                                        value="{{ examen.ojo_derecho_ph_sc|default:'' }}"></td>
+                            </tr>
+                            <tr>
+                                <td class="eye-label">OJO IZQUIERDO</td>
+                                <td><input type="text" name="ojo_izquierdo_vl_sc"
+                                        value="{{ examen.ojo_izquierdo_vl_sc|default:'' }}"></td>
+                                <td><input type="text" name="ojo_izquierdo_vp_sc"
+                                        value="{{ examen.ojo_izquierdo_vp_sc|default:'' }}"></td>
+                                <td><input type="text" name="ojo_izquierdo_ph_sc"
+                                        value="{{ examen.ojo_izquierdo_ph_sc|default:'' }}"></td>
+                            </tr>
+                            <tr>
+                                <td class="eye-label">AMBOS OJOS</td>
+                                <td><input type="text" name="ambos_ojos_vl_sc"
+                                        value="{{ examen.ambos_ojos_vl_sc|default:'' }}"></td>
+                                <td><input type="text" name="ambos_ojos_vp_sc"
+                                        value="{{ examen.ambos_ojos_vp_sc|default:'' }}"></td>
+                                <td><input type="text" name="ambos_ojos_ph_sc"
+                                        value="{{ examen.ambos_ojos_ph_sc|default:'' }}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Agudeza Visual Con Corrección -->
+                <div class="exam-section">
+                    <h5>AGUDEZA VISUAL CON CORRECCIÓN</h5>
+                    <table class="visual-acuity-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 150px;">Ojo</th>
+                                <th>V.L. 20/</th>
+                                <th>V.P.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="eye-label">OJO DERECHO</td>
+                                <td><input type="text" name="ojo_derecho_vl_cc"
+                                        value="{{ examen.ojo_derecho_vl_cc|default:'' }}"></td>
+                                <td><input type="text" name="ojo_derecho_vp_cc"
+                                        value="{{ examen.ojo_derecho_vp_cc|default:'' }}"></td>
+                            </tr>
+                            <tr>
+                                <td class="eye-label">OJO IZQUIERDO</td>
+                                <td><input type="text" name="ojo_izquierdo_vl_cc"
+                                        value="{{ examen.ojo_izquierdo_vl_cc|default:'' }}"></td>
+                                <td><input type="text" name="ojo_izquierdo_vp_cc"
+                                        value="{{ examen.ojo_izquierdo_vp_cc|default:'' }}"></td>
+                            </tr>
+                            <tr>
+                                <td class="eye-label">AMBOS OJOS</td>
+                                <td><input type="text" name="ambos_ojos_vl_cc"
+                                        value="{{ examen.ambos_ojos_vl_cc|default:'' }}"></td>
+                                <td><input type="text" name="ambos_ojos_vp_cc"
+                                        value="{{ examen.ambos_ojos_vp_cc|default:'' }}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Otros Exámenes -->
+                <div class="basic-info-grid">
+                    <div class="info-field">
+                        <label>EXAMEN EXTERNO - OJO DERECHO:</label>
+                        <textarea name="ojo_derecho_externo"
+                            rows="2">{{ examen.ojo_derecho_externo|default:'' }}</textarea>
+                    </div>
+                    <div class="info-field">
+                        <label>EXAMEN EXTERNO - OJO IZQUIERDO:</label>
+                        <textarea name="ojo_izquierdo_externo"
+                            rows="2">{{ examen.ojo_izquierdo_externo|default:'' }}</textarea>
+                    </div>
+                    <div class="info-field">
+                        <label>REFLEJOS - OBSERVACIÓN:</label>
+                        <input type="text" name="reflejos_observacion"
+                            value="{{ examen.reflejos_observacion|default:'PRESENTES Y NORMALES' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>COVER TEST - VISIÓN LEJANA:</label>
+                        <input type="text" name="vision_lejana_cover"
+                            value="{{ examen.vision_lejana_cover|default:'NORMAL' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>COVER TEST - VISIÓN PRÓXIMA:</label>
+                        <input type="text" name="vision_proxima_cover"
+                            value="{{ examen.vision_proxima_cover|default:'NORMAL' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>MOTILIDAD OCULAR:</label>
+                        <input type="text" name="motilidad_observacion"
+                            value="{{ examen.motilidad_observacion|default:'NORMAL' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>PUNTO PRÓXIMO DE CONVERGENCIA:</label>
+                        <input type="text" name="convergencia_observacion"
+                            value="{{ examen.convergencia_observacion|default:'NORMAL' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>OFTALMOSCOPÍA - OJO DERECHO:</label>
+                        <input type="text" name="ojo_derecho_oftalmoscopia"
+                            value="{{ examen.ojo_derecho_oftalmoscopia|default:'FONDO DE OJO APARENTEMENTE NORMAL' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>OFTALMOSCOPÍA - OJO IZQUIERDO:</label>
+                        <input type="text" name="ojo_izquierdo_oftalmoscopia"
+                            value="{{ examen.ojo_izquierdo_oftalmoscopia|default:'FONDO DE OJO APARENTEMENTE NORMAL' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>QUERATOMETRÍA - OJO DERECHO K´=:</label>
+                        <input type="text" name="ojo_derecho_queratometria"
+                            value="{{ examen.ojo_derecho_queratometria|default:'' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>QUERATOMETRÍA - OJO IZQUIERDO K´=:</label>
+                        <input type="text" name="ojo_izquierdo_queratometria"
+                            value="{{ examen.ojo_izquierdo_queratometria|default:'' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>VISIÓN COLOR - OJO DERECHO:</label>
+                        <input type="text" name="ojo_derecho_vision_color"
+                            value="{{ examen.ojo_derecho_vision_color|default:'NORMAL' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>VISIÓN COLOR - OJO IZQUIERDO:</label>
+                        <input type="text" name="ojo_izquierdo_vision_color"
+                            value="{{ examen.ojo_izquierdo_vision_color|default:'NORMAL' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>ESTEREOPSIS:</label>
+                        <input type="text" name="estereopsis_observacion"
+                            value="{{ examen.estereopsis_observacion|default:'NORMAL' }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab de Diagnóstico y Recomendaciones -->
+            <div id="diagnostico" class="tab-content">
+                <div class="diagnostics-section">
+                    <h5>Diagnóstico y Recomendaciones</h5>
+                    <textarea name="diagnostico_recomendaciones" rows="4" class="form-control"
+                        placeholder="Escriba aquí el diagnóstico y recomendaciones">{{ examen.diagnostico_recomendaciones|default:'' }}</textarea>
+                </div>
+
+                <!-- Sección de Diagnósticos Específicos -->
+                <div class="diagnostics-section">
+                    <h5>Diagnósticos CIE-10</h5>
+
+                    <div class="diagnostic-item">
+                        <h6>Diagnóstico Principal</h6>
+                        <div class="diagnostic-grid">
+                            <label>Código CIE10:</label>
+                            <input type="text" name="diagnostico_principal_cie10" placeholder="Ej: H52.1">
+                            <label>Lateralidad:</label>
+                            <select name="diagnostico_principal_lateralidad">
+                                <option value="">Seleccione</option>
+                                <option value="BILATERAL">Bilateral</option>
+                                <option value="DERECHO">Derecho</option>
+                                <option value="IZQUIERDO">Izquierdo</option>
+                                <option value="NO_APLICA">No Aplica</option>
+                            </select>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label>Nombre del diagnóstico:</label>
+                            <input type="text" name="diagnostico_principal_nombre" placeholder="Nombre del diagnóstico"
+                                style="width: 100%; margin-top: 5px;">
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label>Observaciones:</label>
+                            <textarea name="diagnostico_principal_observaciones" rows="2"
+                                style="width: 100%; margin-top: 5px;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conductas y Recomendaciones -->
+                <div class="recommendations-grid">
+                    <div class="recommendations-column">
+                        <h5>Conducta y/o Recomendaciones</h5>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="control_6_meses" name="conducta_control_6_meses">
+                            <label for="control_6_meses">CONTROL EN 6 MESES</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="control_1_ano" name="conducta_control_1_ano">
+                            <label for="control_1_ano">CONTROL EN UN AÑO</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="pve_visual" name="conducta_pve_visual">
+                            <label for="pve_visual">INCLUIR EN EL PVE VISUAL</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="correccion_permanente" name="conducta_correccion_permanente">
+                            <label for="correccion_permanente">USAR CORRECCIÓN ÓPTICA PERMANENTE</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="correccion_proxima" name="conducta_correccion_proxima">
+                            <label for="correccion_proxima">USAR CORRECCIÓN ÓPTICA PARA VISIÓN PRÓXIMA</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="correccion_lejana" name="conducta_correccion_lejana">
+                            <label for="correccion_lejana">USAR CORRECCIÓN ÓPTICA PARA VISIÓN LEJANA</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="correccion_ocasional" name="conducta_correccion_ocasional">
+                            <label for="correccion_ocasional">USAR CORRECCIÓN ÓPTICA OCASIONAL</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="proteccion_visual" name="conducta_proteccion_visual">
+                            <label for="proteccion_visual">USO DE ELEMENTOS DE PROTECCIÓN VISUAL</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="pausas_activas" name="conducta_pausas_activas">
+                            <label for="pausas_activas">REALIZAR PAUSAS ACTIVAS</label>
+                        </div>
+                    </div>
+
+                    <div class="recommendations-column">
+                        <h5>Remisiones</h5>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ortoptica" name="remision_ortoptica">
+                            <label for="ortoptica">VALORACIÓN POR ORTÓPTICA</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="optometria" name="remision_optometria">
+                            <label for="optometria">VALORACIÓN POR OPTOMETRÍA BAJO CICLOPLEJIA</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="topografia" name="remision_topografia">
+                            <label for="topografia">REALIZACIÓN DE TOPOGRAFÍA CORNEAL</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="oftalmologia" name="remision_oftalmologia">
+                            <label for="oftalmologia">VALORACIÓN POR OFTALMOLOGÍA</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="otras_remisiones" name="remision_otras">
+                            <label for="otras_remisiones">OTRAS</label>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label>Escribe aquí otras remisiones:</label>
+                            <textarea name="otras_remisiones_descripcion" rows="3" style="width: 100%; margin-top: 5px;"
+                                placeholder="Especifique otras remisiones"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Otras Observaciones -->
+                <div class="info-field">
+                    <label>Otras Observaciones y Recomendaciones:</label>
+                    <textarea name="otras_observaciones" rows="4">{{ examen.otras_observaciones|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Botón de guardar -->
+    <div class="save-section">
+        <button type="submit" form="examenVisualForm" class="btn-save">
+            <i class="fas fa-save me-2"></i>Guardar Examen Visual
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showTab(tabName) {
+        // Ocultar todos los tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Desactivar todos los headers
+        document.querySelectorAll('.tab-header').forEach(header => {
+            header.classList.remove('active');
+        });
+
+        // Mostrar el tab seleccionado
+        document.getElementById(tabName).classList.add('active');
+
+        // Activar el header correspondiente
+        event.target.classList.add('active');
+    }
+
+    // Función para enviar el formulario
+    document.getElementById('examenVisualForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        // Implementar guardado AJAX
+        alert('Guardando examen visual... (En desarrollo)');
+    });
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Examen Visual cargado correctamente');
+    });
+</script>
+{% endblock %}

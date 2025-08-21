@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dental - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header del Módulo -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h1 class="card-title mb-1">
+                                <i class="fas fa-tooth me-3"></i>
+                                Dental
+                            </h1>
+                            <p class="card-text mb-0">Panel de control del módulo de dental</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-center">
+                                <h4 class="mb-0">HMS</h4>
+                                <small>Sistema Hospitalario</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Rápidas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-tooth fa-2x text-primary mb-3"></i>
+                    <h5 class="fw-semibold">{{ total_records|default:"0" }}</h5>
+                    <p class="text-muted mb-0">Total de Pacientes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar fa-2x text-success mb-3"></i>
+                    <h5 class="fw-semibold">{{ today_records|default:"0" }}</h5>
+                    <p class="text-muted mb-0">Citas Hoy</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-procedures fa-2x text-info mb-3"></i>
+                    <h5 class="fw-semibold">{{ procedures|default:"0" }}</h5>
+                    <p class="text-muted mb-0">Procedimientos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-glasses fa-2x text-warning mb-3"></i>
+                    <h5 class="fw-semibold">{{ consultations|default:"0" }}</h5>
+                    <p class="text-muted mb-0">Consultas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Acciones Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="#" class="btn btn-primary w-100">
+                                <i class="fas fa-plus me-2"></i>
+                                Nueva Consulta
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="#" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-calendar me-2"></i>
+                                Programar Cita
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="#" class="btn btn-outline-info w-100">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Reportes
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <a href="#" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-users me-2"></i>
+                                Ver Pacientes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock me-2"></i>
+                        Módulo de Dental
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <i class="fas fa-tooth fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">Módulo de Dental</h5>
+                        <p class="text-muted">Panel de control para el manejo de pacientes dentales.</p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Sistema HMS:</strong> Módulo configurado y listo para usar.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-link me-2"></i>
+                        Enlaces Rápidos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/dashboard/" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-home me-2"></i>
+                            Dashboard Principal
+                        </a>
+                        <a href="/hms/" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-hospital me-2"></i>
+                            Módulos HMS
+                        </a>
+                        <a href="/patients/" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-users me-2"></i>
+                            Pacientes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

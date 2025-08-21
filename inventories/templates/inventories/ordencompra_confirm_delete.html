@@ -1,0 +1,102 @@
+{% extends "inventories/base.html" %}
+
+{% block title %}Eliminar Orden de Compra{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirmar Eliminación
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-warning"></i>
+                    <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                </div>
+
+                <p>¿Está seguro que desea eliminar la siguiente orden de compra?</p>
+
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Número:</dt>
+                            <dd class="col-sm-8">{{ object.numero }}</dd>
+
+                            <dt class="col-sm-4">Proveedor:</dt>
+                            <dd class="col-sm-8">{{ object.proveedor.nombre_completo }}</dd>
+
+                            <dt class="col-sm-4">Fecha:</dt>
+                            <dd class="col-sm-8">{{ object.fecha_orden|date:"d/m/Y" }}</dd>
+
+                            <dt class="col-sm-4">Estado:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge badge-secondary">{{ object.get_estado_display }}</span>
+                            </dd>
+
+                            <dt class="col-sm-4">Total:</dt>
+                            <dd class="col-sm-8">
+                                <strong class="text-success">${{ object.total|floatformat:2 }}</strong>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                {% if object.contabilizada %}
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-ban"></i>
+                    <strong>Orden Contabilizada:</strong> Esta orden ya fue contabilizada.
+                    Eliminarla afectará los registros contables.
+                </div>
+                {% endif %}
+
+                {% if object.recepciones.exists %}
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-ban"></i>
+                    <strong>Tiene Recepciones:</strong> Esta orden tiene {{ object.recepciones.count }} recepción(es)
+                    asociada(s).
+                    Eliminarla afectará estos registros.
+                </div>
+                {% endif %}
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{% url 'inventories:ordencompra_detail' object.pk %}"
+                                class="btn btn-secondary btn-block">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-danger btn-block">
+                                <i class="fas fa-trash"></i> Sí, Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Confirmación adicional
+        const deleteForm = document.querySelector('form');
+        const deleteButton = document.querySelector('button[type="submit"]');
+
+        deleteButton.addEventListener('click', function (e) {
+            if (!confirm('¿Está completamente seguro de eliminar esta orden de compra? Esta acción no se puede deshacer.')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}
+

@@ -77,7 +77,7 @@ class GynecPatientDetailView(LoginRequiredMixin, DetailView):
 class GynecPatientCreateView(LoginRequiredMixin, CreateView):
     model = GynecologyPatient
     form_class = GynecologyPatientForm
-    template_name = 'acs_hms_gynec/create.html'
+    template_name = 'acs_hms_gynec/patient_create.html'
     success_url = reverse_lazy('gynec:patient_list')
     
     def get_context_data(self, **kwargs):
@@ -140,7 +140,7 @@ class PregnancyDetailView(LoginRequiredMixin, DetailView):
 class PregnancyCreateView(LoginRequiredMixin, CreateView):
     model = Pregnancy
     form_class = PregnancyForm
-    template_name = 'acs_hms_gynec/create.html'
+    template_name = 'acs_hms_gynec/pregnancy_create.html'
     success_url = reverse_lazy('gynec:pregnancy_list')
     
     def get_context_data(self, **kwargs):
@@ -202,7 +202,7 @@ class AntenatalVisitDetailView(LoginRequiredMixin, DetailView):
 class AntenatalVisitCreateView(LoginRequiredMixin, CreateView):
     model = AntenatalVisit
     form_class = AntenatalVisitForm
-    template_name = 'acs_hms_gynec/create.html'
+    template_name = 'acs_hms_gynec/antenatal_create.html'
     success_url = reverse_lazy('gynec:antenatal_list')
     
     def get_context_data(self, **kwargs):
@@ -264,7 +264,7 @@ class GynecologyProcedureDetailView(LoginRequiredMixin, DetailView):
 class GynecologyProcedureCreateView(LoginRequiredMixin, CreateView):
     model = GynecologyProcedure
     form_class = GynecologyProcedureForm
-    template_name = 'acs_hms_gynec/create.html'
+    template_name = 'acs_hms_gynec/procedure_create.html'
     success_url = reverse_lazy('gynec:procedure_list')
     
     def get_context_data(self, **kwargs):
@@ -326,7 +326,7 @@ class ContraceptiveConsultationDetailView(LoginRequiredMixin, DetailView):
 class ContraceptiveConsultationCreateView(LoginRequiredMixin, CreateView):
     model = ContraceptiveConsultation
     form_class = ContraceptiveConsultationForm
-    template_name = 'acs_hms_gynec/create.html'
+    template_name = 'acs_hms_gynec/contraceptive_create.html'
     success_url = reverse_lazy('gynec:contraceptive_list')
     
     def get_context_data(self, **kwargs):
@@ -388,7 +388,7 @@ class MenopauseManagementDetailView(LoginRequiredMixin, DetailView):
 class MenopauseManagementCreateView(LoginRequiredMixin, CreateView):
     model = MenopauseManagement
     form_class = MenopauseManagementForm
-    template_name = 'acs_hms_gynec/create.html'
+    template_name = 'acs_hms_gynec/menopause_create.html'
     success_url = reverse_lazy('gynec:menopause_list')
     
     def get_context_data(self, **kwargs):
@@ -450,7 +450,7 @@ class GynecologyMedicalRecordDetailView(LoginRequiredMixin, DetailView):
 class GynecologyMedicalRecordCreateView(LoginRequiredMixin, CreateView):
     model = GynecologyMedicalRecord
     form_class = GynecologyMedicalRecordForm
-    template_name = 'acs_hms_gynec/create.html'
+    template_name = 'acs_hms_gynec/medical_record_create.html'
     success_url = reverse_lazy('gynec:medical_record_list')
     
     def get_context_data(self, **kwargs):

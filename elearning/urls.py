@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    ElearningDashboardView,
     CursoListView, CursoDetailView, CursoCreateView, CursoUpdateView, CursoDeleteView,
     ModuloListView, ModuloDetailView, ModuloCreateView, ModuloUpdateView, ModuloDeleteView,
     LeccionListView, LeccionDetailView, LeccionCreateView, LeccionUpdateView, LeccionDeleteView,
@@ -7,7 +8,11 @@ from .views import (
     ProgresoLeccionListView, ProgresoLeccionDetailView, ProgresoLeccionCreateView, ProgresoLeccionUpdateView, ProgresoLeccionDeleteView
 )
 
+app_name = 'elearning'
+
 urlpatterns = [
+    # Dashboard principal
+    path('', ElearningDashboardView.as_view(), name='dashboard'),
     # URLs para Curso
     path('cursos/', CursoListView.as_view(), name='curso_list'),
     path('cursos/<int:pk>/', CursoDetailView.as_view(), name='curso_detail'),

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Historia Clínica General - Nueva{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-medical-alt me-2"></i>Nueva Historia Clínica General</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Información Básica -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ficha Clínica</label>
+                                    {{ form.ficha_clinica }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha</label>
+                                    {{ form.fecha }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Motivo de Consulta -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Motivo de Consulta</label>
+                                    {{ form.motivo_consulta }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Antecedentes -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Antecedentes Personales</label>
+                                    {{ form.antecedentes_personales }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Antecedentes Familiares</label>
+                                    {{ form.antecedentes_familiares }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Revisión por Sistemas -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Revisión por Sistemas</label>
+                                    {{ form.revision_sistemas }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Examen Físico -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Peso (kg)</label>
+                                    {{ form.peso }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Talla (cm)</label>
+                                    {{ form.talla }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">TA Sistólica</label>
+                                    {{ form.ta_sistolica }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">TA Diastólica</label>
+                                    {{ form.ta_diastolica }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">FC (lpm)</label>
+                                    {{ form.frecuencia_cardiaca }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">FR (rpm)</label>
+                                    {{ form.frecuencia_respiratoria }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Examen Físico Detallado -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Examen Físico</label>
+                                    {{ form.examen_fisico }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Diagnósticos -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Diagnóstico Principal</label>
+                                    {{ form.diagnostico_principal }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Diagnósticos Secundarios</label>
+                                    {{ form.diagnosticos_secundarios }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Plan de Manejo -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Plan de Manejo</label>
+                                    {{ form.plan_manejo }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Observaciones</label>
+                                    {{ form.observaciones }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admision_recepcion:fichas_clinicas' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar Historia Clínica General
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluación Ocupacional - Nueva{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-hard-hat me-2"></i>Nueva Evaluación Ocupacional</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Información Básica -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ficha Clínica</label>
+                                    {{ form.ficha_clinica }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Fecha</label>
+                                    {{ form.fecha }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- EPP -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Elementos de Protección Personal</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Casco</label>
+                                            {{ form.epp_casco }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Gafas</label>
+                                            {{ form.epp_gafas }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Respirador</label>
+                                            {{ form.epp_respirador }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Guantes</label>
+                                            {{ form.epp_guantes }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Botas</label>
+                                            {{ form.epp_botas }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Auditivos</label>
+                                            {{ form.epp_auditivos }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Otros EPP</label>
+                                            {{ form.epp_otros }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Antecedentes de Exposición -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Antecedentes de Exposición Laboral</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Exposiciones Laborales Previas</label>
+                                            {{ form.exposiciones_previas }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Motivo de Consulta -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Motivo de Consulta</label>
+                                    {{ form.motivo_consulta }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Antecedentes -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Historia de Antecedentes</label>
+                                    {{ form.antecedentes }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Revisión por Sistemas</label>
+                                    {{ form.revision_sistemas }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Signos Vitales -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Signos Vitales y Examen Físico</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Peso (kg)</label>
+                                            {{ form.peso }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Talla (cm)</label>
+                                            {{ form.talla }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">TA Sistólica</label>
+                                            {{ form.ta_sistolica }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">TA Diastólica</label>
+                                            {{ form.ta_diastolica }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Concepto de Aptitud -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Concepto de Aptitud</label>
+                                    {{ form.concepto_aptitud }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Recomendaciones</label>
+                                    {{ form.recomendaciones }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Observaciones</label>
+                                    {{ form.observaciones }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admision_recepcion:fichas_clinicas' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar Evaluación Ocupacional
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

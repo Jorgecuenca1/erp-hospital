@@ -1,0 +1,65 @@
+{% extends 'base_hms.html' %}
+
+{% block title %}Historias Clínicas - HMetaHIS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-file-medical text-primary"></i> Historias Clínicas
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{% url 'patients:paciente_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-users"></i> Ver Pacientes
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input type="text" class="form-control" placeholder="Buscar por paciente...">
+        </div>
+        <div class="col-md-3">
+            <select class="form-control">
+                <option>Todas las historias</option>
+                <option>Con consultas recientes</option>
+                <option>Sin actividad</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Lista de historias -->
+    <div class="row">
+        {% for historia in historias %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{ historia.paciente.nombres }} {{ historia.paciente.apellidos }}
+                    </h5>
+                    <p class="card-text">
+                        <strong>ID:</strong> {{ historia.paciente.numero_identificacion }}<br>
+                        <strong>Régimen:</strong> {{ historia.paciente.get_tipo_regimen_display }}<br>
+                        <strong>EPS:</strong> {{ historia.paciente.eps|default:"No especificada" }}
+                    </p>
+                    <a href="{% url 'patients:paciente_detail' historia.paciente.pk %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye"></i> Ver Historia
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No hay historias clínicas registradas.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+

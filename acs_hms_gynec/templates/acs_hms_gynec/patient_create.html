@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Nuevo Paciente{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-plus text-success"></i>
+                        Nuevo Paciente Ginecológico
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'gynec:patient_list' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver a Lista
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="row">
+                        {% csrf_token %}
+                        <div class="col-md-6">
+                            <h5 class="text-primary">
+                                <i class="fas fa-user"></i> Información Básica
+                            </h5>
+                            <div class="form-group">
+                                <label for="{{ form.patient.id_for_label }}">{{ form.patient.label }}</label>
+                                {{ form.patient }}
+                                {% if form.patient.errors %}
+                                <div class="text-danger">{{ form.patient.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.menarche_age.id_for_label }}">{{ form.menarche_age.label }}</label>
+                                {{ form.menarche_age }}
+                                {% if form.menarche_age.errors %}
+                                <div class="text-danger">{{ form.menarche_age.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.menopause_age.id_for_label }}">{{ form.menopause_age.label
+                                    }}</label>
+                                {{ form.menopause_age }}
+                                {% if form.menopause_age.errors %}
+                                <div class="text-danger">{{ form.menopause_age.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="text-info">
+                                <i class="fas fa-calendar-alt"></i> Historia Menstrual
+                            </h5>
+                            <div class="form-group">
+                                <label for="{{ form.menstrual_cycle.id_for_label }}">{{ form.menstrual_cycle.label
+                                    }}</label>
+                                {{ form.menstrual_cycle }}
+                                {% if form.menstrual_cycle.errors %}
+                                <div class="text-danger">{{ form.menstrual_cycle.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.cycle_length.id_for_label }}">{{ form.cycle_length.label }}</label>
+                                {{ form.cycle_length }}
+                                {% if form.cycle_length.errors %}
+                                <div class="text-danger">{{ form.cycle_length.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.last_menstrual_period.id_for_label }}">{{
+                                    form.last_menstrual_period.label }}</label>
+                                {{ form.last_menstrual_period }}
+                                {% if form.last_menstrual_period.errors %}
+                                <div class="text-danger">{{ form.last_menstrual_period.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="text-warning">
+                                <i class="fas fa-baby"></i> Historia Obstétrica
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.gravida.id_for_label }}">{{ form.gravida.label }}</label>
+                                        {{ form.gravida }}
+                                        {% if form.gravida.errors %}
+                                        <div class="text-danger">{{ form.gravida.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.para.id_for_label }}">{{ form.para.label }}</label>
+                                        {{ form.para }}
+                                        {% if form.para.errors %}
+                                        <div class="text-danger">{{ form.para.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.term_deliveries.id_for_label }}">{{
+                                            form.term_deliveries.label }}</label>
+                                        {{ form.term_deliveries }}
+                                        {% if form.term_deliveries.errors %}
+                                        <div class="text-danger">{{ form.term_deliveries.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.preterm_deliveries.id_for_label }}">{{
+                                            form.preterm_deliveries.label }}</label>
+                                        {{ form.preterm_deliveries }}
+                                        {% if form.preterm_deliveries.errors %}
+                                        <div class="text-danger">{{ form.preterm_deliveries.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.abortions.id_for_label }}">{{ form.abortions.label
+                                            }}</label>
+                                        {{ form.abortions }}
+                                        {% if form.abortions.errors %}
+                                        <div class="text-danger">{{ form.abortions.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.living_children.id_for_label }}">{{
+                                            form.living_children.label }}</label>
+                                        {{ form.living_children }}
+                                        {% if form.living_children.errors %}
+                                        <div class="text-danger">{{ form.living_children.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="text-success">
+                                <i class="fas fa-pills"></i> Anticoncepción
+                            </h5>
+                            <div class="form-group">
+                                <label for="{{ form.current_contraceptive.id_for_label }}">{{
+                                    form.current_contraceptive.label }}</label>
+                                {{ form.current_contraceptive }}
+                                {% if form.current_contraceptive.errors %}
+                                <div class="text-danger">{{ form.current_contraceptive.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.contraceptive_duration.id_for_label }}">{{
+                                    form.contraceptive_duration.label }}</label>
+                                {{ form.contraceptive_duration }}
+                                {% if form.contraceptive_duration.errors %}
+                                <div class="text-danger">{{ form.contraceptive_duration.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <h6 class="text-muted">
+                                <i class="fas fa-search"></i> Exámenes de Screening
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.last_pap_smear.id_for_label }}">{{ form.last_pap_smear.label
+                                            }}</label>
+                                        {{ form.last_pap_smear }}
+                                        {% if form.last_pap_smear.errors %}
+                                        <div class="text-danger">{{ form.last_pap_smear.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.pap_smear_result.id_for_label }}">{{
+                                            form.pap_smear_result.label }}</label>
+                                        {{ form.pap_smear_result }}
+                                        {% if form.pap_smear_result.errors %}
+                                        <div class="text-danger">{{ form.pap_smear_result.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.last_mammogram.id_for_label }}">{{ form.last_mammogram.label
+                                            }}</label>
+                                        {{ form.last_mammogram }}
+                                        {% if form.last_mammogram.errors %}
+                                        <div class="text-danger">{{ form.last_mammogram.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.mammogram_result.id_for_label }}">{{
+                                            form.mammogram_result.label }}</label>
+                                        {{ form.mammogram_result }}
+                                        {% if form.mammogram_result.errors %}
+                                        <div class="text-danger">{{ form.mammogram_result.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <h5 class="text-dark">
+                                <i class="fas fa-notes-medical"></i> Información Adicional
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.surgical_history.id_for_label }}">{{
+                                            form.surgical_history.label }}</label>
+                                        {{ form.surgical_history }}
+                                        {% if form.surgical_history.errors %}
+                                        <div class="text-danger">{{ form.surgical_history.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.family_history.id_for_label }}">{{ form.family_history.label
+                                            }}</label>
+                                        {{ form.family_history }}
+                                        {% if form.family_history.errors %}
+                                        <div class="text-danger">{{ form.family_history.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> Guardar Paciente Ginecológico
+                            </button>
+                            <a href="{% url 'gynec:patient_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Validación de formularios
+        $('form').on('submit', function (e) {
+            var requiredFields = $(this).find('[required]');
+            var isValid = true;
+
+            requiredFields.each(function () {
+                if (!$(this).val()) {
+                    $(this).addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Por favor complete todos los campos requeridos.');
+            }
+        });
+
+        // Agregar clases de Bootstrap a los campos del formulario
+        $('input, select, textarea').addClass('form-control');
+        $('input[type="checkbox"]').removeClass('form-control').addClass('form-check-input');
+    });
+</script>
+{% endblock %}
+
+
+

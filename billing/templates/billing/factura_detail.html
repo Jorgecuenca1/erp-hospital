@@ -3,53 +3,60 @@
 {% block title %}Detalle de Factura{% endblock %}
 
 {% block content %}
-    <h1>Detalle de Factura #{{ factura.numero_factura|default:"BORRADOR" }}</h1>
-    <p><strong>Paciente:</strong> {{ factura.paciente.nombres }} {{ factura.paciente.apellidos }} ({{ factura.paciente.numero_identificacion }})</p>
-    <p><strong>Fecha de Emisión:</strong> {{ factura.fecha_emision|date:"d/m/Y H:i" }}</p>
-    <p><strong>Fecha de Vencimiento:</strong> {{ factura.fecha_vencimiento|default:"N/A" }}</p>
-    <p><strong>Estado:</strong> {{ factura.get_estado_display }}</p>
-    <p><strong>Total Bruto:</strong> {{ factura.total_bruto }}</p>
-    <p><strong>Total Impuestos:</strong> {{ factura.total_impuestos }}</p>
-    <p><strong>Total Neto:</strong> {{ factura.total_neto }}</p>
-    <p><strong>CUFE:</strong> {{ factura.cufe|default:"N/A" }}</p>
-    <p><strong>UUID:</strong> {{ factura.uuid|default:"N/A" }}</p>
-    {% if factura.xml_dian %}<p><strong>XML DIAN:</strong> <a href="{{ factura.xml_dian.url }}" target="_blank">Ver XML</a></p>{% endif %}
-    {% if factura.pdf_factura %}<p><strong>PDF Factura:</strong> <a href="{{ factura.pdf_factura.url }}" target="_blank">Ver PDF</a></p>{% endif %}
-    {% if factura.qr_code %}<p><strong>Código QR:</strong> <img src="{{ factura.qr_code.url }}" alt="Código QR" width="100"></p>{% endif %}
+<h1>Detalle de Factura #{{ factura.numero_factura|default:"BORRADOR" }}</h1>
+<p><strong>Paciente:</strong> {{ factura.paciente.nombres }} {{ factura.paciente.apellidos }} ({{
+    factura.paciente.numero_identificacion }})</p>
+<p><strong>Fecha de Emisión:</strong> {{ factura.fecha_emision|date:"d/m/Y H:i" }}</p>
+<p><strong>Fecha de Vencimiento:</strong> {{ factura.fecha_vencimiento|default:"N/A" }}</p>
+<p><strong>Estado:</strong> {{ factura.get_estado_display }}</p>
+<p><strong>Total Bruto:</strong> {{ factura.total_bruto }}</p>
+<p><strong>Total Impuestos:</strong> {{ factura.total_impuestos }}</p>
+<p><strong>Total Neto:</strong> {{ factura.total_neto }}</p>
+<p><strong>CUFE:</strong> {{ factura.cufe|default:"N/A" }}</p>
+<p><strong>UUID:</strong> {{ factura.uuid|default:"N/A" }}</p>
+{% if factura.xml_dian %}<p><strong>XML DIAN:</strong> <a href="{{ factura.xml_dian.url }}" target="_blank">Ver XML</a>
+</p>{% endif %}
+{% if factura.pdf_factura %}<p><strong>PDF Factura:</strong> <a href="{{ factura.pdf_factura.url }}" target="_blank">Ver
+        PDF</a></p>{% endif %}
+{% if factura.qr_code %}<p><strong>Código QR:</strong> <img src="{{ factura.qr_code.url }}" alt="Código QR" width="100">
+</p>{% endif %}
 
-    <h2>Detalles de Factura</h2>
-    <ul>
-        {% for detalle in detalles %}
-            <li>
-                {% if detalle.producto %}
-                    {{ detalle.producto.nombre }}
-                {% else %}
-                    {{ detalle.descripcion }}
-                {% endif %}
-                - Cantidad: {{ detalle.cantidad }} - Precio Unitario: {{ detalle.precio_unitario }} - Subtotal: {{ detalle.subtotal }}
-                {% if detalle.impuesto_porcentaje > 0 %}- Impuesto ({{ detalle.impuesto_porcentaje }}%): {{ detalle.valor_impuesto }}{% endif %}
-                - Total Línea: {{ detalle.total_linea }}
-            </li>
-        {% empty %}
-            <li>No hay detalles para esta factura.</li>
-        {% endfor %}
-    </ul>
+<h2>Detalles de Factura</h2>
+<ul>
+    {% for detalle in detalles %}
+    <li>
+        {% if detalle.producto %}
+        {{ detalle.producto.nombre }}
+        {% else %}
+        {{ detalle.descripcion }}
+        {% endif %}
+        - Cantidad: {{ detalle.cantidad }} - Precio Unitario: {{ detalle.precio_unitario }} - Subtotal: {{
+        detalle.subtotal }}
+        {% if detalle.impuesto_porcentaje > 0 %}- Impuesto ({{ detalle.impuesto_porcentaje }}%): {{
+        detalle.valor_impuesto }}{% endif %}
+        - Total Línea: {{ detalle.total_linea }}
+    </li>
+    {% empty %}
+    <li>No hay detalles para esta factura.</li>
+    {% endfor %}
+</ul>
 
-    <h2>Transacciones DIAN</h2>
-    <ul>
-        {% for transaccion in transacciones_dian %}
-            <li>
-                {{ transaccion.fecha_transaccion|date:"d/m/Y H:i" }} - Tipo: {{ transaccion.tipo_transaccion }} - Estado: {{ transaccion.estado_respuesta|default:"N/A" }}
-                {% if transaccion.mensaje_error %}<br>Error: {{ transaccion.mensaje_error }}{% endif %}
-            </li>
-        {% empty %}
-            <li>No hay transacciones DIAN para esta factura.</li>
-        {% endfor %}
-    </ul>
+<h2>Transacciones DIAN</h2>
+<ul>
+    {% for transaccion in transacciones_dian %}
+    <li>
+        {{ transaccion.fecha_transaccion|date:"d/m/Y H:i" }} - Tipo: {{ transaccion.tipo_transaccion }} - Estado: {{
+        transaccion.estado_respuesta|default:"N/A" }}
+        {% if transaccion.mensaje_error %}<br>Error: {{ transaccion.mensaje_error }}{% endif %}
+    </li>
+    {% empty %}
+    <li>No hay transacciones DIAN para esta factura.</li>
+    {% endfor %}
+</ul>
 
-    <p>
-        <a href="{% url 'factura_edit' factura.pk %}">Editar Factura</a> |
-        <a href="{% url 'factura_delete' factura.pk %}">Eliminar Factura</a> |
-        <a href="{% url 'factura_list' %}">Volver a la Lista de Facturas</a>
-    </p>
-{% endblock %} 
+<p>
+    <a href="{% url 'billing:factura_edit' factura.pk %}">Editar Factura</a> |
+    <a href="{% url 'billing:factura_delete' factura.pk %}">Eliminar Factura</a> |
+    <a href="{% url 'billing:factura_list' %}">Volver a la Lista de Facturas</a>
+</p>
+{% endblock %}

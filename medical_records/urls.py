@@ -1,7 +1,11 @@
 from django.urls import path
 from . import views
 
+app_name = 'medical_records'
+
 urlpatterns = [
+    # Dashboard principal
+    path('', views.MedicalRecordsDashboardView.as_view(), name='dashboard'),
     # URLs para Consultas
     path('historias/<int:historia_clinica_id>/consultas/', views.ConsultaListView.as_view(), name='consulta_list'),
     path('historias/<int:historia_clinica_id>/consultas/new/', views.ConsultaCreateView.as_view(), name='consulta_create'),

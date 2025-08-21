@@ -1,0 +1,884 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Portal de Acceso a Empresas - Admisión{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+<style>
+    .filter-section {
+        background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #e3e6f0;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-title {
+        color: #5a5c69;
+        margin-bottom: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .cita-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        border: none;
+        overflow: hidden;
+    }
+
+    .cita-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .cita-header {
+        padding: 15px 20px;
+        color: white;
+        font-weight: 600;
+    }
+
+    .estado-programada {
+        background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+        border-left: 5px solid #ff6f00;
+    }
+
+    .estado-confirmada {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border-left: 5px solid #17a2b8;
+    }
+
+    .estado-cancelada {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border-left: 5px solid #bd2130;
+    }
+
+    .estado-completada {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        border-left: 5px solid #117a8b;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-programada {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-confirmada {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge-cancelada {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .badge-completada {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .trabajador-info {
+        background: #f8f9fc;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .empresa-info {
+        background: #e3f2fd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .servicio-info {
+        background: #f3e5f5;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .cita-actions {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #e3e6f0;
+    }
+
+    .action-btn {
+        margin: 2px;
+        border-radius: 20px;
+        padding: 6px 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e3e6f0;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.3;
+    }
+
+    .search-input {
+        border-radius: 10px;
+        border: 2px solid #e3e6f0;
+        padding: 10px 15px;
+    }
+
+    .search-input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .alert-vencida {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+    }
+
+    .timeline-item {
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        padding-left: 20px;
+        position: relative;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 6px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #007bff;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Portal de Empresas</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:dashboard' %}">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_create' %}">
+        <i class="fas fa-plus-circle me-2"></i>Nueva Orden
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_list' %}">
+        <i class="fas fa-file-medical-alt me-2"></i>Órdenes de Servicios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:seguimiento_pacientes' %}">
+        <i class="fas fa-user-check me-2"></i>Seguimiento Pacientes
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:seguimiento_atenciones' %}">
+        <i class="fas fa-stethoscope me-2"></i>Seguimiento Atenciones
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'admision_recepcion:portal_empresas' %}">
+        <i class="fas fa-building me-2"></i>Portal Empresas
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">🏢 Servicios solicitados en el portal de acceso a empresas</h1>
+            <p class="mb-0 text-muted">de la sección Admisión - Recepción
+                <a href="#" class="text-primary ms-2" data-bs-toggle="modal" data-bs-target="#instructionsModal">
+                    👉🏼 De clic aquí para aprender o ver los instructivos <i class="fas fa-info-circle"></i>
+                </a>
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-outline-success me-2" id="refreshBtn">
+                <i class="fas fa-sync-alt me-1"></i>Actualizar
+            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-download me-1"></i>Exportar
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="exportarReporte('excel')">
+                            <i class="fas fa-file-excel text-success me-2"></i>Excel
+                        </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="exportarReporte('pdf')">
+                            <i class="fas fa-file-pdf text-danger me-2"></i>PDF
+                        </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="filter-section">
+        <div class="filter-title">
+            <i class="fas fa-filter me-2"></i>Filtros de Búsqueda
+        </div>
+        <form method="get" id="filterForm">
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Día de la cita:</label>
+                    <input type="date" name="dia_cita" class="search-input form-control"
+                        value="{{ filtros_actuales.dia_cita|default:today }}" id="diaCitaFilter">
+                    <small class="text-muted">10/08/2025</small>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">N°. de identificación:</label>
+                    <input type="text" name="identificacion" class="search-input form-control"
+                        value="{{ filtros_actuales.identificacion }}" placeholder="Número de identificación"
+                        id="identificacionFilter">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Nombre del trabajador:</label>
+                    <input type="text" name="trabajador" class="search-input form-control"
+                        value="{{ filtros_actuales.trabajador }}" placeholder="Escriba nombre o apellido para filtrar."
+                        id="trabajadorFilter">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Nombre de la empresa:</label>
+                    <input type="text" name="empresa" class="search-input form-control"
+                        value="{{ filtros_actuales.empresa }}"
+                        placeholder="Escriba el nombre de la empresa para filtrar." id="empresaFilter">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Estado:</label>
+                    <select name="estado" class="form-control" id="estadoFilter">
+                        <option value="">Todos</option>
+                        <option value="PROGRAMADA" {% if filtros_actuales.estado == "PROGRAMADA" %}selected{% endif %}>
+                            PROGRAMADA</option>
+                        <option value="CONFIRMADA" {% if filtros_actuales.estado == "CONFIRMADA" %}selected{% endif %}>
+                            CONFIRMADA</option>
+                        <option value="CANCELADA" {% if filtros_actuales.estado == "CANCELADA" %}selected{% endif %}>
+                            CANCELADA</option>
+                        <option value="COMPLETADA" {% if filtros_actuales.estado == "COMPLETADA" %}selected{% endif %}>
+                            COMPLETADA</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-10">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i>Buscar
+                    </button>
+                    <a href="{% url 'admision_recepcion:portal_empresas' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-eraser me-1"></i>Limpiar
+                    </a>
+                </div>
+                <div class="col-md-2 text-end">
+                    <button type="button" class="btn btn-outline-info" data-bs-toggle="collapse"
+                        data-bs-target="#filtrosAvanzados">
+                        <i class="fas fa-cogs me-1"></i>Avanzados
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros Avanzados -->
+            <div class="collapse mt-3" id="filtrosAvanzados">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Sede:</label>
+                        <select name="sede" class="form-control">
+                            <option value="">Todas las sedes</option>
+                            {% for sede_code, sede_name in sedes_choices %}
+                            <option value="{{ sede_code }}" {% if filtros_actuales.sede == sede_code %}selected{% endif
+                                %}>{{ sede_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo de Servicio:</label>
+                        <select name="tipo_servicio" class="form-control">
+                            <option value="">Todos los servicios</option>
+                            {% for tipo_code, tipo_name in tipos_servicio_choices %}
+                            <option value="{{ tipo_code }}" {% if filtros_actuales.tipo_servicio == tipo_code %}selected{%
+                                endif %}>{{ tipo_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Desde:</label>
+                        <input type="date" name="fecha_desde" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Hasta:</label>
+                        <input type="date" name="fecha_hasta" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-card">
+        <div class="row">
+            <div class="col-md-2 stat-item">
+                <span class="stat-number text-warning">{{ stats.programadas }}</span>
+                <div class="stat-label">Programadas</div>
+            </div>
+            <div class="col-md-2 stat-item">
+                <span class="stat-number text-success">{{ stats.confirmadas }}</span>
+                <div class="stat-label">Confirmadas</div>
+            </div>
+            <div class="col-md-2 stat-item">
+                <span class="stat-number text-danger">{{ stats.canceladas }}</span>
+                <div class="stat-label">Canceladas</div>
+            </div>
+            <div class="col-md-2 stat-item">
+                <span class="stat-number text-info">{{ stats.completadas }}</span>
+                <div class="stat-label">Completadas</div>
+            </div>
+            <div class="col-md-2 stat-item">
+                <span class="stat-number text-secondary">${{ stats.total_valor|floatformat:0 }}</span>
+                <div class="stat-label">Valor Total</div>
+            </div>
+            <div class="col-md-2 stat-item">
+                <span class="stat-number text-dark">{{ citas.count }}</span>
+                <div class="stat-label">Total Citas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Citas -->
+    <div class="row" id="citasContainer">
+        {% if citas %}
+        {% for cita in citas %}
+        <div class="col-lg-6 mb-4">
+            <div class="cita-card card estado-{{ cita.estado|lower }}">
+                <div class="cita-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">
+                                <span class="status-badge badge-{{ cita.estado|lower }}">{{ cita.get_estado_display
+                                    }}</span>
+                            </h6>
+                            <small class="opacity-75">{{ cita.fecha_cita|date:"d/m/Y" }} - {{ cita.hora_cita|date:"H:i"
+                                }}</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="opacity-75">Cita</small>
+                            <div class="fw-bold">{{ cita.numero_cita }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Alerta si está vencida -->
+                    {% if cita.esta_vencida %}
+                    <div class="alert-vencida">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <strong>Cita Vencida:</strong> La fecha y hora de la cita ya pasaron
+                    </div>
+                    {% endif %}
+
+                    <!-- Información del Trabajador -->
+                    <div class="trabajador-info">
+                        <h6 class="text-primary mb-2">
+                            <i class="fas fa-user me-2"></i>{{ cita.nombre_trabajador }}
+                        </h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-id-card me-1"></i>{{ cita.get_tipo_documento_display }} {{
+                                    cita.numero_identificacion }}
+                                </small>
+                            </div>
+                            <div class="col-6">
+                                {% if cita.telefono_trabajador %}
+                                <small class="text-muted">
+                                    <i class="fas fa-phone me-1"></i>{{ cita.telefono_trabajador }}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if cita.email_trabajador %}
+                        <div class="mt-1">
+                            <small class="text-muted">
+                                <i class="fas fa-envelope me-1"></i>{{ cita.email_trabajador }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Información de la Empresa -->
+                    <div class="empresa-info">
+                        <h6 class="text-info mb-2">
+                            <i class="fas fa-building me-2"></i>{{ cita.empresa.razon_social|truncatechars:30 }}
+                        </h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-hashtag me-1"></i>{{ cita.empresa.nit }}
+                                </small>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ cita.get_sede_cita_display }}
+                                </small>
+                            </div>
+                        </div>
+                        {% if cita.contacto_empresa %}
+                        <div class="mt-1">
+                            <small class="text-muted">
+                                <i class="fas fa-user-tie me-1"></i>{{ cita.contacto_empresa }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Información del Servicio -->
+                    <div class="servicio-info">
+                        <h6 class="text-purple mb-2">
+                            <i class="fas fa-stethoscope me-2"></i>{{ cita.get_tipo_servicio_display }}
+                        </h6>
+                        {% if cita.servicios_adicionales.exists %}
+                        <div class="mt-2">
+                            <small class="text-muted d-block mb-1">Servicios adicionales:</small>
+                            {% for servicio in cita.servicios_adicionales.all %}
+                            <span class="badge bg-light text-dark me-1">{{ servicio.nombre }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if cita.prestador_asignado %}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-user-md me-1"></i>Asignado a: {{ cita.prestador_asignado.nombre }}
+                            </small>
+                        </div>
+                        {% endif %}
+                        {% if cita.valor_estimado %}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-dollar-sign me-1"></i>Valor estimado: ${{
+                                cita.valor_estimado|floatformat:0 }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Historial -->
+                    <div class="mt-3">
+                        <h6 class="mb-2">
+                            <i class="fas fa-history me-2"></i>Historial
+                        </h6>
+                        <div class="timeline-mini">
+                            <div class="timeline-item">
+                                <strong>Programada:</strong> {{ cita.fecha_programacion|date:"d/m/Y H:i" }}
+                            </div>
+                            {% if cita.fecha_confirmacion %}
+                            <div class="timeline-item">
+                                <strong>Confirmada:</strong> {{ cita.fecha_confirmacion|date:"d/m/Y H:i" }}
+                                {% if cita.confirmada_por %}por {{ cita.confirmada_por.get_full_name }}{% endif %}
+                            </div>
+                            {% endif %}
+                            {% if cita.fecha_cancelacion %}
+                            <div class="timeline-item">
+                                <strong>Cancelada:</strong> {{ cita.fecha_cancelacion|date:"d/m/Y H:i" }}
+                                {% if cita.cancelada_por %}por {{ cita.cancelada_por.get_full_name }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="cita-actions">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            {% if cita.puede_confirmar %}
+                            <button class="btn btn-success action-btn" onclick="confirmarCita({{ cita.id }})">
+                                <i class="fas fa-check me-1"></i>Confirmar
+                            </button>
+                            {% endif %}
+
+                            {% if cita.puede_cancelar %}
+                            <button class="btn btn-danger action-btn" onclick="cancelarCita({{ cita.id }})">
+                                <i class="fas fa-times me-1"></i>Cancelar
+                            </button>
+                            {% endif %}
+
+                            {% if cita.estado == 'CONFIRMADA' and not cita.orden_servicio %}
+                            <button class="btn btn-primary action-btn" onclick="crearOrdenDesdeCita({{ cita.id }})">
+                                <i class="fas fa-file-medical me-1"></i>Crear Orden
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if cita.orden_servicio %}
+                            <a href="{% url 'admision_recepcion:orden_detail' cita.orden_servicio.pk %}"
+                                class="btn btn-outline-info action-btn">
+                                <i class="fas fa-external-link-alt me-1"></i>Ver Orden
+                            </a>
+                            {% endif %}
+
+                            <button class="btn btn-outline-secondary action-btn"
+                                onclick="verDetallesCita({{ cita.id }})">
+                                <i class="fas fa-eye me-1"></i>Detalles
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <h5>No se encontraron Datos con estos criterios de búsqueda o filtrado.</h5>
+                <p>Intente modificar los filtros de búsqueda o seleccione una fecha diferente.</p>
+                <a href="{% url 'admision_recepcion:portal_empresas' %}" class="btn btn-primary">
+                    <i class="fas fa-refresh me-1"></i>Limpiar Filtros
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Paginación">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Instrucciones -->
+<div class="modal fade" id="instructionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Instrucciones - Portal de Acceso a Empresas
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="fw-bold mb-3">🎯 Objetivo del Módulo</h6>
+                        <p>Este módulo gestiona las citas médicas solicitadas por las empresas a través del portal web,
+                            permitiendo confirmar, cancelar y convertir en órdenes de servicio.</p>
+
+                        <h6 class="fw-bold mb-3">🔍 Filtros de Búsqueda</h6>
+                        <ul>
+                            <li><strong>Día de la cita:</strong> Buscar citas de una fecha específica</li>
+                            <li><strong>N° identificación:</strong> Buscar por número de identificación del trabajador
+                            </li>
+                            <li><strong>Nombre del trabajador:</strong> Buscar por nombre o apellido</li>
+                            <li><strong>Nombre de la empresa:</strong> Filtrar por empresa específica</li>
+                            <li><strong>Estado:</strong> Programada, Confirmada, Cancelada, Completada</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">📊 Estados de las Citas</h6>
+                        <div class="d-flex flex-column gap-2">
+                            <div><span class="status-badge badge-programada">PROGRAMADA</span> Cita solicitada desde el
+                                portal</div>
+                            <div><span class="status-badge badge-confirmada">CONFIRMADA</span> Cita confirmada por el
+                                hospital</div>
+                            <div><span class="status-badge badge-cancelada">CANCELADA</span> Cita cancelada</div>
+                            <div><span class="status-badge badge-completada">COMPLETADA</span> Cita completada</div>
+                        </div>
+
+                        <h6 class="fw-bold mb-3 mt-3">🚀 Acciones Disponibles</h6>
+                        <ul>
+                            <li><strong>Confirmar:</strong> Confirmar citas programadas</li>
+                            <li><strong>Cancelar:</strong> Cancelar citas programadas o confirmadas</li>
+                            <li><strong>Crear Orden:</strong> Convertir cita confirmada en orden de servicio</li>
+                            <li><strong>Ver Detalles:</strong> Información completa de la cita</li>
+                            <li><strong>Exportar:</strong> Generar reportes en Excel o PDF</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">📱 Uso del Sistema</h6>
+                        <ol>
+                            <li>Use los filtros para encontrar citas específicas</li>
+                            <li>Revise la información del trabajador y empresa</li>
+                            <li>Confirme las citas programadas desde el portal</li>
+                            <li>Cree órdenes de servicio para citas confirmadas</li>
+                            <li>Gestione cancelaciones cuando sea necesario</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Cancelar Cita -->
+<div class="modal fade" id="cancelarCitaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-times-circle me-2"></i>Cancelar Cita
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Motivo de cancelación:</label>
+                    <textarea class="form-control" id="motivoCancelacion" rows="3"
+                        placeholder="Escriba el motivo de la cancelación..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" id="confirmarCancelacion">
+                    <i class="fas fa-times me-1"></i>Cancelar Cita
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Auto-submit en cambio de filtros principales
+        $('#diaCitaFilter, #estadoFilter').change(function () {
+            $('#filterForm').submit();
+        });
+
+        // Inicializar Select2 para campos de empresa y trabajador
+        $('#empresaFilter, #trabajadorFilter').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Escriba para buscar...',
+            allowClear: true
+        });
+
+        // Auto-refresh
+        $('#refreshBtn').click(function () {
+            window.location.reload();
+        });
+    });
+
+    let citaParaCancelar = null;
+
+    // Confirmar cita
+    function confirmarCita(citaId) {
+        if (confirm('¿Está seguro de confirmar esta cita?')) {
+            $.post(`/admision/ajax/confirmar-cita/${citaId}/`, {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            }, function (response) {
+                if (response.success) {
+                    showToast(response.message, 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast(response.message, 'error');
+                }
+            }).fail(function () {
+                showToast('Error de conexión al confirmar cita', 'error');
+            });
+        }
+    }
+
+    // Cancelar cita
+    function cancelarCita(citaId) {
+        citaParaCancelar = citaId;
+        $('#motivoCancelacion').val('');
+        $('#cancelarCitaModal').modal('show');
+    }
+
+    // Confirmar cancelación
+    $('#confirmarCancelacion').click(function () {
+        const motivo = $('#motivoCancelacion').val();
+
+        if (!motivo.trim()) {
+            alert('Por favor ingrese el motivo de cancelación');
+            return;
+        }
+
+        $.post(`/admision/ajax/cancelar-cita/${citaParaCancelar}/`, {
+            'motivo': motivo,
+            'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+        }, function (response) {
+            if (response.success) {
+                $('#cancelarCitaModal').modal('hide');
+                showToast(response.message, 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showToast(response.message, 'error');
+            }
+        }).fail(function () {
+            showToast('Error de conexión al cancelar cita', 'error');
+        });
+    });
+
+    // Crear orden desde cita
+    function crearOrdenDesdeCita(citaId) {
+        if (confirm('¿Está seguro de crear una orden de servicio desde esta cita?')) {
+            $.post(`/admision/ajax/crear-orden-cita/${citaId}/`, {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            }, function (response) {
+                if (response.success) {
+                    showToast(response.message, 'success');
+                    setTimeout(() => {
+                        if (confirm('¿Desea ver la orden creada?')) {
+                            window.open(`/admision/ordenes/${response.orden_id}/`, '_blank');
+                        }
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showToast(response.message, 'error');
+                }
+            }).fail(function () {
+                showToast('Error de conexión al crear orden', 'error');
+            });
+        }
+    }
+
+    // Ver detalles de cita (placeholder)
+    function verDetallesCita(citaId) {
+        // Implementar modal de detalles o redireccionar
+        showToast('Función de detalles en desarrollo', 'info');
+    }
+
+    // Exportar reportes
+    function exportarReporte(formato) {
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', formato);
+        window.open(`${window.location.pathname}?${params.toString()}`);
+    }
+
+    // Mostrar notificaciones toast
+    function showToast(message, type) {
+        const toastClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+        const toast = $(`
+        <div class="toast align-items-center text-white ${toastClass} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `);
+
+        // Agregar contenedor de toasts si no existe
+        if (!$('.toast-container').length) {
+            $('body').append('<div class="toast-container position-fixed top-0 end-0 p-3"></div>');
+        }
+
+        $('.toast-container').append(toast);
+        const bsToast = new bootstrap.Toast(toast[0]);
+        bsToast.show();
+
+        // Remover toast después de ocultarlo
+        toast.on('hidden.bs.toast', function () {
+            $(this).remove();
+        });
+    }
+</script>
+{% endblock %}

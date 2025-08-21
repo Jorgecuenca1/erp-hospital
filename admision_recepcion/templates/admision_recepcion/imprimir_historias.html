@@ -1,0 +1,604 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Imprimir Historias Clínicas - Admisión{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-section {
+        background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #e3e6f0;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-title {
+        color: #5a5c69;
+        margin-bottom: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input {
+        border-radius: 10px;
+        border: 2px solid #e3e6f0;
+        padding: 10px 15px;
+    }
+
+    .search-input:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e3e6f0;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 15px;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .historias-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+    }
+
+    .historias-table table {
+        margin-bottom: 0;
+    }
+
+    .historias-table thead {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+    }
+
+    .historias-table thead th {
+        border: none;
+        padding: 15px 12px;
+        font-weight: 600;
+        text-align: center;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    .historias-table tbody td {
+        padding: 12px;
+        border-bottom: 1px solid #f8f9fa;
+        vertical-align: middle;
+    }
+
+    .historias-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .estado-badge {
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .estado-abierta {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .estado-cerrada {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .estado-anulada {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .estado-en-proceso {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .hc-numero {
+        font-weight: bold;
+        color: #4e73df;
+        font-family: monospace;
+    }
+
+    .paciente-info {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .identificacion-info {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .empresa-info {
+        color: #7b1fa2;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .fecha-info {
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    .profesional-info {
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.3;
+    }
+
+    .print-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+
+    .print-btn:hover {
+        background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .actions-cell {
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Imprimir Historias Clínicas</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:dashboard' %}">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_create' %}">
+        <i class="fas fa-plus-circle me-2"></i>Nueva Orden
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_list' %}">
+        <i class="fas fa-file-medical-alt me-2"></i>Órdenes de Servicios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:lista_precios' %}">
+        <i class="fas fa-tags me-2"></i>Lista de Precios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'admision_recepcion:imprimir_historias' %}">
+        <i class="fas fa-print me-2"></i>Imprimir Historias
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:empresas_historias' %}">
+        <i class="fas fa-building me-2"></i>Empresas Historias
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">🖨️ Imprimir Historias Clínicas</h1>
+            <p class="mb-0 text-muted">de la sección Admisión - Recepción
+                <a href="#" class="text-primary ms-2" data-bs-toggle="modal" data-bs-target="#instructionsModal">
+                    👉🏼 De clic aquí para aprender o ver los instructivos <i class="fas fa-info-circle"></i>
+                </a>
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-outline-success me-2" id="refreshBtn">
+                <i class="fas fa-sync-alt me-1"></i>Actualizar
+            </button>
+            <button class="btn btn-success" onclick="imprimirSeleccionadas()">
+                <i class="fas fa-print me-1"></i>Imprimir Seleccionadas
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtros de Búsqueda -->
+    <div class="filter-section">
+        <div class="filter-title">
+            <i class="fas fa-search me-2"></i>Filtros de Búsqueda
+        </div>
+        <form method="get" id="filterForm">
+            <div class="row">
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">N°. de Identificación:</label>
+                    <input type="text" name="identificacion" class="search-input form-control"
+                        value="{{ filtros_actuales.identificacion }}" placeholder="Número de identificación">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Nombre del Paciente:</label>
+                    <input type="text" name="nombre_paciente" class="search-input form-control"
+                        value="{{ filtros_actuales.nombre_paciente }}" placeholder="Nombre del paciente">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Nombre de la Empresa:</label>
+                    <input type="text" name="nombre_empresa" class="search-input form-control"
+                        value="{{ filtros_actuales.nombre_empresa }}" placeholder="Nombre de la empresa">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Fecha Desde:</label>
+                    <input type="date" name="fecha_desde" class="form-control"
+                        value="{{ filtros_actuales.fecha_desde }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Fecha Hasta:</label>
+                    <input type="date" name="fecha_hasta" class="form-control"
+                        value="{{ filtros_actuales.fecha_hasta }}">
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Estados:</label>
+                    <select name="estado" class="form-control" id="estadoFilter">
+                        <option value="">Todos</option>
+                        <option value="ABIERTA" {% if filtros_actuales.estado == "ABIERTA" %}selected{% endif %}>ABIERTAS
+                        </option>
+                        <option value="CERRADA" {% if filtros_actuales.estado == "CERRADA" %}selected{% endif %}>CERRADAS
+                        </option>
+                        <option value="ANULADA" {% if filtros_actuales.estado == "ANULADA" %}selected{% endif %}>ANULADAS
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-9 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i>Buscar
+                    </button>
+                    <a href="{% url 'admision_recepcion:imprimir_historias' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-eraser me-1"></i>Limpiar Filtros
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-card">
+        <div class="row">
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-primary">{{ stats.total }}</span>
+                <div class="stat-label">Total Historias</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-success">{{ stats.abiertas }}</span>
+                <div class="stat-label">Abiertas</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-info">{{ stats.cerradas }}</span>
+                <div class="stat-label">Cerradas</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <span class="stat-number text-danger">{{ stats.anuladas }}</span>
+                <div class="stat-label">Anuladas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Historias Clínicas -->
+    <div class="historias-table">
+        {% if historias %}
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                    </th>
+                    <th style="width: 8%;">H.C.</th>
+                    <th style="width: 15%;">Fecha Creación</th>
+                    <th style="width: 12%;">N°. Identificación</th>
+                    <th style="width: 20%;">Nombre</th>
+                    <th style="width: 15%;">Empresa</th>
+                    <th style="width: 15%;">Profesional</th>
+                    <th style="width: 10%;">Estado</th>
+                    <th style="width: 5%;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for historia in historias %}
+                <tr>
+                    <td class="text-center">
+                        <input type="checkbox" class="historia-checkbox" value="{{ historia.id }}">
+                    </td>
+                    <td>
+                        <span class="hc-numero">{{ historia.numero_hc }}</span>
+                    </td>
+                    <td>
+                        <div class="fecha-info">{{ historia.fecha_creacion|date:"d/m/Y H:i" }}</div>
+                    </td>
+                    <td>
+                        <div class="identificacion-info">{{ historia.numero_identificacion }}</div>
+                    </td>
+                    <td>
+                        <div class="paciente-info">{{ historia.nombre_paciente }}</div>
+                    </td>
+                    <td>
+                        <div class="empresa-info">{{ historia.empresa_nombre|truncatechars:25 }}</div>
+                    </td>
+                    <td>
+                        <div class="profesional-info">{{ historia.nombre_completo_profesional|truncatechars:20 }}</div>
+                    </td>
+                    <td class="text-center">
+                        <span class="estado-badge estado-{{ historia.estado|lower }}">
+                            {{ historia.get_estado_display|upper }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="print-btn" onclick="imprimirHistoria({{ historia.id }})"
+                            title="Imprimir Historia">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-medical"></i>
+            <h5>No se encontraron historias clínicas</h5>
+            <p>No hay historias que coincidan con los criterios de búsqueda.</p>
+            <a href="{% url 'admision_recepcion:imprimir_historias' %}" class="btn btn-primary">
+                <i class="fas fa-refresh me-1"></i>Ver Todas las Historias
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Paginación">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Instrucciones -->
+<div class="modal fade" id="instructionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Instrucciones - Imprimir Historias Clínicas
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="fw-bold mb-3">🎯 Objetivo del Módulo</h6>
+                        <p>Gestionar e imprimir las historias clínicas de todos los pacientes con filtros avanzados de
+                            búsqueda.</p>
+
+                        <h6 class="fw-bold mb-3">🔍 Filtros de Búsqueda</h6>
+                        <ul>
+                            <li><strong>N° Identificación:</strong> Buscar por documento del paciente</li>
+                            <li><strong>Nombre del Paciente:</strong> Buscar por nombre completo</li>
+                            <li><strong>Nombre de la Empresa:</strong> Filtrar por empresa asociada</li>
+                            <li><strong>Rango de Fechas:</strong> Desde y hasta fecha específica</li>
+                            <li><strong>Estados:</strong> Abiertas, Cerradas, Anuladas o todas</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">📋 Estados de las Historias</h6>
+                        <div class="d-flex flex-column gap-2">
+                            <div><span class="estado-badge estado-abierta">ABIERTA</span> Historia en proceso de
+                                elaboración</div>
+                            <div><span class="estado-badge estado-cerrada">CERRADA</span> Historia finalizada y cerrada
+                            </div>
+                            <div><span class="estado-badge estado-anulada">ANULADA</span> Historia anulada por algún
+                                motivo</div>
+                        </div>
+
+                        <h6 class="fw-bold mb-3 mt-3">🖨️ Opciones de Impresión</h6>
+                        <ul>
+                            <li><strong>Imprimir Individual:</strong> Click en el botón de impresión de cada historia
+                            </li>
+                            <li><strong>Impresión Masiva:</strong> Seleccione múltiples historias y use "Imprimir
+                                Seleccionadas"</li>
+                            <li><strong>Seleccionar Todas:</strong> Use el checkbox del encabezado para seleccionar
+                                todas</li>
+                        </ul>
+
+                        <h6 class="fw-bold mb-3">📊 Información Mostrada</h6>
+                        <ul>
+                            <li>Número de Historia Clínica (H.C.)</li>
+                            <li>Fecha y hora de creación</li>
+                            <li>Datos del paciente</li>
+                            <li>Empresa asociada (si aplica)</li>
+                            <li>Profesional responsable</li>
+                            <li>Estado actual</li>
+                        </ul>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Tip:</strong> Use los filtros para encontrar rápidamente las historias que necesita
+                            imprimir. Las historias abiertas pueden seguir siendo editadas.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Auto-submit al presionar Enter
+        $('#filterForm input[type="text"]').on('keypress', function (e) {
+            if (e.which === 13) {
+                $('#filterForm').submit();
+            }
+        });
+
+        // Auto-submit en cambio de estado
+        $('#estadoFilter').change(function () {
+            $('#filterForm').submit();
+        });
+
+        // Actualizar página
+        $('#refreshBtn').click(function () {
+            window.location.reload();
+        });
+    });
+
+    // Seleccionar/deseleccionar todas las historias
+    function toggleSelectAll() {
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const historiaCheckboxes = document.querySelectorAll('.historia-checkbox');
+
+        historiaCheckboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+    }
+
+    // Imprimir historia individual
+    function imprimirHistoria(historiaId) {
+        // Abrir ventana de impresión para historia específica
+        const url = `/admision/imprimir-historias/${historiaId}/print/`;
+        window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    }
+
+    // Imprimir historias seleccionadas
+    function imprimirSeleccionadas() {
+        const selectedCheckboxes = document.querySelectorAll('.historia-checkbox:checked');
+
+        if (selectedCheckboxes.length === 0) {
+            alert('Por favor seleccione al menos una historia clínica para imprimir.');
+            return;
+        }
+
+        const historiaIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+        if (confirm(`¿Está seguro de imprimir ${historiaIds.length} historia(s) clínica(s)?`)) {
+            // Crear formulario para envío masivo
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admision/imprimir-historias/print-multiple/';
+            form.target = '_blank';
+
+            // Agregar token CSRF
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = '{{ csrf_token }}';
+            form.appendChild(csrfInput);
+
+            // Agregar IDs de historias
+            historiaIds.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'historia_ids';
+                input.value = id;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+    }
+
+    // Función para exportar a Excel
+    function exportarExcel() {
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', 'excel');
+        window.open(`${window.location.pathname}?${params.toString()}`);
+    }
+</script>
+{% endblock %}

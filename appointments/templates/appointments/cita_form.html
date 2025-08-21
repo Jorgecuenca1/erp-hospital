@@ -26,7 +26,7 @@
                 {% csrf_token %}
                 {{ form|crispy }}
                 <button type="submit" class="btn btn-success mt-3">Guardar Cita</button>
-                <a href="{% if form.instance.pk %}{% url 'cita_detail' form.instance.pk %}{% else %}{% url 'cita_list' %}{% endif %}" class="btn btn-secondary mt-3">Cancelar</a>
+                <a href="{% if form.instance.pk %}{% url 'appointments:cita_detail' form.instance.pk %}{% else %}{% url 'appointments:cita_list' %}{% endif %}" class="btn btn-secondary mt-3">Cancelar</a>
             </form>
         </div>
     </div>

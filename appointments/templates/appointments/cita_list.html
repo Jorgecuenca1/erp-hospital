@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Agenda de Citas</h1>
-        <a href="{% url 'cita_create' %}" class="btn btn-primary">Agendar Nueva Cita</a>
+        <a href="{% url 'appointments:cita_create' %}" class="btn btn-primary">Agendar Nueva Cita</a>
     </div>
 
     <div class="row">
@@ -15,12 +15,12 @@
             <div class="card h-100 shadow-sm">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <a href="{% url 'cita_detail' cita.pk %}">Cita #{{ cita.pk }}</a>
+                        <a href="{% url 'appointments:cita_detail' cita.pk %}">Cita #{{ cita.pk }}</a>
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p><strong>Paciente:</strong> <a href="{% url 'paciente_detail' cita.paciente.pk %}">{{ cita.paciente.nombres }} {{ cita.paciente.apellidos }}</a></p>
-                    <p><strong>Profesional:</strong> <a href="{% url 'profesional_detail' cita.profesional.pk %}">{{ cita.profesional.nombres }} {{ cita.profesional.apellidos }}</a></p>
+                    <p><strong>Paciente:</strong> <a href="{% url 'patients:paciente_detail' cita.paciente.pk %}">{{ cita.paciente.nombres }} {{ cita.paciente.apellidos }}</a></p>
+                    <p><strong>Profesional:</strong> <a href="{% url 'professionals:profesional_detail' cita.profesional.pk %}">{{ cita.profesional.nombres }} {{ cita.profesional.apellidos }}</a></p>
                     <p><strong>Fecha:</strong> {{ cita.fecha_hora_inicio|date:"d M, Y" }}</p>
                     <p><strong>Hora:</strong> {{ cita.fecha_hora_inicio|time:"H:i" }} - {{ cita.fecha_hora_fin|time:"H:i" }}</p>
                 </div>
@@ -34,7 +34,7 @@
                     {% elif cita.estado == 'FINALIZADA' %}
                         <span class="badge bg-secondary">Finalizada</span>
                     {% endif %}
-                    <a href="{% url 'cita_detail' cita.pk %}" class="btn btn-sm btn-outline-primary">Ver Detalles</a>
+                    <a href="{% url 'appointments:cita_detail' cita.pk %}" class="btn btn-sm btn-outline-primary">Ver Detalles</a>
                 </div>
             </div>
         </div>

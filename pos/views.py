@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import PuntoVenta, Caja, SesionCaja, MetodoPagoPOS, VentaPOS, LineaVentaPOS
+from .models import PuntoVenta, Caja, SesionCaja, MetodoPagoPOS, VentaPOS, LineaVentaPOS, PromocionesPOS, MovimientoCaja
 from .forms import PuntoVentaForm, CajaForm, SesionCajaForm, MetodoPagoPOSForm, VentaPOSForm, LineaVentaPOSForm
 
 # Create your views here.
@@ -107,3 +107,66 @@ class LineaVentaPOSUpdateView(UpdateView):
 class LineaVentaPOSDeleteView(DeleteView):
     model = LineaVentaPOS
     success_url = reverse_lazy('pos:lineaventapos_list')
+
+# PromocionesPOS
+class PromocionesPOSListView(ListView):
+    model = PromocionesPOS
+    template_name = 'pos/promocionespos_list.html'
+    context_object_name = 'promociones'
+    paginate_by = 20
+
+class PromocionesPOSDetailView(DetailView):
+    model = PromocionesPOS
+    template_name = 'pos/promocionespos_detail.html'
+
+class PromocionesPOSCreateView(CreateView):
+    model = PromocionesPOS
+    template_name = 'pos/promocionespos_form.html'
+    fields = ['codigo', 'nombre', 'descripcion', 'tipo_promocion', 'valor_descuento', 
+              'porcentaje_descuento', 'monto_minimo_compra', 'fecha_inicio', 'fecha_fin', 
+              'activa', 'productos', 'categorias', 'puntos_venta']
+    success_url = reverse_lazy('pos:promocionespos_list')
+
+class PromocionesPOSUpdateView(UpdateView):
+    model = PromocionesPOS
+    template_name = 'pos/promocionespos_form.html'
+    fields = ['codigo', 'nombre', 'descripcion', 'tipo_promocion', 'valor_descuento', 
+              'porcentaje_descuento', 'monto_minimo_compra', 'fecha_inicio', 'fecha_fin', 
+              'activa', 'productos', 'categorias', 'puntos_venta']
+    success_url = reverse_lazy('pos:promocionespos_list')
+
+class PromocionesPOSDeleteView(DeleteView):
+    model = PromocionesPOS
+    template_name = 'pos/promocionespos_confirm_delete.html'
+    success_url = reverse_lazy('pos:promocionespos_list')
+
+# MovimientoCaja
+class MovimientoCajaListView(ListView):
+    model = MovimientoCaja
+    template_name = 'pos/movimientocaja_list.html'
+    context_object_name = 'movimientos'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        return MovimientoCaja.objects.select_related('sesion', 'usuario').order_by('-fecha')
+
+class MovimientoCajaDetailView(DetailView):
+    model = MovimientoCaja
+    template_name = 'pos/movimientocaja_detail.html'
+
+class MovimientoCajaCreateView(CreateView):
+    model = MovimientoCaja
+    template_name = 'pos/movimientocaja_form.html'
+    fields = ['sesion', 'tipo_movimiento', 'monto', 'concepto', 'descripcion', 'usuario', 'autorizado_por']
+    success_url = reverse_lazy('pos:movimientocaja_list')
+
+class MovimientoCajaUpdateView(UpdateView):
+    model = MovimientoCaja
+    template_name = 'pos/movimientocaja_form.html'
+    fields = ['sesion', 'tipo_movimiento', 'monto', 'concepto', 'descripcion', 'usuario', 'autorizado_por']
+    success_url = reverse_lazy('pos:movimientocaja_list')
+
+class MovimientoCajaDeleteView(DeleteView):
+    model = MovimientoCaja
+    template_name = 'pos/movimientocaja_confirm_delete.html'
+    success_url = reverse_lazy('pos:movimientocaja_list')

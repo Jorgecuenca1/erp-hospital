@@ -47,4 +47,18 @@ urlpatterns = [
     path('lineaventa/<int:pk>/', views.LineaVentaPOSDetailView.as_view(), name='lineaventapos_detail'),
     path('lineaventa/<int:pk>/edit/', views.LineaVentaPOSUpdateView.as_view(), name='lineaventapos_update'),
     path('lineaventa/<int:pk>/delete/', views.LineaVentaPOSDeleteView.as_view(), name='lineaventapos_delete'),
+    
+    # PromocionesPOS
+    path('promociones/', views.PromocionesPOSListView.as_view(), name='promocionespos_list'),
+    path('promociones/new/', views.PromocionesPOSCreateView.as_view(), name='promocionespos_create'),
+    path('promociones/<int:pk>/', views.PromocionesPOSDetailView.as_view(), name='promocionespos_detail'),
+    path('promociones/<int:pk>/edit/', views.PromocionesPOSUpdateView.as_view(), name='promocionespos_update'),
+    path('promociones/<int:pk>/delete/', views.PromocionesPOSDeleteView.as_view(), name='promocionespos_delete'),
+    
+    # MovimientoCaja
+    path('movimientos-caja/', views.MovimientoCajaListView.as_view(), name='movimientocaja_list'),
+    path('movimientos-caja/new/', views.MovimientoCajaCreateView.as_view(), name='movimientocaja_create'),
+    path('movimientos-caja/<int:pk>/', views.MovimientoCajaDetailView.as_view(), name='movimientocaja_detail'),
+    path('movimientos-caja/<int:pk>/edit/', views.MovimientoCajaUpdateView.as_view(), name='movimientocaja_update'),
+    path('movimientos-caja/<int:pk>/delete/', views.MovimientoCajaDeleteView.as_view(), name='movimientocaja_delete'),
 ] 

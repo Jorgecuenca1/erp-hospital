@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Editar{% else %}Nuevo{% endif %} Procedimiento Oftalmológico - Hospital{% endblock %}
+
+{% block extra_css %}
+<style>
+.procedure-form {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px 0;
+}
+.form-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+.section-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px 10px 0 0;
+    margin: -20px -20px 20px -20px;
+}
+.eye-selector {
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.eye-selector:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.eye-selector.selected {
+    background: #e7f3ff;
+    border: 2px solid #007bff;
+}
+.procedure-type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 15px 0;
+}
+.procedure-type-card {
+    background: #f8f9fa;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.procedure-type-card:hover {
+    border-color: #007bff;
+    background: #e7f3ff;
+}
+.procedure-type-card.selected {
+    border-color: #28a745;
+    background: #d4edda;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="procedure-form">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-procedures me-2 text-success"></i>
+                            {% if object %}Editar Procedimiento Oftalmológico{% else %}Nuevo Procedimiento Oftalmológico{% endif %}
+                        </h4>
+                        <a href="{% url 'ophthalmology:procedure_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver a la Lista
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Información del Paciente y Examen -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user-md me-2"></i>
+                                        Información del Paciente
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.patient.id_for_label }}" class="form-label">Paciente *</label>
+                                            {{ form.patient }}
+                                            {% if form.patient.errors %}
+                                                <div class="text-danger">{{ form.patient.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.eye_examination.id_for_label }}" class="form-label">Examen Oftalmológico Relacionado</label>
+                                            {{ form.eye_examination }}
+                                            <small class="form-text text-muted">Seleccione el examen que originó este procedimiento</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tipo de Procedimiento -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-list me-2"></i>
+                                        Tipo de Procedimiento
+                                    </h5>
+                                </div>
+                                
+                                <!-- Selector visual de tipo de procedimiento -->
+                                <div class="procedure-type-grid">
+                                    <div class="procedure-type-card" data-type="CATARACT_SURGERY">
+                                        <i class="fas fa-eye fa-2x text-primary mb-2"></i>
+                                        <h6>Cirugía de Catarata</h6>
+                                        <small class="text-muted">Facoemulsificación</small>
+                                    </div>
+                                    <div class="procedure-type-card" data-type="GLAUCOMA_SURGERY">
+                                        <i class="fas fa-tint fa-2x text-info mb-2"></i>
+                                        <h6>Cirugía de Glaucoma</h6>
+                                        <small class="text-muted">Trabeculectomía</small>
+                                    </div>
+                                    <div class="procedure-type-card" data-type="RETINAL_SURGERY">
+                                        <i class="fas fa-crosshairs fa-2x text-warning mb-2"></i>
+                                        <h6>Cirugía de Retina</h6>
+                                        <small class="text-muted">Vitrectomía</small>
+                                    </div>
+                                    <div class="procedure-type-card" data-type="REFRACTIVE_SURGERY">
+                                        <i class="fas fa-glasses fa-2x text-success mb-2"></i>
+                                        <h6>Cirugía Refractiva</h6>
+                                        <small class="text-muted">LASIK, PRK</small>
+                                    </div>
+                                    <div class="procedure-type-card" data-type="LASER_THERAPY">
+                                        <i class="fas fa-bolt fa-2x text-danger mb-2"></i>
+                                        <h6>Terapia Láser</h6>
+                                        <small class="text-muted">YAG, Argón</small>
+                                    </div>
+                                    <div class="procedure-type-card" data-type="INJECTION">
+                                        <i class="fas fa-syringe fa-2x text-secondary mb-2"></i>
+                                        <h6>Inyección</h6>
+                                        <small class="text-muted">Intravítrea</small>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.procedure_type.id_for_label }}" class="form-label">Tipo de Procedimiento *</label>
+                                            {{ form.procedure_type }}
+                                            {% if form.procedure_type.errors %}
+                                                <div class="text-danger">{{ form.procedure_type.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.procedure_name.id_for_label }}" class="form-label">Nombre del Procedimiento *</label>
+                                            {{ form.procedure_name }}
+                                            {% if form.procedure_name.errors %}
+                                                <div class="text-danger">{{ form.procedure_name.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label">Descripción del Procedimiento</label>
+                                    {{ form.description }}
+                                </div>
+                            </div>
+
+                            <!-- Selección del Ojo -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Selección del Ojo a Operar
+                                    </h5>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="eye-selector" data-eye="RIGHT">
+                                            <i class="fas fa-eye fa-3x text-primary mb-3"></i>
+                                            <h5>Ojo Derecho</h5>
+                                            <p class="text-muted">OD</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="eye-selector" data-eye="LEFT">
+                                            <i class="fas fa-eye fa-3x text-success mb-3"></i>
+                                            <h5>Ojo Izquierdo</h5>
+                                            <p class="text-muted">OI</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="eye-selector" data-eye="BOTH">
+                                            <i class="fas fa-eye fa-3x text-info me-2"></i>
+                                            <i class="fas fa-eye fa-3x text-info"></i>
+                                            <h5>Ambos Ojos</h5>
+                                            <p class="text-muted">Bilateral</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <label for="{{ form.eye_operated.id_for_label }}" class="form-label">Ojo a Operar *</label>
+                                    {{ form.eye_operated }}
+                                    {% if form.eye_operated.errors %}
+                                        <div class="text-danger">{{ form.eye_operated.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Programación y Equipo Médico -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        Programación y Equipo Médico
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.scheduled_date.id_for_label }}" class="form-label">Fecha y Hora Programada *</label>
+                                            {{ form.scheduled_date }}
+                                            {% if form.scheduled_date.errors %}
+                                                <div class="text-danger">{{ form.scheduled_date.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.status.id_for_label }}" class="form-label">Estado del Procedimiento</label>
+                                            {{ form.status }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.primary_surgeon.id_for_label }}" class="form-label">Cirujano Principal *</label>
+                                    {{ form.primary_surgeon }}
+                                    {% if form.primary_surgeon.errors %}
+                                        <div class="text-danger">{{ form.primary_surgeon.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Diagnóstico Pre-operatorio -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-stethoscope me-2"></i>
+                                        Diagnóstico Pre-operatorio
+                                    </h5>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.preop_diagnosis.id_for_label }}" class="form-label">Diagnóstico Pre-operatorio *</label>
+                                    {{ form.preop_diagnosis }}
+                                    {% if form.preop_diagnosis.errors %}
+                                        <div class="text-danger">{{ form.preop_diagnosis.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Los campos marcados con * son obligatorios
+                                    </small>
+                                </div>
+                                <div>
+                                    <a href="{% url 'ophthalmology:procedure_list' %}" class="btn btn-secondary me-2">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if object %}Actualizar Procedimiento{% else %}Programar Procedimiento{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Validación del formulario
+    $('.needs-validation').on('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        $(this).addClass('was-validated');
+    });
+
+    // Selector visual de tipo de procedimiento
+    $('.procedure-type-card').click(function() {
+        $('.procedure-type-card').removeClass('selected');
+        $(this).addClass('selected');
+        const procedureType = $(this).data('type');
+        $('#id_procedure_type').val(procedureType);
+        
+        // Auto-completar nombre según el tipo
+        const procedureNames = {
+            'CATARACT_SURGERY': 'Facoemulsificación con implante de LIO',
+            'GLAUCOMA_SURGERY': 'Trabeculectomía',
+            'RETINAL_SURGERY': 'Vitrectomía pars plana',
+            'REFRACTIVE_SURGERY': 'LASIK',
+            'LASER_THERAPY': 'Fotocoagulación retiniana',
+            'INJECTION': 'Inyección intravítrea'
+        };
+        
+        if (procedureNames[procedureType] && !$('#id_procedure_name').val()) {
+            $('#id_procedure_name').val(procedureNames[procedureType]);
+        }
+    });
+
+    // Selector visual de ojo
+    $('.eye-selector').click(function() {
+        $('.eye-selector').removeClass('selected');
+        $(this).addClass('selected');
+        const eyeType = $(this).data('eye');
+        $('#id_eye_operated').val(eyeType);
+    });
+
+    // Sincronizar selecciones existentes con elementos visuales
+    const currentProcedureType = $('#id_procedure_type').val();
+    if (currentProcedureType) {
+        $(`.procedure-type-card[data-type="${currentProcedureType}"]`).addClass('selected');
+    }
+
+    const currentEye = $('#id_eye_operated').val();
+    if (currentEye) {
+        $(`.eye-selector[data-eye="${currentEye}"]`).addClass('selected');
+    }
+
+    // Auto-completar fecha si no está establecida
+    if (!$('#id_scheduled_date').val()) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(8, 0, 0, 0);
+        const isoString = tomorrow.toISOString().slice(0, 16);
+        $('#id_scheduled_date').val(isoString);
+    }
+
+    // Validación de fecha (no permitir fechas pasadas)
+    $('#id_scheduled_date').on('change', function() {
+        const selectedDate = new Date($(this).val());
+        const now = new Date();
+        
+        if (selectedDate < now) {
+            alert('La fecha del procedimiento no puede ser en el pasado.');
+            $(this).focus();
+        }
+    });
+
+    console.log('✅ Formulario de procedimiento oftalmológico cargado');
+});
+</script>
+{% endblock %}
+
+
+

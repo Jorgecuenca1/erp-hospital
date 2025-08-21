@@ -1,0 +1,1483 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Espirometría - {{ ficha.nombre_trabajador }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .spirometry-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+        margin-bottom: 0;
+    }
+
+    .spiro-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+        padding: 15px 20px;
+        border-bottom: 1px solid #e3e6f0;
+        font-weight: 600;
+        color: #5a5c69;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .section-content {
+        padding: 20px;
+    }
+
+    .basic-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .info-field {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+    }
+
+    .info-field.compact {
+        padding: 8px 10px;
+    }
+
+    .info-field label {
+        font-weight: 600;
+        color: #5a5c69;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .info-field input,
+    .info-field select,
+    .info-field textarea {
+        border: none;
+        background: transparent;
+        font-weight: 500;
+        color: #2c3e50;
+        width: 100%;
+        padding: 5px 0;
+        font-size: 0.9rem;
+    }
+
+    .tab-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .tab-headers {
+        display: flex;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e3e6f0;
+    }
+
+    .tab-header {
+        flex: 1;
+        padding: 15px 20px;
+        text-align: center;
+        cursor: pointer;
+        font-weight: 600;
+        color: #5a5c69;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .tab-header.active {
+        background: white;
+        color: #28a745;
+        border-bottom-color: #28a745;
+    }
+
+    .tab-content {
+        padding: 20px;
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .exposure-section {
+        background: #e8f5e8;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+    }
+
+    .epp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin: 15px 0;
+    }
+
+    .epp-item {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+
+    .epp-item input[type="checkbox"] {
+        margin-right: 8px;
+        transform: scale(1.1);
+    }
+
+    .epp-item label {
+        margin: 0;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .habits-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .habits-table th {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .habits-table td {
+        padding: 10px;
+        border-bottom: 1px solid #e3e6f0;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .habits-table .habit-question {
+        text-align: left;
+        font-weight: 500;
+        background: #f8f9fa;
+        padding-left: 15px;
+    }
+
+    .btn-group-toggle {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+    }
+
+    .btn-toggle {
+        padding: 5px 12px;
+        border: 1px solid #28a745;
+        background: white;
+        color: #28a745;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+    }
+
+    .btn-toggle.active {
+        background: #28a745;
+        color: white;
+    }
+
+    .symptoms-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    .symptom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .symptom-row label {
+        font-weight: 600;
+        color: #5a5c69;
+        margin: 0;
+        flex: 1;
+    }
+
+    .symptom-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .symptom-detail {
+        margin-left: 10px;
+        padding: 5px 8px;
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        width: 120px;
+    }
+
+    .spirometry-values-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .spirometry-values-table th {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .spirometry-values-table td {
+        padding: 10px;
+        border-bottom: 1px solid #e3e6f0;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .spirometry-values-table .param-name {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #5a5c69;
+        text-align: left;
+        padding-left: 15px;
+        white-space: nowrap;
+    }
+
+    .spirometry-values-table input {
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        width: 80px;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .spirometry-values-table textarea {
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        width: 100%;
+        resize: vertical;
+        min-height: 60px;
+        font-size: 0.8rem;
+    }
+
+    .interpretation-section {
+        background: #e8f5e8;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+
+    .interpretation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .pattern-functional {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .pattern-functional h6 {
+        color: #28a745;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .pattern-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .pattern-btn {
+        padding: 10px;
+        border: 2px solid #e3e6f0;
+        background: white;
+        color: #5a5c69;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
+    .pattern-btn.normal {
+        border-color: #28a745;
+        color: #28a745;
+    }
+
+    .pattern-btn.normal.active {
+        background: #28a745;
+        color: white;
+    }
+
+    .pattern-btn.obstructivo {
+        border-color: #ffc107;
+        color: #ffc107;
+    }
+
+    .pattern-btn.obstructivo.active {
+        background: #ffc107;
+        color: white;
+    }
+
+    .pattern-btn.restrictivo {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .pattern-btn.restrictivo.active {
+        background: #dc3545;
+        color: white;
+    }
+
+    .pattern-btn.mixto {
+        border-color: #6f42c1;
+        color: #6f42c1;
+    }
+
+    .pattern-btn.mixto.active {
+        background: #6f42c1;
+        color: white;
+    }
+
+    .severity-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .severity-btn {
+        padding: 8px;
+        border: 2px solid #e3e6f0;
+        background: white;
+        color: #5a5c69;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+    }
+
+    .severity-btn.leve {
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
+
+    .severity-btn.leve.active {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .severity-btn.moderado {
+        border-color: #ffc107;
+        color: #ffc107;
+    }
+
+    .severity-btn.moderado.active {
+        background: #ffc107;
+        color: white;
+    }
+
+    .severity-btn.severo {
+        border-color: #fd7e14;
+        color: #fd7e14;
+    }
+
+    .severity-btn.severo.active {
+        background: #fd7e14;
+        color: white;
+    }
+
+    .severity-btn.muy-severo {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+    .severity-btn.muy-severo.active {
+        background: #dc3545;
+        color: white;
+    }
+
+    .recommendations-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+
+    .recommendations-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .recommendations-table th {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 12px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .recommendations-table td {
+        padding: 10px;
+        border-bottom: 1px solid #e3e6f0;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .recommendations-table input,
+    .recommendations-table select {
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .file-upload-section {
+        background: #e8f5e8;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        text-align: center;
+    }
+
+    .file-upload-section h6 {
+        color: #28a745;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .file-upload-area {
+        border: 2px dashed #28a745;
+        border-radius: 10px;
+        padding: 20px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .file-upload-area:hover {
+        background: #f8f9fa;
+        border-color: #20c997;
+    }
+
+    .save-section {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 20px;
+        border-top: 1px solid #e3e6f0;
+        text-align: center;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+
+    .worker-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+
+    .header-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .worker-details h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .worker-details p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+    }
+
+    .instructivo-alert {
+        background: #e3f2fd;
+        border: 1px solid #90caf9;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .instructivo-alert i {
+        color: #1976d2;
+        margin-right: 10px;
+    }
+
+    .instructivo-alert a {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auto-calculation {
+        background: #d4edda;
+        padding: 10px;
+        border-radius: 6px;
+        margin: 10px 0;
+        text-align: center;
+        font-weight: 600;
+        color: #155724;
+    }
+
+    .calculation-badge {
+        display: inline-block;
+        background: #28a745;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:fichas_clinicas' %}">Fichas Clínicas</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Espirometría</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header de espirometría -->
+    <div class="spirometry-header">
+        <div class="header-info">
+            <div class="worker-avatar">
+                🫁
+            </div>
+            <div class="worker-details">
+                <h3>Espirometría - {{ ficha.nombre_trabajador }}</h3>
+                <p><strong>Ficha N°:</strong> {{ ficha.numero_ficha }} | <strong>Identificación:</strong> {{
+                    ficha.numero_identificacion }}</p>
+                <p><strong>Empresa:</strong> {% if ficha.empresa %}{{ ficha.empresa.razon_social }}{% else %}No
+                    especificada{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructivo -->
+    <div class="instructivo-alert">
+        <i class="fas fa-info-circle"></i>
+        <span>👉🏼 <a href="#" onclick="alert('Instructivo de Espirometría - En desarrollo')">De clic aquí para aprender
+                o ver los instructivos</a></span>
+    </div>
+
+    <form method="post" id="espirometriaForm" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Información Básica del Examen -->
+        <div class="spiro-section">
+            <div class="section-header">
+                <span>🫁 Información Básica de la Espirometría</span>
+            </div>
+            <div class="section-content">
+                <div class="basic-info-grid">
+                    <div class="info-field">
+                        <label>Producto:</label>
+                        <input type="text" name="producto" value="{{ espirometria.producto|default:'' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>Municipio:</label>
+                        <input type="text" value="EL BANCO (MAGDALENA, COLOMBIA)" readonly>
+                    </div>
+                    <div class="info-field">
+                        <label>Fecha:</label>
+                        <input type="date" name="fecha_evaluacion" value="{{ ficha.fecha_evaluacion|date:'Y-m-d' }}"
+                            required>
+                    </div>
+                    <div class="info-field">
+                        <label>Tipo Evaluación Médica:</label>
+                        <select name="tipo_evaluacion_medica">
+                            <option value="PREOCUPACIONAL">Pre-ocupacional</option>
+                            <option value="OCUPACIONAL">Ocupacional</option>
+                            <option value="POSTOCUPACIONAL">Post-ocupacional</option>
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Tipo:</label>
+                        <select name="tipo_documento">
+                            {% for codigo, nombre in ficha.TIPO_DOC_CHOICES %}
+                            <option value="{{ codigo }}" {% if ficha.tipo_documento==codigo %}selected{% endif %}>{{
+                                nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Número Identificación:</label>
+                        <input type="text" name="numero_identificacion" value="{{ ficha.numero_identificacion }}"
+                            required>
+                    </div>
+                    <div class="info-field">
+                        <label>Nombre:</label>
+                        <input type="text" name="nombre_trabajador" value="{{ ficha.nombre_trabajador }}" required>
+                    </div>
+                    <div class="info-field compact">
+                        <label>Edad:</label>
+                        <input type="number" name="edad" value="{{ ficha.edad }}" min="16" max="100">
+                    </div>
+                    <div class="info-field compact">
+                        <label>Peso (kg):</label>
+                        <input type="number" step="0.01" name="peso_kg" value="{{ espirometria.peso_kg|default:'' }}"
+                            onchange="calcularIMC()">
+                    </div>
+                    <div class="info-field compact">
+                        <label>Talla (cm):</label>
+                        <input type="number" step="0.01" name="talla_cm" value="{{ espirometria.talla_cm|default:'' }}"
+                            onchange="calcularIMC()">
+                    </div>
+                    <div class="info-field compact">
+                        <label>IMC:</label>
+                        <input type="number" step="0.01" name="imc" id="imc_field"
+                            value="{{ espirometria.imc|default:'' }}" readonly>
+                        {% if imc_calculado %}<span class="calculation-badge">{{ imc_calculado }}</span>{% endif %}
+                    </div>
+                    <div class="info-field">
+                        <label>Empresa:</label>
+                        <select name="empresa">
+                            <option value="">Seleccione</option>
+                            {% for empresa in empresas %}
+                            <option value="{{ empresa.id }}" {% if ficha.empresa_id==empresa.id %}selected{% endif %}>
+                                {{ empresa.razon_social }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Fecha Ingreso Empresa:</label>
+                        <input type="date" name="fecha_ingreso_empresa"
+                            value="{{ espirometria.fecha_ingreso_empresa|date:'Y-m-d' }}">
+                    </div>
+                    <div class="info-field compact">
+                        <label>Antigüedad Años:</label>
+                        <input type="number" name="antiguedad_cargo_anos"
+                            value="{{ espirometria.antiguedad_cargo_anos|default:'' }}">
+                    </div>
+                    <div class="info-field compact">
+                        <label>Antigüedad Meses:</label>
+                        <input type="number" name="antiguedad_cargo_meses"
+                            value="{{ espirometria.antiguedad_cargo_meses|default:'' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>Cargo:</label>
+                        <input type="text" name="cargo" value="{{ ficha.cargo }}">
+                    </div>
+                    <div class="info-field">
+                        <label>Funciones del Cargo:</label>
+                        <textarea name="funciones_cargo"
+                            rows="3">{{ espirometria.funciones_cargo|default:'' }}</textarea>
+                    </div>
+                    <div class="info-field">
+                        <label>EPS:</label>
+                        <input type="text" name="eps" value="{{ espirometria.eps|default:'' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>Fecha último Examen:</label>
+                        <input type="date" name="fecha_ultimo_examen"
+                            value="{{ espirometria.fecha_ultimo_examen|date:'Y-m-d' }}">
+                    </div>
+                    <div class="info-field">
+                        <label>Resultado Anterior:</label>
+                        <select name="resultado_anterior">
+                            <option value="NO APLICA" {% if espirometria.resultado_anterior == "NO APLICA" %}selected{%
+                                endif %}>NO APLICA</option>
+                            <option value="NORMAL">NORMAL</option>
+                            <option value="ANORMAL">ANORMAL</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistema de Tabs -->
+        <div class="tab-container">
+            <div class="tab-headers">
+                <div class="tab-header active" onclick="showTab('antecedentes')">Antecedentes y Pruebas Realizadas</div>
+                <div class="tab-header" onclick="showTab('resultados')">Resultado del Espirómetro</div>
+            </div>
+
+            <!-- Tab de Antecedentes -->
+            <div id="antecedentes" class="tab-content active">
+                <!-- Características de Exposición -->
+                <div class="exposure-section">
+                    <h6>Característica Exposición</h6>
+                    <textarea name="caracteristica_exposicion" rows="3"
+                        placeholder="Describir características de exposición ocupacional">{{ espirometria.caracteristica_exposicion|default:'' }}</textarea>
+
+                    <h6 style="margin-top: 15px;">Riesgos Ocupacionales</h6>
+                    <textarea name="riesgos_ocupacionales" rows="3"
+                        placeholder="Describir riesgos ocupacionales">{{ espirometria.riesgos_ocupacionales|default:'' }}</textarea>
+                </div>
+
+                <!-- Elementos de Protección Personal -->
+                <h6>Uso de Elementos de Protección Personal:</h6>
+                <div class="epp-grid">
+                    <div class="epp-item">
+                        <input type="checkbox" id="mascarilla" name="uso_mascarilla" {% if espirometria.uso_mascarilla
+                            %}checked{% endif %}>
+                        <label for="mascarilla">Mascarilla</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" id="respirador" name="uso_respirador" {% if espirometria.uso_respirador
+                            %}checked{% endif %}>
+                        <label for="respirador">Respirador</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" id="otros_epp" name="uso_otros_epp" {% if espirometria.uso_otros_epp
+                            %}checked{% endif %}>
+                        <label for="otros_epp">Otros</label>
+                    </div>
+                    <div class="info-field compact">
+                        <label>¿Cuál?:</label>
+                        <input type="text" name="otros_epp_cual" value="{{ espirometria.otros_epp_cual|default:'' }}">
+                    </div>
+                </div>
+
+                <!-- Factores de Riesgo -->
+                <h6>Factores de Riesgo:</h6>
+                <div class="epp-grid">
+                    <div class="epp-item">
+                        <input type="checkbox" id="polvo" name="factor_polvo" {% if espirometria.factor_polvo
+                            %}checked{% endif %}>
+                        <label for="polvo">Polvo</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" id="humos" name="factor_humos" {% if espirometria.factor_humos
+                            %}checked{% endif %}>
+                        <label for="humos">Humos</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" id="gases" name="factor_gases" {% if espirometria.factor_gases
+                            %}checked{% endif %}>
+                        <label for="gases">Gases</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" id="vapores" name="factor_vapores" {% if espirometria.factor_vapores
+                            %}checked{% endif %}>
+                        <label for="vapores">Vapores</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" id="neblinas" name="factor_neblinas" {% if espirometria.factor_neblinas
+                            %}checked{% endif %}>
+                        <label for="neblinas">Neblinas</label>
+                    </div>
+                    <div class="info-field compact">
+                        <label>Tiempo Exposición Años:</label>
+                        <input type="number" name="tiempo_exposicion_anos"
+                            value="{{ espirometria.tiempo_exposicion_anos|default:'' }}">
+                    </div>
+                    <div class="info-field compact">
+                        <label>Meses:</label>
+                        <input type="number" name="tiempo_exposicion_meses"
+                            value="{{ espirometria.tiempo_exposicion_meses|default:'' }}">
+                    </div>
+                </div>
+
+                <!-- Hábitos Personales -->
+                <h5>HÁBITOS PERSONALES</h5>
+                <table class="habits-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Hábito</th>
+                            <th style="width: 15%;">Refiere</th>
+                            <th style="width: 15%;">Cant</th>
+                            <th style="width: 20%;">Frecuencia</th>
+                            <th style="width: 20%;">Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="habit-question">¿FUMA CIGARRILLO, TABACO O PIPA?</td>
+                            <td>
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.fuma_tabaco %}active{% endif %}"
+                                        onclick="toggleHabit('fuma_tabaco', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.fuma_tabaco %}active{% endif %}"
+                                        onclick="toggleHabit('fuma_tabaco', false)">No</button>
+                                </div>
+                                <input type="hidden" name="fuma_tabaco" id="fuma_tabaco"
+                                    value="{{ espirometria.fuma_tabaco }}">
+                            </td>
+                            <td><input type="text" name="fuma_cantidad"
+                                    value="{{ espirometria.fuma_cantidad|default:'CONSUMO/DÍA' }}" style="width: 100%;">
+                            </td>
+                            <td><input type="text" name="fuma_tiempo" value="{{ espirometria.fuma_tiempo|default:'' }}"
+                                    placeholder="¿HACE CUANTO TIEMPO?" style="width: 100%;"></td>
+                            <td><input type="text" name="fuma_observacion" value="" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td class="habit-question">¿ES EXFUMADOR?</td>
+                            <td>
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.es_exfumador %}active{% endif %}"
+                                        onclick="toggleHabit('es_exfumador', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.es_exfumador %}active{% endif %}"
+                                        onclick="toggleHabit('es_exfumador', false)">No</button>
+                                </div>
+                                <input type="hidden" name="es_exfumador" id="es_exfumador"
+                                    value="{{ espirometria.es_exfumador }}">
+                            </td>
+                            <td><input type="text" name="exfumador_cantidad"
+                                    value="{{ espirometria.exfumador_cantidad|default:'CONSUMO/DÍA' }}"
+                                    style="width: 100%;"></td>
+                            <td><input type="number" name="ano_dejo_fumar"
+                                    value="{{ espirometria.ano_dejo_fumar|default:'' }}"
+                                    placeholder="AÑO EN QUE DEJÓ DE FUMAR" style="width: 100%;"></td>
+                            <td><input type="text" name="exfumador_observacion" value="" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td class="habit-question">¿PRACTICA ALGÚN DEPORTE?</td>
+                            <td>
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.practica_deporte %}active{% endif %}"
+                                        onclick="toggleHabit('practica_deporte', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.practica_deporte %}active{% endif %}"
+                                        onclick="toggleHabit('practica_deporte', false)">No</button>
+                                </div>
+                                <input type="hidden" name="practica_deporte" id="practica_deporte"
+                                    value="{{ espirometria.practica_deporte }}">
+                            </td>
+                            <td><input type="text" name="deporte_horas_semana"
+                                    value="{{ espirometria.deporte_horas_semana|default:'HORAS/SEMANA' }}"
+                                    style="width: 100%;"></td>
+                            <td><input type="text" name="deporte_cual"
+                                    value="{{ espirometria.deporte_cual|default:'' }}" placeholder="¿CUÁL?"
+                                    style="width: 100%;"></td>
+                            <td><input type="text" name="deporte_observacion" value="" style="width: 100%;"></td>
+                        </tr>
+                        <tr>
+                            <td class="habit-question">¿COCINA O COCINÓ CON LEÑA?</td>
+                            <td>
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.cocina_lena %}active{% endif %}"
+                                        onclick="toggleHabit('cocina_lena', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.cocina_lena %}active{% endif %}"
+                                        onclick="toggleHabit('cocina_lena', false)">No</button>
+                                </div>
+                                <input type="hidden" name="cocina_lena" id="cocina_lena"
+                                    value="{{ espirometria.cocina_lena }}">
+                            </td>
+                            <td><input type="text" value="NA" readonly style="width: 100%;"></td>
+                            <td><input type="text" name="lena_tiempo_exposicion"
+                                    value="{{ espirometria.lena_tiempo_exposicion|default:'' }}"
+                                    placeholder="TIEMPO DE EXPOSICIÓN" style="width: 100%;"></td>
+                            <td><input type="text" name="lena_observacion" value="" style="width: 100%;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Sintomatología -->
+                <h5>SINTOMATOLOGÍA</h5>
+                <div class="symptoms-grid">
+                    <div>
+                        <div class="symptom-row">
+                            <label>DIFICULTAD AL RESPIRAR</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.dificultad_respirar %}active{% endif %}"
+                                        onclick="toggleSymptom('dificultad_respirar', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.dificultad_respirar %}active{% endif %}"
+                                        onclick="toggleSymptom('dificultad_respirar', false)">No</button>
+                                </div>
+                                <input type="hidden" name="dificultad_respirar" id="dificultad_respirar"
+                                    value="{{ espirometria.dificultad_respirar }}">
+                            </div>
+                        </div>
+                        <div class="symptom-row">
+                            <label>TOS FRECUENTE</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.tos_frecuente %}active{% endif %}"
+                                        onclick="toggleSymptom('tos_frecuente', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.tos_frecuente %}active{% endif %}"
+                                        onclick="toggleSymptom('tos_frecuente', false)">No</button>
+                                </div>
+                                <input type="hidden" name="tos_frecuente" id="tos_frecuente"
+                                    value="{{ espirometria.tos_frecuente }}">
+                            </div>
+                        </div>
+                        <div class="symptom-row">
+                            <label>ENFERMEDAD CARDÍACA</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.enfermedad_cardiaca %}active{% endif %}"
+                                        onclick="toggleSymptom('enfermedad_cardiaca', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.enfermedad_cardiaca %}active{% endif %}"
+                                        onclick="toggleSymptom('enfermedad_cardiaca', false)">No</button>
+                                </div>
+                                <input type="hidden" name="enfermedad_cardiaca" id="enfermedad_cardiaca"
+                                    value="{{ espirometria.enfermedad_cardiaca }}">
+                            </div>
+                        </div>
+                        <div class="symptom-row">
+                            <label>DOLOR AL RESPIRAR</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.dolor_respirar %}active{% endif %}"
+                                        onclick="toggleSymptom('dolor_respirar', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.dolor_respirar %}active{% endif %}"
+                                        onclick="toggleSymptom('dolor_respirar', false)">No</button>
+                                </div>
+                                <input type="hidden" name="dolor_respirar" id="dolor_respirar"
+                                    value="{{ espirometria.dolor_respirar }}">
+                            </div>
+                        </div>
+                        <div class="symptom-row">
+                            <label>ALERGIA RESPIRATORIA</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.alergia_respiratoria %}active{% endif %}"
+                                        onclick="toggleSymptom('alergia_respiratoria', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.alergia_respiratoria %}active{% endif %}"
+                                        onclick="toggleSymptom('alergia_respiratoria', false)">No</button>
+                                </div>
+                                <input type="hidden" name="alergia_respiratoria" id="alergia_respiratoria"
+                                    value="{{ espirometria.alergia_respiratoria }}">
+                            </div>
+                        </div>
+                        <div class="symptom-row">
+                            <label>ASMA</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button" class="btn-toggle {% if espirometria.asma %}active{% endif %}"
+                                        onclick="toggleSymptom('asma', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.asma %}active{% endif %}"
+                                        onclick="toggleSymptom('asma', false)">No</button>
+                                </div>
+                                <input type="hidden" name="asma" id="asma" value="{{ espirometria.asma }}">
+                            </div>
+                        </div>
+                        <div class="symptom-row">
+                            <label>OTRA ENFERMEDAD RESPIRATORIA</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.otra_enfermedad_respiratoria %}active{% endif %}"
+                                        onclick="toggleSymptom('otra_enfermedad_respiratoria', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.otra_enfermedad_respiratoria %}active{% endif %}"
+                                        onclick="toggleSymptom('otra_enfermedad_respiratoria', false)">No</button>
+                                </div>
+                                <input type="hidden" name="otra_enfermedad_respiratoria"
+                                    id="otra_enfermedad_respiratoria"
+                                    value="{{ espirometria.otra_enfermedad_respiratoria }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="symptom-row">
+                            <label>CON EL ESFUERZO FÍSICO</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.dificultad_esfuerzo_fisico %}active{% endif %}"
+                                        onclick="toggleSymptom('dificultad_esfuerzo_fisico', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.dificultad_esfuerzo_fisico %}active{% endif %}"
+                                        onclick="toggleSymptom('dificultad_esfuerzo_fisico', false)">No</button>
+                                    <button type="button" class="btn-toggle">No Aplica</button>
+                                </div>
+                                <input type="hidden" name="dificultad_esfuerzo_fisico" id="dificultad_esfuerzo_fisico"
+                                    value="{{ espirometria.dificultad_esfuerzo_fisico }}">
+                            </div>
+                        </div>
+                        <div class="symptom-row">
+                            <label>CON ESPUTO</label>
+                            <div class="symptom-controls">
+                                <div class="btn-group-toggle">
+                                    <button type="button"
+                                        class="btn-toggle {% if espirometria.tos_con_esputo %}active{% endif %}"
+                                        onclick="toggleSymptom('tos_con_esputo', true)">Sí</button>
+                                    <button type="button"
+                                        class="btn-toggle {% if not espirometria.tos_con_esputo %}active{% endif %}"
+                                        onclick="toggleSymptom('tos_con_esputo', false)">No</button>
+                                    <button type="button" class="btn-toggle">No Aplica</button>
+                                </div>
+                                <input type="hidden" name="tos_con_esputo" id="tos_con_esputo"
+                                    value="{{ espirometria.tos_con_esputo }}">
+                            </div>
+                        </div>
+                        <div class="symptom-row">
+                            <input type="text" name="enfermedad_cardiaca_cual"
+                                value="{{ espirometria.enfermedad_cardiaca_cual|default:'' }}" class="symptom-detail"
+                                placeholder="¿CUÁL?">
+                        </div>
+                        <div class="symptom-row">
+                            <input type="text" name="dolor_respirar_donde"
+                                value="{{ espirometria.dolor_respirar_donde|default:'' }}" class="symptom-detail"
+                                placeholder="¿DÓNDE?">
+                        </div>
+                        <div class="symptom-row">
+                            <input type="text" name="alergia_respiratoria_que"
+                                value="{{ espirometria.alergia_respiratoria_que|default:'' }}" class="symptom-detail"
+                                placeholder="¿A QUÉ?">
+                        </div>
+                        <div class="symptom-row">
+                            <input type="text" name="asma_edad_ultima_crisis"
+                                value="{{ espirometria.asma_edad_ultima_crisis|default:'' }}" class="symptom-detail"
+                                placeholder="EDAD ÚLTIMA CRISIS">
+                        </div>
+                        <div class="symptom-row">
+                            <input type="text" name="otra_enfermedad_cual"
+                                value="{{ espirometria.otra_enfermedad_cual|default:'' }}" class="symptom-detail"
+                                placeholder="¿CUÁL?">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab de Resultados -->
+            <div id="resultados" class="tab-content">
+                <!-- Valores Observados de Espirometría -->
+                <h5>VALORES OBSERVADOS DE ESPIROMETRÍA</h5>
+                <table class="spirometry-values-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">PARÁMETROS</th>
+                            <th style="width: 15%;">PRE</th>
+                            <th style="width: 15%;">POST</th>
+                            <th style="width: 15%;">TEOR</th>
+                            <th style="width: 15%;">OBSERVACIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="param-name">CAPACIDAD VITAL FORZADA - CVF (Lt)</td>
+                            <td><input type="number" step="0.01" name="cvf_pre"
+                                    value="{{ espirometria.cvf_pre|default:'' }}"></td>
+                            <td><input type="number" step="0.01" name="cvf_post"
+                                    value="{{ espirometria.cvf_post|default:'' }}" onchange="calcularPorcentajes()">
+                            </td>
+                            <td><input type="number" step="0.01" name="cvf_teor"
+                                    value="{{ espirometria.cvf_teor|default:'' }}" onchange="calcularPorcentajes()">
+                            </td>
+                            <td><textarea
+                                    name="cvf_observaciones">{{ espirometria.cvf_observaciones|default:'' }}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">VOLUMEN ESPIRATORIO FORZADO PRIMER SEGUNDO - VEF1 (Lt)</td>
+                            <td><input type="number" step="0.01" name="vef1_pre"
+                                    value="{{ espirometria.vef1_pre|default:'' }}"></td>
+                            <td><input type="number" step="0.01" name="vef1_post"
+                                    value="{{ espirometria.vef1_post|default:'' }}" onchange="calcularPorcentajes()">
+                            </td>
+                            <td><input type="number" step="0.01" name="vef1_teor"
+                                    value="{{ espirometria.vef1_teor|default:'' }}" onchange="calcularPorcentajes()">
+                            </td>
+                            <td><textarea
+                                    name="vef1_observaciones">{{ espirometria.vef1_observaciones|default:'' }}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">VEF1/CVF(%) ÍNDICE DE TIFFENEAU</td>
+                            <td><input type="number" step="0.01" name="vef1_cvf_pre"
+                                    value="{{ espirometria.vef1_cvf_pre|default:'' }}"></td>
+                            <td><input type="number" step="0.01" name="vef1_cvf_post"
+                                    value="{{ espirometria.vef1_cvf_post|default:'' }}" onchange="interpretarPatron()">
+                            </td>
+                            <td><input type="number" step="0.01" name="vef1_cvf_teor"
+                                    value="{{ espirometria.vef1_cvf_teor|default:'' }}"></td>
+                            <td><textarea
+                                    name="vef1_cvf_observaciones">{{ espirometria.vef1_cvf_observaciones|default:'' }}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">FLUJO ESPIRATORIO FORZADO - FEF 25 - 75 (Lt/SEG)</td>
+                            <td><input type="number" step="0.01" name="fef_25_75_pre"
+                                    value="{{ espirometria.fef_25_75_pre|default:'' }}"></td>
+                            <td><input type="number" step="0.01" name="fef_25_75_post"
+                                    value="{{ espirometria.fef_25_75_post|default:'' }}"></td>
+                            <td><input type="number" step="0.01" name="fef_25_75_teor"
+                                    value="{{ espirometria.fef_25_75_teor|default:'' }}"></td>
+                            <td><textarea
+                                    name="fef_25_75_observaciones">{{ espirometria.fef_25_75_observaciones|default:'' }}</textarea>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                {% if vef1_porcentaje or cvf_porcentaje %}
+                <div class="auto-calculation">
+                    <strong>Cálculos Automáticos:</strong>
+                    {% if vef1_porcentaje %}<span class="calculation-badge">VEF1: {{ vef1_porcentaje }}%</span>{% endif
+                    %}
+                    {% if cvf_porcentaje %}<span class="calculation-badge">CVF: {{ cvf_porcentaje }}%</span>{% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Interpretación -->
+                <div class="interpretation-section">
+                    <h6>Interpretación</h6>
+                    <div class="interpretation-grid">
+                        <div class="info-field">
+                            <label>Marca y referencia espirómetro utilizado:</label>
+                            <input type="text" name="marca_espirometro"
+                                value="{{ espirometria.marca_espirometro|default:'' }}">
+                        </div>
+                        <div class="info-field">
+                            <label>F Última Calibración:</label>
+                            <input type="date" name="fecha_ultima_calibracion"
+                                value="{{ espirometria.fecha_ultima_calibracion|date:'Y-m-d' }}">
+                        </div>
+                        <div class="info-field">
+                            <label>Escala interpretación:</label>
+                            <select name="escala_interpretacion">
+                                {% for codigo, nombre in escala_interpretacion_choices %}
+                                <option value="{{ codigo }}" {% if espirometria.escala_interpretacion==codigo
+                                    %}selected{% endif %}>{{ nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Patrón Funcional -->
+                    <div class="pattern-functional">
+                        <h6>Patrón Funcional</h6>
+                        <div class="pattern-buttons">
+                            <button type="button"
+                                class="pattern-btn normal {% if espirometria.patron_funcional == 'NORMAL' %}active{% endif %}"
+                                onclick="setPatronFuncional('NORMAL')">NORMAL</button>
+                            <button type="button"
+                                class="pattern-btn obstructivo {% if espirometria.patron_funcional == 'OBSTRUCTIVO' %}active{% endif %}"
+                                onclick="setPatronFuncional('OBSTRUCTIVO')">OBSTRUCTIVO</button>
+                            <button type="button"
+                                class="pattern-btn restrictivo {% if espirometria.patron_funcional == 'RESTRICTIVO' %}active{% endif %}"
+                                onclick="setPatronFuncional('RESTRICTIVO')">RESTRICTIVO</button>
+                            <button type="button"
+                                class="pattern-btn mixto {% if espirometria.patron_funcional == 'MIXTO' %}active{% endif %}"
+                                onclick="setPatronFuncional('MIXTO')">MIXTO</button>
+                        </div>
+                        <input type="hidden" name="patron_funcional" id="patron_funcional"
+                            value="{{ espirometria.patron_funcional }}">
+
+                        <h6 style="margin-top: 15px;">Severidad</h6>
+                        <div class="severity-buttons">
+                            <button type="button"
+                                class="severity-btn leve {% if espirometria.severidad == 'LEVE' %}active{% endif %}"
+                                onclick="setSeveridad('LEVE')">LEVE</button>
+                            <button type="button"
+                                class="severity-btn moderado {% if espirometria.severidad == 'MODERADO' %}active{% endif %}"
+                                onclick="setSeveridad('MODERADO')">MODERADO</button>
+                            <button type="button"
+                                class="severity-btn severo {% if espirometria.severidad == 'SEVERO' %}active{% endif %}"
+                                onclick="setSeveridad('SEVERO')">SEVERO</button>
+                            <button type="button"
+                                class="severity-btn muy-severo {% if espirometria.severidad == 'MUY_SEVERO' %}active{% endif %}"
+                                onclick="setSeveridad('MUY_SEVERO')">MUY SEVERO</button>
+                        </div>
+                        <input type="hidden" name="severidad" id="severidad" value="{{ espirometria.severidad }}">
+                    </div>
+                </div>
+
+                <!-- Recomendaciones -->
+                <div class="recommendations-section">
+                    <h6>Recomendaciones</h6>
+                    <table class="recommendations-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60%;">Recomendación</th>
+                                <th style="width: 20%;">Tipo</th>
+                                <th style="width: 20%;">Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for recomendacion in recomendaciones_espirometria %}
+                            <tr>
+                                <td><input type="text" value="{{ recomendacion.recomendacion }}" readonly></td>
+                                <td><input type="text" value="{{ recomendacion.get_tipo_display }}" readonly></td>
+                                <td><input type="date" value="{{ recomendacion.fecha|date:'Y-m-d' }}" readonly></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td><input type="text" name="nueva_recomendacion"
+                                        placeholder="Escribir nueva recomendación"></td>
+                                <td>
+                                    <select name="nuevo_tipo_recomendacion">
+                                        <option value="">Seleccione</option>
+                                        {% for codigo, nombre in tipo_recomendacion_choices %}
+                                        <option value="{{ codigo }}">{{ nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td><input type="date" name="nueva_fecha_recomendacion"
+                                        value="{{ ficha.fecha_evaluacion|date:'Y-m-d' }}"></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="info-field">
+                    <label>Observaciones:</label>
+                    <textarea name="observaciones" rows="4">{{ espirometria.observaciones|default:'' }}</textarea>
+                </div>
+
+                <!-- Resultado del Espirómetro -->
+                <div class="file-upload-section">
+                    <h6>Resultado del Espirómetro</h6>
+                    <div class="file-upload-area" onclick="document.getElementById('resultado_archivo').click()">
+                        <i class="fas fa-upload fa-2x mb-2" style="color: #28a745;"></i>
+                        <p><strong>Adjuntar el Resultado del Espirómetro</strong></p>
+                        <p>{% if espirometria.resultado_archivo %}Archivo actual: {{ espirometria.resultado_archivo.name
+                            }}{% else %}Sin archivos seleccionados{% endif %}</p>
+                        <input type="file" id="resultado_archivo" name="resultado_archivo" style="display: none;"
+                            accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Botón de guardar -->
+    <div class="save-section">
+        <button type="submit" form="espirometriaForm" class="btn-save">
+            <i class="fas fa-save me-2"></i>Guardar Espirometría
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showTab(tabName) {
+        // Ocultar todos los tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Desactivar todos los headers
+        document.querySelectorAll('.tab-header').forEach(header => {
+            header.classList.remove('active');
+        });
+
+        // Mostrar el tab seleccionado
+        document.getElementById(tabName).classList.add('active');
+
+        // Activar el header correspondiente
+        event.target.classList.add('active');
+    }
+
+    function calcularIMC() {
+        const peso = parseFloat(document.querySelector('input[name="peso_kg"]').value);
+        const talla = parseFloat(document.querySelector('input[name="talla_cm"]').value);
+
+        if (peso && talla) {
+            const tallam = talla / 100;
+            const imc = peso / (tallam * tallam);
+            document.getElementById('imc_field').value = imc.toFixed(2);
+        }
+    }
+
+    function toggleHabit(habitName, value) {
+        document.getElementById(habitName).value = value;
+        // Actualizar botones
+        const buttons = event.target.parentElement.querySelectorAll('.btn-toggle');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function toggleSymptom(symptomName, value) {
+        document.getElementById(symptomName).value = value;
+        // Actualizar botones
+        const buttons = event.target.parentElement.querySelectorAll('.btn-toggle');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function calcularPorcentajes() {
+        // Calcular VEF1 porcentaje
+        const vef1Post = parseFloat(document.querySelector('input[name="vef1_post"]').value);
+        const vef1Teor = parseFloat(document.querySelector('input[name="vef1_teor"]').value);
+
+        if (vef1Post && vef1Teor) {
+            const vef1Porcentaje = (vef1Post / vef1Teor) * 100;
+            console.log('VEF1 Porcentaje:', vef1Porcentaje.toFixed(1) + '%');
+
+            // Auto-calcular severidad
+            if (vef1Porcentaje >= 80) {
+                setSeveridad('LEVE');
+            } else if (vef1Porcentaje >= 50) {
+                setSeveridad('MODERADO');
+            } else if (vef1Porcentaje >= 30) {
+                setSeveridad('SEVERO');
+            } else {
+                setSeveridad('MUY_SEVERO');
+            }
+        }
+
+        // Calcular CVF porcentaje
+        const cvfPost = parseFloat(document.querySelector('input[name="cvf_post"]').value);
+        const cvfTeor = parseFloat(document.querySelector('input[name="cvf_teor"]').value);
+
+        if (cvfPost && cvfTeor) {
+            const cvfPorcentaje = (cvfPost / cvfTeor) * 100;
+            console.log('CVF Porcentaje:', cvfPorcentaje.toFixed(1) + '%');
+        }
+
+        // Auto-interpretar patrón funcional
+        interpretarPatron();
+    }
+
+    function interpretarPatron() {
+        const vef1CvfRatio = parseFloat(document.querySelector('input[name="vef1_cvf_post"]').value);
+        const vef1Post = parseFloat(document.querySelector('input[name="vef1_post"]').value);
+        const vef1Teor = parseFloat(document.querySelector('input[name="vef1_teor"]').value);
+        const cvfPost = parseFloat(document.querySelector('input[name="cvf_post"]').value);
+        const cvfTeor = parseFloat(document.querySelector('input[name="cvf_teor"]').value);
+
+        if (vef1CvfRatio && vef1Post && vef1Teor && cvfPost && cvfTeor) {
+            const vef1Percent = (vef1Post / vef1Teor) * 100;
+            const cvfPercent = (cvfPost / cvfTeor) * 100;
+
+            let patron = 'NORMAL';
+
+            if (vef1CvfRatio < 70) {  // Obstrucción
+                if (cvfPercent < 80) {  // También hay restricción
+                    patron = 'MIXTO';
+                } else {
+                    patron = 'OBSTRUCTIVO';
+                }
+            } else if (cvfPercent < 80) {  // Solo restricción
+                patron = 'RESTRICTIVO';
+            }
+
+            setPatronFuncional(patron);
+        }
+    }
+
+    function setPatronFuncional(patron) {
+        document.getElementById('patron_funcional').value = patron;
+        // Actualizar botones
+        document.querySelectorAll('.pattern-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.pattern-btn.${patron.toLowerCase()}`).classList.add('active');
+    }
+
+    function setSeveridad(severidad) {
+        document.getElementById('severidad').value = severidad;
+        // Actualizar botones
+        document.querySelectorAll('.severity-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.severity-btn.${severidad.toLowerCase().replace('_', '-')}`).classList.add('active');
+    }
+
+    // Función para enviar el formulario
+    document.getElementById('espirometriaForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        // Implementar guardado AJAX
+        alert('Guardando espirometría... (En desarrollo)');
+    });
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Espirometría cargada correctamente');
+
+        // Auto-calcular IMC si hay datos
+        calcularIMC();
+
+        // Auto-calcular porcentajes si hay datos
+        calcularPorcentajes();
+    });
+</script>

@@ -55,6 +55,9 @@ urlpatterns = [
     # Base and Foundation
     path('hms/', include('acs_hms_base.urls')),
     
+    # ========== ADMISSION AND RECEPTION ==========
+    path('admision/', include('admision_recepcion.urls')),
+    
     # Medical Specialties
     path('hms/gynecology/', include('acs_hms_gynec.urls')),
     path('hms/ophthalmology/', include('acs_hms_ophthalmology.urls')),

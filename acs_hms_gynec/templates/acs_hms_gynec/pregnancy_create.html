@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ginecología - Nuevo Embarazo{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-baby text-pink"></i>
+                        Nuevo Embarazo
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{% url 'gynec:pregnancy_list' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Volver a Lista
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="row">
+                        {% csrf_token %}
+                        <div class="col-md-6">
+                            <h5 class="text-primary">
+                                <i class="fas fa-info-circle"></i> Información del Embarazo
+                            </h5>
+                            <div class="form-group">
+                                <label for="{{ form.patient.id_for_label }}">{{ form.patient.label }}</label>
+                                {{ form.patient }}
+                                {% if form.patient.errors %}
+                                <div class="text-danger">{{ form.patient.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.pregnancy_number.id_for_label }}">{{ form.pregnancy_number.label
+                                    }}</label>
+                                {{ form.pregnancy_number }}
+                                {% if form.pregnancy_number.errors %}
+                                <div class="text-danger">{{ form.pregnancy_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.last_menstrual_period.id_for_label }}">{{
+                                    form.last_menstrual_period.label }}</label>
+                                {{ form.last_menstrual_period }}
+                                {% if form.last_menstrual_period.errors %}
+                                <div class="text-danger">{{ form.last_menstrual_period.errors.0 }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Se calculará automáticamente la fecha probable de
+                                    parto</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.expected_delivery_date.id_for_label }}">{{
+                                    form.expected_delivery_date.label }}</label>
+                                {{ form.expected_delivery_date }}
+                                {% if form.expected_delivery_date.errors %}
+                                <div class="text-danger">{{ form.expected_delivery_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                <div class="text-danger">{{ form.status.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="text-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Factores de Riesgo
+                            </h5>
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    {{ form.high_risk }}
+                                    <label class="custom-control-label" for="{{ form.high_risk.id_for_label }}">
+                                        {{ form.high_risk.label }}
+                                    </label>
+                                </div>
+                                {% if form.high_risk.errors %}
+                                <div class="text-danger">{{ form.high_risk.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.risk_factors.id_for_label }}">{{ form.risk_factors.label }}</label>
+                                {{ form.risk_factors }}
+                                {% if form.risk_factors.errors %}
+                                <div class="text-danger">{{ form.risk_factors.errors.0 }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Especifique los factores de riesgo
+                                    identificados</small>
+                            </div>
+
+                            <h5 class="text-info">
+                                <i class="fas fa-procedures"></i> Información del Parto
+                            </h5>
+                            <div class="form-group">
+                                <label for="{{ form.delivery_type.id_for_label }}">{{ form.delivery_type.label
+                                    }}</label>
+                                {{ form.delivery_type }}
+                                {% if form.delivery_type.errors %}
+                                <div class="text-danger">{{ form.delivery_type.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.birth_weight.id_for_label }}">{{ form.birth_weight.label }}</label>
+                                {{ form.birth_weight }}
+                                {% if form.birth_weight.errors %}
+                                <div class="text-danger">{{ form.birth_weight.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.complications.id_for_label }}">{{ form.complications.label
+                                    }}</label>
+                                {{ form.complications }}
+                                {% if form.complications.errors %}
+                                <div class="text-danger">{{ form.complications.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save"></i> Guardar Embarazo
+                            </button>
+                            <a href="{% url 'gynec:pregnancy_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        // Agregar clases de Bootstrap a los campos del formulario
+        $('input, select, textarea').addClass('form-control');
+        $('input[type="checkbox"]').removeClass('form-control').addClass('form-check-input');
+
+        // Cálculo automático de fecha probable de parto
+        $('input[name*="last_menstrual_period"]').on('change', function () {
+            var lmp = new Date($(this).val());
+            if (lmp && !isNaN(lmp)) {
+                var edd = new Date(lmp);
+                edd.setDate(edd.getDate() + 280); // 40 semanas
+                var eddFormatted = edd.toISOString().split('T')[0];
+                $('input[name*="expected_delivery_date"]').val(eddFormatted);
+
+                // Calcular edad gestacional actual
+                var today = new Date();
+                var diffTime = Math.abs(today - lmp);
+                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                var weeks = Math.floor(diffDays / 7);
+
+                // Mostrar información de edad gestacional
+                var gestationalInfo = '<small class="text-info">Edad gestacional actual: aproximadamente ' + weeks + ' semanas</small>';
+                $(this).siblings('.gestational-info').remove();
+                $(this).after('<div class="gestational-info">' + gestationalInfo + '</div>');
+            }
+        });
+
+        // Validación de formularios
+        $('form').on('submit', function (e) {
+            var requiredFields = $(this).find('[required]');
+            var isValid = true;
+
+            requiredFields.each(function () {
+                if (!$(this).val()) {
+                    $(this).addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Por favor complete todos los campos requeridos.');
+            }
+        });
+    });
+</script>
+
+
+

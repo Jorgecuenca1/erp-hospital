@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Fichas Clínicas - HMetaHIS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-notes-medical me-2"></i>Dashboard de Fichas Clínicas</h3>
+                </div>
+                <div class="card-body">
+
+                    <!-- Estadísticas Rápidas -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5>Total Fichas</h5>
+                                    <h2>{{ total_fichas|default:0 }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5>Fichas Hoy</h5>
+                                    <h2>{{ fichas_hoy|default:0 }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5>Pendientes</h5>
+                                    <h2>{{ fichas_pendientes|default:0 }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5>Completadas</h5>
+                                    <h2>{{ fichas_completadas|default:0 }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tipos de Fichas Disponibles -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="mb-3">Tipos de Fichas Clínicas Disponibles</h4>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Evaluación Ocupacional -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <i class="fas fa-hard-hat fa-2x text-primary mb-2"></i>
+                                    <h5>Evaluación Ocupacional</h5>
+                                    <p class="text-muted">Evaluaciones médicas ocupacionales completas</p>
+                                    <a href="{% url 'admision_recepcion:evaluacion_ocupacional_create' %}"
+                                        class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Nueva
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Examen Visual -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <i class="fas fa-eye fa-2x text-success mb-2"></i>
+                                    <h5>Examen Visual</h5>
+                                    <p class="text-muted">Exámenes oftalmológicos detallados</p>
+                                    <a href="{% url 'admision_recepcion:examen_visual_create' %}"
+                                        class="btn btn-success">
+                                        <i class="fas fa-plus me-2"></i>Nuevo
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Audiometría -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <i class="fas fa-volume-up fa-2x text-warning mb-2"></i>
+                                    <h5>Audiometría</h5>
+                                    <p class="text-muted">Evaluaciones auditivas con clasificación CAOHC</p>
+                                    <a href="{% url 'admision_recepcion:audiometria_create' %}" class="btn btn-warning">
+                                        <i class="fas fa-plus me-2"></i>Nueva
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Espirometría -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <i class="fas fa-lungs fa-2x text-info mb-2"></i>
+                                    <h5>Espirometría</h5>
+                                    <p class="text-muted">Pruebas de función pulmonar</p>
+                                    <a href="{% url 'admision_recepcion:espirometria_create' %}" class="btn btn-info">
+                                        <i class="fas fa-plus me-2"></i>Nueva
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Osteomuscular -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <i class="fas fa-bone fa-2x text-secondary mb-2"></i>
+                                    <h5>Osteomuscular</h5>
+                                    <p class="text-muted">Evaluaciones osteomusculares y posturales</p>
+                                    <a href="{% url 'admision_recepcion:osteomuscular_create' %}"
+                                        class="btn btn-secondary">
+                                        <i class="fas fa-plus me-2"></i>Nueva
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Historia Clínica General -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <i class="fas fa-file-medical-alt fa-2x text-danger mb-2"></i>
+                                    <h5>Historia Clínica General</h5>
+                                    <p class="text-muted">Historias clínicas generales completas</p>
+                                    <a href="{% url 'admision_recepcion:historia_clinica_general_create' %}"
+                                        class="btn btn-danger">
+                                        <i class="fas fa-plus me-2"></i>Nueva
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acceso Rápido -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h4 class="mb-3">Acceso Rápido</h4>
+                            <a href="{% url 'admision_recepcion:historias_cerradas' %}"
+                                class="btn btn-outline-primary me-2">
+                                <i class="fas fa-archive me-2"></i>Historias Cerradas
+                            </a>
+                            <a href="{% url 'admision_recepcion:dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,693 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}Evaluación Ocupacional - {{ ficha.nombre_trabajador }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .evaluation-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+        margin-bottom: 0;
+    }
+
+    .status-buttons {
+        text-align: center;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .status-btn {
+        margin: 0 10px;
+        padding: 8px 20px;
+        border: none;
+        border-radius: 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .status-btn.pendiente {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .status-btn.sin-atencion {
+        background: #dc3545;
+        color: white;
+    }
+
+    .status-btn.active {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, #f8f9fc 0%, #eef2f7 100%);
+        padding: 15px 20px;
+        border-bottom: 1px solid #e3e6f0;
+        font-weight: 600;
+        color: #5a5c69;
+        cursor: pointer;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+
+    .section-content {
+        padding: 20px;
+    }
+
+    .basic-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .info-field {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 4px solid #4e73df;
+    }
+
+    .info-field label {
+        font-weight: 600;
+        color: #5a5c69;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .info-field input,
+    .info-field select,
+    .info-field textarea {
+        border: none;
+        background: transparent;
+        font-weight: 500;
+        color: #2c3e50;
+        width: 100%;
+        padding: 5px 0;
+        font-size: 0.9rem;
+    }
+
+    .info-field input:focus,
+    .info-field select:focus,
+    .info-field textarea:focus {
+        outline: none;
+        border-bottom: 2px solid #4e73df;
+    }
+
+    .epp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+        margin: 15px 0;
+    }
+
+    .epp-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .epp-item:hover {
+        background: #e9ecef;
+    }
+
+    .epp-item input[type="checkbox"] {
+        margin-right: 8px;
+        transform: scale(1.2);
+    }
+
+    .antecedentes-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .antecedentes-table th {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+        padding: 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .antecedentes-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e3e6f0;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .antecedentes-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .antecedentes-table input,
+    .antecedentes-table select {
+        border: 1px solid #e3e6f0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        width: 100%;
+        font-size: 0.85rem;
+    }
+
+    .save-section {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 20px;
+        border-top: 1px solid #e3e6f0;
+        text-align: center;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+
+    .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .collapsible-content.active {
+        max-height: 2000px;
+    }
+
+    .toggle-icon {
+        transition: transform 0.3s ease;
+    }
+
+    .toggle-icon.rotated {
+        transform: rotate(180deg);
+    }
+
+    .no-data {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+        padding: 30px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .add-record-btn {
+        background: #17a2b8;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .add-record-btn:hover {
+        background: #138496;
+        transform: translateY(-1px);
+    }
+
+    .worker-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+
+    .header-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .worker-details h3 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .worker-details p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:dashboard' %}">Admisión - Recepción</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admision_recepcion:fichas_clinicas' %}">Fichas Clínicas</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Evaluación Ocupacional</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header de la evaluación -->
+    <div class="evaluation-header">
+        <div class="header-info">
+            <div class="worker-avatar">
+                {{ ficha.nombre_trabajador|first }}
+            </div>
+            <div class="worker-details">
+                <h3>{{ ficha.nombre_trabajador }}</h3>
+                <p><strong>Ficha N°:</strong> {{ ficha.numero_ficha }} | <strong>Identificación:</strong> {{
+                    ficha.numero_identificacion }}</p>
+                <p><strong>Empresa:</strong> {% if ficha.empresa %}{{ ficha.empresa.razon_social }}{% else %}No
+                    especificada{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estados de la evaluación -->
+    <div class="status-buttons">
+        <button class="status-btn pendiente active">PENDIENTE</button>
+        <button class="status-btn sin-atencion">SIN ATENCIÓN</button>
+    </div>
+
+    <form method="post" id="evaluacionForm">
+        {% csrf_token %}
+
+        <!-- Información Básica -->
+        <div class="form-section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>📋 Información Básica del Trabajador</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="section-content collapsible-content active">
+                <div class="basic-info-grid">
+                    <div class="info-field">
+                        <label>Fecha:</label>
+                        <input type="date" name="fecha_evaluacion" value="{{ ficha.fecha_evaluacion|date:'Y-m-d' }}"
+                            required>
+                    </div>
+                    <div class="info-field">
+                        <label>Municipio:</label>
+                        <select name="municipio">
+                            <option value="">Seleccione</option>
+                            {% for municipio in municipios %}
+                            <option value="{{ municipio.id }}" {% if ficha.municipio_id==municipio.id %}selected{% endif
+                                %}>
+                                {{ municipio.nombre }} ({{ municipio.departamento }}, {{ municipio.pais }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Tipo de Evaluación Médica o Procedimiento:</label>
+                        <select name="tipo_evaluacion">
+                            {% for codigo, nombre in tipos_evaluacion %}
+                            <option value="{{ codigo }}" {% if evaluacion.tipo_evaluacion==codigo %}selected{% endif %}>
+                                {{ nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Empresa Donde Labora, Laborará o Laboró:</label>
+                        <select name="empresa">
+                            <option value="">Seleccione</option>
+                            {% for empresa in empresas %}
+                            <option value="{{ empresa.id }}" {% if ficha.empresa_id==empresa.id %}selected{% endif %}>
+                                {{ empresa.razon_social }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Actividad Económica:</label>
+                        <textarea name="actividad_economica" rows="2">{{ evaluacion.actividad_economica }}</textarea>
+                    </div>
+                    <div class="info-field">
+                        <label>Tipo:</label>
+                        <select name="tipo_documento">
+                            {% for codigo, nombre in ficha.TIPO_DOC_CHOICES %}
+                            <option value="{{ codigo }}" {% if ficha.tipo_documento==codigo %}selected{% endif %}>{{
+                                nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>N° Identificación:</label>
+                        <input type="text" name="numero_identificacion" value="{{ ficha.numero_identificacion }}"
+                            required>
+                    </div>
+                    <div class="info-field">
+                        <label>Nombre del Trabajador a Aspirante:</label>
+                        <input type="text" name="nombre_trabajador" value="{{ ficha.nombre_trabajador }}" required>
+                    </div>
+                    <div class="info-field">
+                        <label>Género:</label>
+                        <select name="genero">
+                            {% for codigo, nombre in ficha.GENERO_CHOICES %}
+                            <option value="{{ codigo }}" {% if ficha.genero==codigo %}selected{% endif %}>{{ nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Edad:</label>
+                        <input type="number" name="edad" value="{{ ficha.edad }}" min="16" max="100">
+                    </div>
+                    <div class="info-field">
+                        <label>Estado Civil:</label>
+                        <select name="estado_civil">
+                            <option value="">SELECCIONE</option>
+                            {% for codigo, nombre in estados_civiles %}
+                            <option value="{{ codigo }}" {% if evaluacion.estado_civil==codigo %}selected{% endif %}>{{
+                                nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Nivel Educativo:</label>
+                        <select name="nivel_educativo">
+                            <option value="">SELECCIONE</option>
+                            {% for codigo, nombre in niveles_educativos %}
+                            <option value="{{ codigo }}" {% if evaluacion.nivel_educativo==codigo %}selected{% endif %}>
+                                {{ nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>EPS:</label>
+                        <input type="text" name="eps" value="{{ evaluacion.eps }}">
+                    </div>
+                    <div class="info-field">
+                        <label>AFP:</label>
+                        <input type="text" name="afp" value="{{ evaluacion.afp }}">
+                    </div>
+                    <div class="info-field">
+                        <label>ARL:</label>
+                        <input type="text" name="arl" value="{{ evaluacion.arl }}">
+                    </div>
+                    <div class="info-field">
+                        <label>Tipo de Sangre:</label>
+                        <select name="tipo_sangre">
+                            <option value="">SELECCIONE</option>
+                            {% for codigo, nombre in tipos_sangre %}
+                            <option value="{{ codigo }}" {% if evaluacion.tipo_sangre==codigo %}selected{% endif %}>{{
+                                nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>N° de Hijos:</label>
+                        <select name="numero_hijos">
+                            <option value="">SELECCIONE</option>
+                            {% for i in "0123456789"|make_list %}
+                            <option value="{{ i }}" {% if evaluacion.numero_hijos==i|add:0 %}selected{% endif %}>{{ i }}
+                            </option>
+                            {% endfor %}
+                            <option value="10" {% if evaluacion.numero_hijos> 9 %}selected{% endif %}>10+</option>
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Ingresos en Promedio:</label>
+                        <select name="ingresos_promedio">
+                            <option value="">SELECCIONE</option>
+                            <option value="1000000" {% if evaluacion.ingresos_promedio==1000000 %}selected{% endif %}>
+                                Menos de $1.000.000</option>
+                            <option value="2000000" {% if evaluacion.ingresos_promedio==2000000 %}selected{% endif %}>
+                                $1.000.000 - $2.000.000</option>
+                            <option value="3000000" {% if evaluacion.ingresos_promedio==3000000 %}selected{% endif %}>
+                                $2.000.000 - $3.000.000</option>
+                            <option value="5000000" {% if evaluacion.ingresos_promedio==5000000 %}selected{% endif %}>
+                                Más de $3.000.000</option>
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Jornada Laboral:</label>
+                        <select name="jornada_laboral">
+                            <option value="">SELECCIONE</option>
+                            {% for codigo, nombre in jornadas_laborales %}
+                            <option value="{{ codigo }}" {% if evaluacion.jornada_laboral==codigo %}selected{% endif %}>
+                                {{ nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Área del Cargo:</label>
+                        <select name="area_cargo">
+                            <option value="">SELECCIONE</option>
+                            <option value="ADMINISTRATIVA" {% if evaluacion.area_cargo=="ADMINISTRATIVA" %}selected{%
+                                endif %}>Administrativa</option>
+                            <option value="OPERATIVA" {% if evaluacion.area_cargo=="OPERATIVA" %}selected{% endif %}>
+                                Operativa</option>
+                            <option value="TECNICA" {% if evaluacion.area_cargo=="TECNICA" %}selected{% endif %}>Técnica
+                            </option>
+                            <option value="COMERCIAL" {% if evaluacion.area_cargo=="COMERCIAL" %}selected{% endif %}>
+                                Comercial</option>
+                            <option value="FINANCIERA" {% if evaluacion.area_cargo=="FINANCIERA" %}selected{% endif %}>
+                                Financiera</option>
+                        </select>
+                    </div>
+                    <div class="info-field">
+                        <label>Profesión o Cargo:</label>
+                        <input type="text" name="profesion_cargo" value="{{ evaluacion.profesion_cargo }}">
+                    </div>
+                    <div class="info-field">
+                        <label>Funciones del Cargo:</label>
+                        <textarea name="funciones_cargo" rows="3">{{ evaluacion.funciones_cargo }}</textarea>
+                    </div>
+                    <div class="info-field">
+                        <label>Motivo de Consulta:</label>
+                        <textarea name="motivo_consulta" rows="3">{{ evaluacion.motivo_consulta }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Elementos de Protección Personal -->
+        <div class="form-section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🦺 Elementos de Protección Personal (En la última labor o labor actual)</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="section-content collapsible-content">
+                <div class="epp-grid">
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_casco" id="epp_casco" {% if evaluacion.epp_casco %}checked{%
+                            endif %}>
+                        <label for="epp_casco">Casco</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_gorro" id="epp_gorro" {% if evaluacion.epp_gorro %}checked{%
+                            endif %}>
+                        <label for="epp_gorro">Gorro</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_respirador" id="epp_respirador" {% if evaluacion.epp_respirador
+                            %}checked{% endif %}>
+                        <label for="epp_respirador">Respirador</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_gafas" id="epp_gafas" {% if evaluacion.epp_gafas %}checked{%
+                            endif %}>
+                        <label for="epp_gafas">Gafas</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_peto" id="epp_peto" {% if evaluacion.epp_peto %}checked{% endif
+                            %}>
+                        <label for="epp_peto">Peto</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_bata" id="epp_bata" {% if evaluacion.epp_bata %}checked{% endif
+                            %}>
+                        <label for="epp_bata">Bata</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_overol" id="epp_overol" {% if evaluacion.epp_overol %}checked{%
+                            endif %}>
+                        <label for="epp_overol">Overol</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_delantal_plomo" id="epp_delantal_plomo" {% if
+                            evaluacion.epp_delantal_plomo %}checked{% endif %}>
+                        <label for="epp_delantal_plomo">Delantal de Plomo</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_ropa_termica" id="epp_ropa_termica" {% if
+                            evaluacion.epp_ropa_termica %}checked{% endif %}>
+                        <label for="epp_ropa_termica">Ropa Térmica</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_auditivos" id="epp_auditivos" {% if evaluacion.epp_auditivos
+                            %}checked{% endif %}>
+                        <label for="epp_auditivos">Auditivos</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_careta" id="epp_careta" {% if evaluacion.epp_careta %}checked{%
+                            endif %}>
+                        <label for="epp_careta">Careta</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_tapabocas" id="epp_tapabocas" {% if evaluacion.epp_tapabocas
+                            %}checked{% endif %}>
+                        <label for="epp_tapabocas">Tapabocas</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_guantes" id="epp_guantes" {% if evaluacion.epp_guantes
+                            %}checked{% endif %}>
+                        <label for="epp_guantes">Guantes</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_cinturon" id="epp_cinturon" {% if evaluacion.epp_cinturon
+                            %}checked{% endif %}>
+                        <label for="epp_cinturon">Cinturón</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_botas" id="epp_botas" {% if evaluacion.epp_botas %}checked{%
+                            endif %}>
+                        <label for="epp_botas">Botas</label>
+                    </div>
+                    <div class="epp-item">
+                        <input type="checkbox" name="epp_polainas" id="epp_polainas" {% if evaluacion.epp_polainas
+                            %}checked{% endif %}>
+                        <label for="epp_polainas">Polainas</label>
+                    </div>
+                </div>
+                <div class="info-field">
+                    <label>Otro(s): ¿Cúal(es)?</label>
+                    <input type="text" name="epp_otros" value="{{ evaluacion.epp_otros }}"
+                        placeholder="Especifique otros elementos">
+                </div>
+            </div>
+        </div>
+
+        <!-- Antecedentes de Exposición Laboral -->
+        <div class="form-section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span>🏭 Antecedentes de Exposición Laboral</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="section-content collapsible-content">
+                <p><em>(El primero corresponde a la última labor o labor actual)</em></p>
+
+                {% if exposiciones_laborales %}
+                <table class="antecedentes-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre de la Empresa y/o Actividad Económica</th>
+                            <th>Cargo</th>
+                            <th>Factores de Riesgo (GTC-45)</th>
+                            <th>Tiempo Exposición<br><small>Años - Meses</small></th>
+                            <th>Fecha Registrada</th>
+                            <th>Profesional</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exposicion in exposiciones_laborales %}
+                        <tr>
+                            <td>{{ exposicion.nombre_empresa }}</td>
+                            <td>{{ exposicion.cargo }}</td>
+                            <td>{{ exposicion.factores_riesgo }}</td>
+                            <td>{{ exposicion.tiempo_exposicion_anos|default:0 }} - {{
+                                exposicion.tiempo_exposicion_meses|default:0 }}</td>
+                            <td>{{ exposicion.fecha_registro|date:"d/m/Y" }}</td>
+                            <td>{{ exposicion.profesional.nombre|default:"" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="no-data">Sin Históricos para esta persona</div>
+                {% endif %}
+
+                <button type="button" class="add-record-btn" onclick="addExposicionLaboral()">
+                    <i class="fas fa-plus me-1"></i>Agregar Exposición Laboral
+                </button>
+            </div>
+        </div>
+
+        <!-- Secciones de las tablas principales de antecedentes -->
+        <!-- Continuará con las demás secciones... -->
+
+    </form>
+
+    <!-- Botón de guardar -->
+    <div class="save-section">
+        <button type="submit" form="evaluacionForm" class="btn-save">
+            <i class="fas fa-save me-2"></i>Guardar Evaluación
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleSection(header) {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.toggle-icon');
+
+        content.classList.toggle('active');
+        icon.classList.toggle('rotated');
+    }
+
+    // Inicializar las primeras secciones como abiertas
+    document.addEventListener('DOMContentLoaded', function () {
+        // La primera sección ya está abierta por defecto
+    });
+
+    function addExposicionLaboral() {
+        // Implementar modal o formulario para agregar exposición laboral
+        alert('Funcionalidad para agregar exposición laboral - En desarrollo');
+    }
+
+    // Función para enviar el formulario
+    document.getElementById('evaluacionForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        // Implementar guardado AJAX
+        alert('Guardando evaluación... (En desarrollo)');
+    });
+</script>
+{% endblock %}

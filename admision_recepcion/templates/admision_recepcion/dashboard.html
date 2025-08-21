@@ -1,0 +1,388 @@
+{% extends 'base_hms.html' %}
+{% load static %}
+
+{% block title %}{{ module_name }} - Dashboard{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ module_name }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block sidebar %}
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'admision_recepcion:dashboard' %}">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_create' %}">
+        <i class="fas fa-plus-circle me-2"></i>Nueva Orden
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:orden_list' %}">
+        <i class="fas fa-file-medical-alt me-2"></i>Órdenes de Servicios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:seguimiento_pacientes' %}">
+        <i class="fas fa-user-check me-2"></i>Seguimiento Pacientes
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:seguimiento_atenciones' %}">
+        <i class="fas fa-stethoscope me-2"></i>Seguimiento Atenciones
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:portal_empresas' %}">
+        <i class="fas fa-building me-2"></i>Portal Empresas
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:lista_precios' %}">
+        <i class="fas fa-tags me-2"></i>Lista de Precios
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:imprimir_historias' %}">
+        <i class="fas fa-print me-2"></i>Imprimir Historias
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:empresas_historias' %}">
+        <i class="fas fa-file-medical me-2"></i>Empresas Historias
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:fichas_clinicas' %}">
+        <i class="fas fa-clipboard-check me-2"></i>Fichas Clínicas
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:evaluacion_ocupacional_create' %}">
+        <i class="fas fa-plus-square me-2"></i>Nueva Evaluación Ocupacional
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:examen_visual_create' %}">
+        <i class="fas fa-eye me-2"></i>Nuevo Examen Visual
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:audiometria_create' %}">
+        <i class="fas fa-volume-up me-2"></i>Nueva Audiometría
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:espirometria_create' %}">
+        <i class="fas fa-lungs me-2"></i>Nueva Espirometría
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:osteomuscular_create' %}">
+        <i class="fas fa-bone me-2"></i>Nueva Evaluación Osteomuscular
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:historia_clinica_general_create' %}">
+        <i class="fas fa-notes-medical me-2"></i>Nueva Historia Clínica General
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'admision_recepcion:historias_cerradas' %}">
+        <i class="fas fa-archive me-2"></i>Historias Clínicas Cerradas
+    </a>
+</li>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+        <i class="fas fa-cog me-2"></i>Configuración
+    </a>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'admision_recepcion:empresa_list' %}">
+                <i class="fas fa-building me-2"></i>Empresas
+            </a></li>
+        <li><a class="dropdown-item" href="{% url 'admision_recepcion:convenio_list' %}">
+                <i class="fas fa-handshake me-2"></i>Convenios
+            </a></li>
+        <li><a class="dropdown-item" href="{% url 'admision_recepcion:servicio_list' %}">
+                <i class="fas fa-stethoscope me-2"></i>Servicios
+            </a></li>
+        <li><a class="dropdown-item" href="{% url 'admision_recepcion:prestador_list' %}">
+                <i class="fas fa-user-md me-2"></i>Prestadores
+            </a></li>
+    </ul>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">📋 {{ module_name }}</h1>
+            <p class="mb-0 text-muted">Sistema completo de gestión de órdenes de servicios médicos</p>
+        </div>
+        <div>
+            <a href="{% url 'admision_recepcion:orden_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nueva Orden de Servicio
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Órdenes Hoy
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ ordenes_hoy }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pendientes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ ordenes_pendientes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                En Proceso
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ ordenes_en_proceso }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Órdenes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_ordenes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-medical fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-bolt me-2"></i>Acciones Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'admision_recepcion:orden_create' %}"
+                                class="btn btn-outline-primary btn-lg btn-block">
+                                <i class="fas fa-plus-circle me-2"></i>
+                                <div>
+                                    <strong>Nueva Orden de Servicio</strong>
+                                    <br><small>Crear nueva orden con datos del paciente</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'admision_recepcion:seguimiento_pacientes' %}"
+                                class="btn btn-outline-info btn-lg btn-block">
+                                <i class="fas fa-user-check me-2"></i>
+                                <div>
+                                    <strong>Seguimiento Pacientes</strong>
+                                    <br><small>Ver estado de pacientes en atención</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'admision_recepcion:empresa_create' %}"
+                                class="btn btn-outline-success btn-lg btn-block">
+                                <i class="fas fa-building me-2"></i>
+                                <div>
+                                    <strong>Nueva Empresa</strong>
+                                    <br><small>Registrar empresa para convenios</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="{% url 'admision_recepcion:servicio_create' %}"
+                                class="btn btn-outline-warning btn-lg btn-block">
+                                <i class="fas fa-stethoscope me-2"></i>
+                                <div>
+                                    <strong>Nuevo Servicio</strong>
+                                    <br><small>Agregar servicio médico</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-info-circle me-2"></i>Información del Módulo
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <i class="fas fa-clipboard-list fa-3x text-primary mb-3"></i>
+                        <h5>Admisión - Recepción</h5>
+                        <p class="text-muted mb-3">
+                            Sistema completo para la gestión de órdenes de servicios,
+                            seguimiento de pacientes y administración de convenios empresariales.
+                        </p>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                Órdenes de Servicios
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                Seguimiento Pacientes
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                Gestión Empresas
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                Convenios
+                                <span class="badge bg-primary rounded-pill">✓</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Órdenes Recientes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-clock me-2"></i>Órdenes Recientes
+                    </h6>
+                    <a href="{% url 'admision_recepcion:orden_list' %}" class="btn btn-sm btn-outline-primary">
+                        Ver Todas <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if ordenes_recientes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>N°. O.S.</th>
+                                    <th>Paciente</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Sede</th>
+                                    <th>Total</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for orden in ordenes_recientes %}
+                                <tr>
+                                    <td><strong>{{ orden.numero_orden }}</strong></td>
+                                    <td>{{ orden.nombre_completo }}</td>
+                                    <td>{{ orden.fecha_orden|date:"d/m/Y" }}</td>
+                                    <td>
+                                        {% if orden.estado_orden == 'PENDIENTE' %}
+                                        <span class="badge bg-warning">{{ orden.get_estado_orden_display }}</span>
+                                        {% elif orden.estado_orden == 'EN_PROCESO' %}
+                                        <span class="badge bg-info">{{ orden.get_estado_orden_display }}</span>
+                                        {% elif orden.estado_orden == 'COMPLETADA' %}
+                                        <span class="badge bg-success">{{ orden.get_estado_orden_display }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ orden.get_estado_orden_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ orden.get_sede_display }}</td>
+                                    <td>${{ orden.total_pagar|floatformat:0 }}</td>
+                                    <td>
+                                        <a href="{% url 'admision_recepcion:orden_detail' orden.pk %}"
+                                            class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay órdenes recientes</h5>
+                        <p class="text-muted">Crea tu primera orden de servicio para comenzar.</p>
+                        <a href="{% url 'admision_recepcion:orden_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Crear Primera Orden
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh estadísticas cada 5 minutos
+    setInterval(function () {
+        location.reload();
+    }, 300000);
+</script>
+{% endblock %}

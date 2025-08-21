@@ -4,6 +4,8 @@ from . import views
 app_name = 'ecommerce'
 
 urlpatterns = [
+    # Dashboard principal
+    path('', views.EcommerceDashboardView.as_view(), name='dashboard'),
     # CategoriaProducto
     path('categorias/', views.CategoriaProductoListView.as_view(), name='categoriaproducto_list'),
     path('categorias/<int:pk>/', views.CategoriaProductoDetailView.as_view(), name='categoriaproducto_detail'),

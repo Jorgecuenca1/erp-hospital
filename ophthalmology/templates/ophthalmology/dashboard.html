@@ -1,0 +1,560 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sistema de Oftalmología - Hospital{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ophthalmology-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+
+    .ophthalmology-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-card {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .procedure-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    .procedure-scheduled {
+        background-color: #17a2b8;
+    }
+
+    .procedure-progress {
+        background-color: #ffc107;
+    }
+
+    .procedure-completed {
+        background-color: #28a745;
+    }
+
+    .procedure-cancelled {
+        background-color: #dc3545;
+    }
+
+    .visual-acuity-chart {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+    }
+
+    .equipment-status {
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-maintenance {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-repair {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <!-- Header Principal -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="ophthalmology-card p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-4 mb-2">
+                            <i class="fas fa-eye me-3"></i>
+                            Servicio de Oftalmología
+                        </h1>
+                        <p class="lead mb-0">Sistema Integral de Gestión Oftalmológica</p>
+                        <small class="text-light">Tecnología avanzada para el cuidado de la vista</small>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="me-4">
+                                <h3 class="mb-0">{{ total_patients|default:"156" }}</h3>
+                                <small>Pacientes Activos</small>
+                            </div>
+                            <div>
+                                <h3 class="mb-0">{{ examinations_today|default:"23" }}</h3>
+                                <small>Exámenes Hoy</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Principales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-procedures fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-primary">{{ scheduled_procedures|default:"12" }}</h4>
+                    <p class="text-muted mb-0">Cirugías Programadas</p>
+                    <small class="text-success">+3 esta semana</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-success mb-3">
+                        <i class="fas fa-microscope fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-success">{{ eye_examinations|default:"89" }}</h4>
+                    <p class="text-muted mb-0">Exámenes Completos</p>
+                    <small class="text-info">Este mes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-3">
+                        <i class="fas fa-glasses fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-warning">{{ prescriptions|default:"156" }}</h4>
+                    <p class="text-muted mb-0">Recetas Ópticas</p>
+                    <small class="text-success">67% dispensadas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card stat-card h-100">
+                <div class="card-body text-center">
+                    <div class="text-info mb-3">
+                        <i class="fas fa-chart-line fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-info">{{ visual_field_tests|default:"45" }}</h4>
+                    <p class="text-muted mb-0">Campos Visuales</p>
+                    <small class="text-muted">Últimos 30 días</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Acciones Rápidas del Servicio
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="#" class="btn btn-outline-primary w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-user-plus fa-2x mb-2"></i>
+                                <span>Nuevo Paciente</span>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="#" class="btn btn-outline-success w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-eye fa-2x mb-2"></i>
+                                <span>Examen Ocular</span>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="#" class="btn btn-outline-info w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-calendar-plus fa-2x mb-2"></i>
+                                <span>Agendar Cirugía</span>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="#" class="btn btn-outline-warning w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-prescription fa-2x mb-2"></i>
+                                <span>Receta Óptica</span>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="#"
+                                class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-chart-area fa-2x mb-2"></i>
+                                <span>Campo Visual</span>
+                            </a>
+                        </div>
+                        <div class="col-lg-2 col-md-4 col-6">
+                            <a href="#" class="btn btn-outline-dark w-100 d-flex flex-column align-items-center p-3">
+                                <i class="fas fa-cogs fa-2x mb-2"></i>
+                                <span>Equipos</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="row">
+        <!-- Panel Izquierdo -->
+        <div class="col-lg-8">
+            <!-- Cirugías Programadas -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-procedures me-2 text-primary"></i>
+                        Cirugías Programadas Hoy
+                    </h5>
+                    <span class="badge bg-primary">{{ todays_procedures|default:"5" }} cirugías</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Paciente</th>
+                                    <th>Procedimiento</th>
+                                    <th>Cirujano</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>08:00</strong></td>
+                                    <td>María González</td>
+                                    <td>Cirugía de Catarata OD</td>
+                                    <td>Dr. Rodríguez</td>
+                                    <td><span class="procedure-indicator procedure-scheduled"></span>Programada</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>09:30</strong></td>
+                                    <td>Carlos Pérez</td>
+                                    <td>Cirugía de Glaucoma OI</td>
+                                    <td>Dra. López</td>
+                                    <td><span class="procedure-indicator procedure-progress"></span>En Curso</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>11:00</strong></td>
+                                    <td>Ana Martínez</td>
+                                    <td>Vitrectomía</td>
+                                    <td>Dr. García</td>
+                                    <td><span class="procedure-indicator procedure-scheduled"></span>Programada</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>14:00</strong></td>
+                                    <td>Luis Torres</td>
+                                    <td>LASIK Bilateral</td>
+                                    <td>Dr. Jiménez</td>
+                                    <td><span class="procedure-indicator procedure-scheduled"></span>Programada</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>15:30</strong></td>
+                                    <td>Elena Vargas</td>
+                                    <td>Pterigion OD</td>
+                                    <td>Dra. Morales</td>
+                                    <td><span class="procedure-indicator procedure-scheduled"></span>Programada</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exámenes Recientes -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clipboard-list me-2 text-success"></i>
+                        Exámenes Oftalmológicos Recientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="visual-acuity-chart">
+                                <h6 class="text-primary">Agudeza Visual Promedio</h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>OD: 20/25</span>
+                                    <span>OI: 20/30</span>
+                                </div>
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: 85%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="visual-acuity-chart">
+                                <h6 class="text-info">Presión Intraocular Promedio</h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>OD: 16 mmHg</span>
+                                    <span>OI: 15 mmHg</span>
+                                </div>
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div class="progress-bar bg-info" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group list-group-flush mt-3">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Roberto Silva</strong> - Examen Completo
+                                <br><small class="text-muted">Hace 15 minutos</small>
+                            </div>
+                            <span class="badge bg-success">Completado</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Carmen Ruiz</strong> - Campos Visuales
+                                <br><small class="text-muted">Hace 1 hora</small>
+                            </div>
+                            <span class="badge bg-success">Completado</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Pedro Moreno</strong> - Control Glaucoma
+                                <br><small class="text-muted">Hace 2 horas</small>
+                            </div>
+                            <span class="badge bg-warning">En Proceso</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Derecho -->
+        <div class="col-lg-4">
+            <!-- Estado de Equipos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cogs me-2 text-dark"></i>
+                        Estado de Equipos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Lámpara de Hendidura #1</span>
+                        <span class="equipment-status status-active">Activo</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Tonómetro Goldman</span>
+                        <span class="equipment-status status-active">Activo</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>OCT Zeiss Cirrus</span>
+                        <span class="equipment-status status-active">Activo</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Campímetro Humphrey</span>
+                        <span class="equipment-status status-maintenance">Mantenimiento</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Facoemulsificador</span>
+                        <span class="equipment-status status-active">Activo</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Retinógrafo Digital</span>
+                        <span class="equipment-status status-repair">Reparación</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas Mensuales -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2 text-warning"></i>
+                        Estadísticas del Mes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <canvas id="monthlyStatsChart" width="200" height="200"></canvas>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h6 class="text-primary">Cataratas</h6>
+                            <h4>45%</h4>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-success">Glaucoma</h6>
+                            <h4>30%</h4>
+                        </div>
+                    </div>
+                    <div class="row text-center mt-2">
+                        <div class="col-6">
+                            <h6 class="text-info">Refractivos</h6>
+                            <h4>15%</h4>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-warning">Retina</h6>
+                            <h4>10%</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enlaces Rápidos -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-link me-2 text-secondary"></i>
+                        Enlaces Rápidos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/dashboard/" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-home me-2"></i>
+                            Dashboard Principal
+                        </a>
+                        <a href="/hms/" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-hospital me-2"></i>
+                            Módulos HMS
+                        </a>
+                        <a href="/patients/" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-users me-2"></i>
+                            Gestión de Pacientes
+                        </a>
+                        <a href="#" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-file-medical me-2"></i>
+                            Historias Clínicas
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Reportes Oftalmológicos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Acciones Rápidas -->
+<div class="modal fade" id="quickActionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-eye me-2"></i>
+                    Acción Rápida - Oftalmología
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Selecciona la acción que deseas realizar:</p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-primary w-100 p-3">
+                            <i class="fas fa-user-md fa-2x d-block mb-2"></i>
+                            Consulta Oftalmológica
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-success w-100 p-3">
+                            <i class="fas fa-procedures fa-2x d-block mb-2"></i>
+                            Programar Cirugía
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(document).ready(function () {
+        // Inicializar tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Gráfico de estadísticas mensuales
+        var ctx = document.getElementById('monthlyStatsChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cataratas', 'Glaucoma', 'Refractivos', 'Retina'],
+                    datasets: [{
+                        data: [45, 30, 15, 10],
+                        backgroundColor: [
+                            '#007bff',
+                            '#28a745',
+                            '#17a2b8',
+                            '#ffc107'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Actualización automática de datos cada 30 segundos
+        setInterval(function () {
+            // Aquí se puede implementar la actualización automática via AJAX
+            console.log('Actualizando datos del dashboard...');
+        }, 30000);
+
+        // Notificaciones en tiempo real
+        function showNotification(message, type = 'info') {
+            // Implementar sistema de notificaciones
+            console.log(`Notificación ${type}: ${message}`);
+        }
+
+        // Simular algunas notificaciones
+        setTimeout(() => {
+            showNotification('Nueva cita programada para las 16:00', 'success');
+        }, 5000);
+
+        console.log('✅ Dashboard de Oftalmología cargado exitosamente');
+    });
+</script>
+
+
+

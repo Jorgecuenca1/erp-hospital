@@ -76,6 +76,13 @@ class DoctorAvailability(models.Model):
         ('telemedicine', 'Telemedicine'),
     ]
     
+    SEDE_CHOICES = [
+        ('PRINCIPAL', 'PRINCIPAL'),
+        ('SUCURSAL_1', 'SUCURSAL 1'),
+        ('SUCURSAL_2', 'SUCURSAL 2'),
+        ('CONSULTORIO_EXTERNO', 'CONSULTORIO EXTERNO'),
+    ]
+    
     doctor = models.ForeignKey(HMSUser, on_delete=models.CASCADE, related_name='online_availability')
     day_of_week = models.CharField(max_length=10, choices=DAY_CHOICES)
     
@@ -88,8 +95,15 @@ class DoctorAvailability(models.Model):
     max_appointments = models.IntegerField(default=1)
     consultation_fee = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     
+    # Información de sede
+    sede = models.CharField(max_length=50, choices=SEDE_CHOICES, default='PRINCIPAL')
+    
     is_available = models.BooleanField(default=True)
     is_telemedicine = models.BooleanField(default=False)
+    
+    # Integraciones externas
+    habilitar_agenda_tus_citas = models.BooleanField(default=False, help_text="Habilitar en plataforma Agenda tus citas")
+    habilitar_doctoralia = models.BooleanField(default=False, help_text="Habilitar en plataforma Doctoralia")
     
     special_instructions = models.TextField(blank=True)
     
@@ -422,4 +436,224 @@ class WaitingList(models.Model):
         verbose_name_plural = 'Waiting Lists'
     
     def __str__(self):
-        return f"{self.patient_profile.user.get_full_name()} - {self.doctor.user.get_full_name()}" 
+        return f"{self.patient_profile.user.get_full_name()} - {self.doctor.user.get_full_name()}"
+
+
+class AgendaElectronicaDisponibilidad(models.Model):
+    """Modelo para gestionar la disponibilidad creada desde agenda electrónica"""
+    
+    STATUS_CHOICES = [
+        ('active', 'Activa'),
+        ('inactive', 'Inactiva'),
+        ('expired', 'Expirada'),
+    ]
+    
+    # Información del profesional
+    profesional = models.ForeignKey(HMSUser, on_delete=models.CASCADE, related_name='agenda_disponibilidades')
+    
+    # Rango de fechas
+    fecha_desde = models.DateField(help_text="Fecha de inicio de la disponibilidad")
+    fecha_hasta = models.DateField(help_text="Fecha de fin de la disponibilidad")
+    
+    # Horarios de mañana
+    hora_inicio_am = models.TimeField(null=True, blank=True, help_text="Hora de inicio turno mañana")
+    hora_fin_am = models.TimeField(null=True, blank=True, help_text="Hora de fin turno mañana")
+    
+    # Horarios de tarde
+    hora_inicio_pm = models.TimeField(null=True, blank=True, help_text="Hora de inicio turno tarde")
+    hora_fin_pm = models.TimeField(null=True, blank=True, help_text="Hora de fin turno tarde")
+    
+    # Configuración de citas
+    dividir_en = models.IntegerField(default=30, help_text="Duración de cada cita en minutos")
+    
+    # Sede
+    sede = models.CharField(
+        max_length=50, 
+        choices=DoctorAvailability.SEDE_CHOICES, 
+        default='PRINCIPAL',
+        help_text="Sede donde se creará la disponibilidad"
+    )
+    
+    # Días de la semana
+    lunes = models.BooleanField(default=False)
+    martes = models.BooleanField(default=False)
+    miercoles = models.BooleanField(default=False)
+    jueves = models.BooleanField(default=False)
+    viernes = models.BooleanField(default=False)
+    sabado = models.BooleanField(default=False)
+    domingo = models.BooleanField(default=False)
+    
+    # Integraciones externas
+    habilitar_agenda_tus_citas = models.BooleanField(default=False)
+    habilitar_doctoralia = models.BooleanField(default=False)
+    
+    # Estado y seguimiento
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    slots_generados = models.IntegerField(default=0, help_text="Cantidad de slots generados")
+    
+    # Auditoría
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='agenda_creadas')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Agenda Electrónica Disponibilidad'
+        verbose_name_plural = 'Agenda Electrónica Disponibilidades'
+    
+    def __str__(self):
+        return f"{self.profesional.user.get_full_name()} - {self.fecha_desde} a {self.fecha_hasta} ({self.sede})"
+    
+    def get_dias_seleccionados(self):
+        """Retorna los días de la semana seleccionados como lista"""
+        dias = []
+        if self.lunes: dias.append('Lunes')
+        if self.martes: dias.append('Martes')
+        if self.miercoles: dias.append('Miércoles')
+        if self.jueves: dias.append('Jueves')
+        if self.viernes: dias.append('Viernes')
+        if self.sabado: dias.append('Sábado')
+        if self.domingo: dias.append('Domingo')
+        return dias
+    
+    def get_dias_seleccionados_en(self):
+        """Retorna los días de la semana seleccionados en inglés para DoctorAvailability"""
+        day_mapping = {
+            'lunes': 'monday',
+            'martes': 'tuesday',
+            'miercoles': 'wednesday',
+            'jueves': 'thursday',
+            'viernes': 'friday',
+            'sabado': 'saturday',
+            'domingo': 'sunday',
+        }
+        
+        dias_en = []
+        if self.lunes: dias_en.append('monday')
+        if self.martes: dias_en.append('tuesday')
+        if self.miercoles: dias_en.append('wednesday')
+        if self.jueves: dias_en.append('thursday')
+        if self.viernes: dias_en.append('friday')
+        if self.sabado: dias_en.append('saturday')
+        if self.domingo: dias_en.append('sunday')
+        
+        return dias_en
+    
+    def tiene_horario_manana(self):
+        """Verifica si tiene horario de mañana configurado"""
+        return self.hora_inicio_am and self.hora_fin_am
+    
+    def tiene_horario_tarde(self):
+        """Verifica si tiene horario de tarde configurado"""
+        return self.hora_inicio_pm and self.hora_fin_pm
+    
+    def generar_slots_disponibilidad(self):
+        """Genera los slots de disponibilidad basados en la configuración"""
+        from datetime import datetime, timedelta
+        
+        slots_creados = 0
+        current_date = self.fecha_desde
+        
+        # Mapeo de días de la semana (0=lunes, 6=domingo)
+        weekday_mapping = {
+            0: self.lunes,    # Monday
+            1: self.martes,   # Tuesday
+            2: self.miercoles, # Wednesday
+            3: self.jueves,   # Thursday
+            4: self.viernes,  # Friday
+            5: self.sabado,   # Saturday
+            6: self.domingo,  # Sunday
+        }
+        
+        day_choices_mapping = {
+            0: 'monday',
+            1: 'tuesday',
+            2: 'wednesday',
+            3: 'thursday',
+            4: 'friday',
+            5: 'saturday',
+            6: 'sunday',
+        }
+        
+        while current_date <= self.fecha_hasta:
+            weekday = current_date.weekday()
+            
+            # Verificar si este día de la semana está seleccionado
+            if weekday_mapping.get(weekday, False):
+                day_choice = day_choices_mapping[weekday]
+                
+                # Crear disponibilidad para horario de mañana
+                if self.tiene_horario_manana():
+                    availability_am, created = DoctorAvailability.objects.get_or_create(
+                        doctor=self.profesional,
+                        day_of_week=day_choice,
+                        start_time=self.hora_inicio_am,
+                        end_time=self.hora_fin_am,
+                        defaults={
+                            'slot_duration': self.dividir_en,
+                            'sede': self.sede,
+                            'habilitar_agenda_tus_citas': self.habilitar_agenda_tus_citas,
+                            'habilitar_doctoralia': self.habilitar_doctoralia,
+                            'slot_type': 'consultation',
+                        }
+                    )
+                    if created:
+                        slots_creados += 1
+                
+                # Crear disponibilidad para horario de tarde
+                if self.tiene_horario_tarde():
+                    availability_pm, created = DoctorAvailability.objects.get_or_create(
+                        doctor=self.profesional,
+                        day_of_week=day_choice,
+                        start_time=self.hora_inicio_pm,
+                        end_time=self.hora_fin_pm,
+                        defaults={
+                            'slot_duration': self.dividir_en,
+                            'sede': self.sede,
+                            'habilitar_agenda_tus_citas': self.habilitar_agenda_tus_citas,
+                            'habilitar_doctoralia': self.habilitar_doctoralia,
+                            'slot_type': 'consultation',
+                        }
+                    )
+                    if created:
+                        slots_creados += 1
+            
+            current_date += timedelta(days=1)
+        
+        # Actualizar contador de slots generados
+        self.slots_generados = slots_creados
+        self.save()
+        
+        return slots_creados
+
+
+class DisponibilidadDetalle(models.Model):
+    """Detalle de la disponibilidad generada para mostrar en tabla"""
+    
+    agenda_disponibilidad = models.ForeignKey(
+        AgendaElectronicaDisponibilidad, 
+        on_delete=models.CASCADE, 
+        related_name='detalles'
+    )
+    
+    fecha_disponibilidad = models.DateField()
+    hora_inicio = models.TimeField()
+    hora_terminacion = models.TimeField()
+    
+    # Integraciones
+    agenda_tus_citas = models.BooleanField(default=False)
+    doctoralia = models.BooleanField(default=False)
+    
+    # Estado del slot
+    is_available = models.BooleanField(default=True)
+    is_booked = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['fecha_disponibilidad', 'hora_inicio']
+        verbose_name = 'Detalle de Disponibilidad'
+        verbose_name_plural = 'Detalles de Disponibilidad'
+    
+    def __str__(self):
+        return f"{self.fecha_disponibilidad} - {self.hora_inicio} a {self.hora_terminacion}" 

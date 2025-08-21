@@ -1,7 +1,11 @@
 from django.urls import path
 from . import views
 
+app_name = 'hr'
+
 urlpatterns = [
+    # Dashboard principal
+    path('', views.HRDashboardView.as_view(), name='dashboard'),
     # URLs para Cargo
     path('cargos/', views.CargoListView.as_view(), name='cargo_list'),
     path('cargos/new/', views.CargoCreateView.as_view(), name='cargo_create'),

@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Órdenes de Venta - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shopping-cart me-2 text-success"></i>
+                        Órdenes de Venta
+                    </h4>
+                    <div>
+                        <a href="{% url 'sales:ordenventa_create' %}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Nueva Orden
+                        </a>
+                        <a href="{% url 'sales:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <form method="get" class="d-flex">
+                                <input type="text" name="search" class="form-control me-2"
+                                    placeholder="Buscar por número de orden o cliente..."
+                                    value="{{ request.GET.search }}">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="btn-group w-100" role="group">
+                                <a href="?estado=BORRADOR" class="btn btn-outline-secondary btn-sm">Borradores</a>
+                                <a href="?estado=CONFIRMADA" class="btn btn-outline-info btn-sm">Confirmadas</a>
+                                <a href="?estado=COMPLETADA" class="btn btn-outline-success btn-sm">Completadas</a>
+                                <a href="{% url 'sales:ordenventa_list' %}"
+                                    class="btn btn-outline-dark btn-sm">Todas</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de órdenes -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>N° Orden</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Total</th>
+                                    <th>Vendedor</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for orden in ordenes %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-success">{{ orden.numero_orden }}</strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ orden.cliente.nombre }}</strong>
+                                        </div>
+                                        <small class="text-muted">{{ orden.cliente.identificacion }}</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ orden.fecha_orden|date:"d/m/Y" }}</div>
+                                        <small class="text-muted">{{ orden.fecha_orden|time:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        {% if orden.estado == 'BORRADOR' %}
+                                        <span class="badge bg-secondary">Borrador</span>
+                                        {% elif orden.estado == 'CONFIRMADA' %}
+                                        <span class="badge bg-info">Confirmada</span>
+                                        {% elif orden.estado == 'EN_PROCESO' %}
+                                        <span class="badge bg-warning">En Proceso</span>
+                                        {% elif orden.estado == 'COMPLETADA' %}
+                                        <span class="badge bg-success">Completada</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Cancelada</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>${{ orden.total|floatformat:2 }}</strong>
+                                        {% if orden.descuento > 0 %}
+                                        <br><small class="text-info">Desc: ${{ orden.descuento|floatformat:2 }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if orden.vendedor %}
+                                        <div>{{ orden.vendedor.first_name }} {{ orden.vendedor.last_name }}</div>
+                                        {% else %}
+                                        <span class="text-muted">Sin asignar</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'sales:ordenventa_detail' orden.pk %}"
+                                                class="btn btn-sm btn-outline-primary" title="Ver">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if orden.estado == 'BORRADOR' %}
+                                            <a href="{% url 'sales:ordenventa_update' orden.pk %}"
+                                                class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% endif %}
+                                            {% if orden.estado == 'CONFIRMADA' %}
+                                            <button class="btn btn-sm btn-outline-success" title="Facturar"
+                                                onclick="createInvoice({{ orden.pk }})">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </button>
+                                            {% endif %}
+                                            <button class="btn btn-sm btn-outline-info" title="Imprimir"
+                                                onclick="printOrder({{ orden.pk }})">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                                            <h5>No hay órdenes de venta</h5>
+                                            <p>Haga clic en "Nueva Orden" para crear la primera orden de venta.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginación">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                            </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function createInvoice(orderId) {
+        if (confirm('¿Desea crear una factura basada en esta orden?')) {
+            // Redirigir a crear factura con la orden pre-seleccionada
+            window.location.href = `/sales/facturas/new/?orden=${orderId}`;
+        }
+    }
+
+    function printOrder(orderId) {
+        // Abrir ventana de impresión
+        window.open(`/sales/ordenes/${orderId}/print/`, '_blank');
+    }
+
+    $(document).ready(function () {
+        console.log('✅ Lista de órdenes de venta cargada');
+    });
+</script>
+{% endblock %}
+
+
+

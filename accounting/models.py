@@ -37,25 +37,89 @@ class CentroCosto(models.Model):
 class PeriodoContable(models.Model):
     nombre = models.CharField(max_length=100)
     fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
+    fecha_fin = models.DateField(blank=True, null=True, help_text="Dejar vacío para período indefinido")
     cerrado = models.BooleanField(default=False)
     
     def __str__(self):
-        return f"{self.nombre} ({self.fecha_inicio} a {self.fecha_fin})"
+        if self.fecha_fin:
+            return f"{self.nombre} ({self.fecha_inicio} a {self.fecha_fin})"
+        else:
+            return f"{self.nombre} (desde {self.fecha_inicio} - indefinido)"
 
 class CuentaContable(models.Model):
+    TIPO_CHOICES = [
+        ('ACTIVO', 'Activo'),
+        ('PASIVO', 'Pasivo'),
+        ('PATRIMONIO', 'Patrimonio'),
+        ('INGRESO', 'Ingreso'),
+        ('GASTO', 'Gasto'),
+        ('COSTO', 'Costo'),
+        ('ORDEN', 'Cuentas de Orden'),
+    ]
+    
     codigo = models.CharField(max_length=20, unique=True, help_text="Código PUC")
     nombre = models.CharField(max_length=255)
-    tipo = models.CharField(max_length=20, choices=[('ACTIVO','Activo'),('PASIVO','Pasivo'),('PATRIMONIO','Patrimonio'),('INGRESO','Ingreso'),('GASTO','Gasto'),('ORDEN','Orden')])
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     nivel = models.IntegerField(default=1)
     padre = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='subcuentas')
     activa = models.BooleanField(default=True)
     
+    class Meta:
+        verbose_name = "Cuenta Contable"
+        verbose_name_plural = "Cuentas Contables"
+        ordering = ['codigo']
+    
     def __str__(self):
         return f"{self.codigo} - {self.nombre}"
 
+class Pais(models.Model):
+    codigo = models.CharField(max_length=3, unique=True, help_text="Código ISO del país")
+    nombre = models.CharField(max_length=100)
+    
+    class Meta:
+        verbose_name = "País"
+        verbose_name_plural = "Países"
+        ordering = ['nombre']
+    
+    def __str__(self):
+        return f"{self.codigo} - {self.nombre}"
+
+class Departamento(models.Model):
+    codigo = models.CharField(max_length=5, unique=True, help_text="Código DANE del departamento")
+    nombre = models.CharField(max_length=100)
+    pais = models.ForeignKey(Pais, on_delete=models.CASCADE, related_name='departamentos')
+    
+    class Meta:
+        verbose_name = "Departamento"
+        verbose_name_plural = "Departamentos"
+        ordering = ['nombre']
+    
+    def __str__(self):
+        return f"{self.codigo} - {self.nombre}"
+
+class Ciudad(models.Model):
+    codigo = models.CharField(max_length=8, unique=True, help_text="Código DANE de la ciudad")
+    nombre = models.CharField(max_length=100)
+    departamento = models.ForeignKey(Departamento, on_delete=models.CASCADE, related_name='ciudades')
+    
+    class Meta:
+        verbose_name = "Ciudad"
+        verbose_name_plural = "Ciudades"
+        ordering = ['nombre']
+    
+    def __str__(self):
+        return f"{self.codigo} - {self.nombre}, {self.departamento.nombre}"
+
 class Tercero(models.Model):
     TIPO_CHOICES = [('NATURAL','Persona Natural'),('JURIDICA','Persona Jurídica')]
+    REGIMEN_CHOICES = [
+        ('SIMPLIFICADO', 'Régimen Simplificado'),
+        ('COMUN', 'Régimen Común'),
+        ('GRAN_CONTRIBUYENTE', 'Gran Contribuyente'),
+        ('NO_RESPONSABLE', 'No Responsable de IVA'),
+    ]
+    
+    # Campos básicos existentes
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
     nombre = models.CharField(max_length=255)
     nit = models.CharField(max_length=20, unique=True)
@@ -64,6 +128,33 @@ class Tercero(models.Model):
     email = models.EmailField(blank=True, null=True)
     ciudad = models.CharField(max_length=100, blank=True, null=True)
     activa = models.BooleanField(default=True)
+    
+    # Nuevos campos colombianos (todos opcionales para no afectar datos existentes)
+    codigo_tercero = models.CharField(max_length=2, blank=True, null=True, help_text="13=Natural, 31=Jurídica")
+    primer_nombre = models.CharField(max_length=50, blank=True, null=True)
+    segundo_nombre = models.CharField(max_length=50, blank=True, null=True)
+    primer_apellido = models.CharField(max_length=50, blank=True, null=True)
+    segundo_apellido = models.CharField(max_length=50, blank=True, null=True)
+    razon_social = models.CharField(max_length=255, blank=True, null=True)
+    pais = models.ForeignKey(Pais, on_delete=models.PROTECT, blank=True, null=True)
+    departamento = models.ForeignKey(Departamento, on_delete=models.PROTECT, blank=True, null=True)
+    ciudad_nueva = models.ForeignKey(Ciudad, on_delete=models.PROTECT, blank=True, null=True)
+    regimen_iva = models.CharField(max_length=20, choices=REGIMEN_CHOICES, blank=True, null=True)
+    responsable_ica = models.BooleanField(default=False)
+    cupo_credito = models.DecimalField(max_digits=16, decimal_places=2, default=0, blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Tercero"
+        verbose_name_plural = "Terceros"
+        ordering = ['nombre']
+    
+    def save(self, *args, **kwargs):
+        # Asignar código automáticamente según el tipo
+        if self.tipo == 'NATURAL' and not self.codigo_tercero:
+            self.codigo_tercero = '13'
+        elif self.tipo == 'JURIDICA' and not self.codigo_tercero:
+            self.codigo_tercero = '31'
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.nombre} ({self.nit})"
@@ -78,11 +169,30 @@ class Diario(models.Model):
         return f"{self.codigo} - {self.nombre}"
 
 class Impuesto(models.Model):
+    TIPO_IMPUESTO_CHOICES = [
+        ('IVA', 'IVA - Impuesto al Valor Agregado'),
+        ('RETEICA', 'RETEICA - Retención de Industria y Comercio'),
+        ('RETEFUENTE', 'RETEFUENTE - Retención en la Fuente'),
+        ('RETEIVA', 'RETEIVA - Retención de IVA'),
+        ('CONSUMO', 'Impuesto al Consumo'),
+        ('OTRO', 'Otro Impuesto'),
+    ]
+    
     nombre = models.CharField(max_length=100)
     codigo = models.CharField(max_length=20, unique=True)
-    porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
-    tipo = models.CharField(max_length=20, choices=[('IVA','IVA'),('ICA','ICA'),('RETENCION','Retención'),('OTRO','Otro')])
+    porcentaje = models.DecimalField(max_digits=5, decimal_places=2, help_text="Porcentaje del impuesto")
+    tipo = models.CharField(max_length=20, choices=TIPO_IMPUESTO_CHOICES)
     activo = models.BooleanField(default=True)
+    
+    # Nuevos campos colombianos (opcionales)
+    inicio_vigencia = models.DateField(blank=True, null=True, help_text="Fecha de inicio de vigencia")
+    fin_vigencia = models.DateField(blank=True, null=True, help_text="Fecha de fin de vigencia")
+    valor_base_minimo = models.DecimalField(max_digits=16, decimal_places=2, default=0, blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Impuesto"
+        verbose_name_plural = "Impuestos"
+        ordering = ['codigo']
     
     def __str__(self):
         return f"{self.nombre} ({self.porcentaje}%)"
@@ -258,18 +368,32 @@ class AuditLog(models.Model):
 
 class Presupuesto(models.Model):
     """Presupuestos por cuenta y centro de costo"""
+    TIPO_PRESUPUESTO_CHOICES = [
+        ('INGRESO', 'Presupuesto de Ingresos'),
+        ('GASTO', 'Presupuesto de Gastos'),
+        ('INVERSION', 'Presupuesto de Inversión'),
+    ]
+    
     periodo = models.ForeignKey(PeriodoContable, on_delete=models.CASCADE)
     cuenta = models.ForeignKey(CuentaContable, on_delete=models.CASCADE)
     centro_costo = models.ForeignKey(CentroCosto, on_delete=models.CASCADE, blank=True, null=True)
+    tipo_presupuesto = models.CharField(max_length=20, choices=TIPO_PRESUPUESTO_CHOICES, blank=True, null=True)
     monto_presupuestado = models.DecimalField(max_digits=16, decimal_places=2)
     monto_real = models.DecimalField(max_digits=16, decimal_places=2, default=0)
     creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        verbose_name = "Presupuesto"
+        verbose_name_plural = "Presupuestos"
+        unique_together = ['periodo', 'cuenta', 'centro_costo']
+        ordering = ['periodo', 'cuenta__codigo']
+    
     def __str__(self):
         centro = f" - {self.centro_costo.nombre}" if self.centro_costo else ""
-        return f"{self.cuenta.codigo} - {self.periodo.nombre}{centro}"
+        tipo = f" ({self.get_tipo_presupuesto_display()})" if self.tipo_presupuesto else ""
+        return f"{self.cuenta.codigo} - {self.periodo.nombre}{centro}{tipo}"
     
     def variacion_porcentual(self):
         """Calcula la variación porcentual entre presupuesto y real"""

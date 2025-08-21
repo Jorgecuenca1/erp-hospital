@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Procedimientos Oftalmológicos - Hospital{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-procedures me-2 text-primary"></i>
+                        Procedimientos Oftalmológicos
+                    </h4>
+                    <div>
+                        <a href="{% url 'ophthalmology:procedure_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nuevo Procedimiento
+                        </a>
+                        <a href="{% url 'ophthalmology:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros rápidos -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <input type="text" name="search" class="form-control me-2" 
+                                       placeholder="Buscar por paciente o procedimiento..." 
+                                       value="{{ request.GET.search }}">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="btn-group" role="group" aria-label="Filtros de estado">
+                                <a href="?status=SCHEDULED" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-clock"></i> Programados
+                                </a>
+                                <a href="?status=IN_PROGRESS" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-play"></i> En Curso
+                                </a>
+                                <a href="?status=COMPLETED" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-check"></i> Completados
+                                </a>
+                                <a href="{% url 'ophthalmology:procedure_list' %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-list"></i> Todos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de procedimientos -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Paciente</th>
+                                    <th>Procedimiento</th>
+                                    <th>Ojo</th>
+                                    <th>Fecha Programada</th>
+                                    <th>Cirujano</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for procedure in procedures %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">{{ procedure.procedure_number }}</strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ procedure.patient.first_name }} {{ procedure.patient.last_name }}</strong>
+                                        </div>
+                                        <small class="text-muted">ID: {{ procedure.patient.id }}</small>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ procedure.procedure_name }}</strong>
+                                        </div>
+                                        <small class="text-muted">{{ procedure.get_procedure_type_display }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if procedure.eye_operated == 'RIGHT' %}primary{% elif procedure.eye_operated == 'LEFT' %}success{% else %}info{% endif %}">
+                                            {% if procedure.eye_operated == 'RIGHT' %}
+                                                <i class="fas fa-eye"></i> OD
+                                            {% elif procedure.eye_operated == 'LEFT' %}
+                                                <i class="fas fa-eye"></i> OI
+                                            {% else %}
+                                                <i class="fas fa-eye"></i> Ambos
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div>{{ procedure.scheduled_date|date:"d/m/Y" }}</div>
+                                        <small class="text-muted">{{ procedure.scheduled_date|time:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <div>{{ procedure.primary_surgeon.first_name }} {{ procedure.primary_surgeon.last_name }}</div>
+                                        <small class="text-muted">Cirujano Principal</small>
+                                    </td>
+                                    <td>
+                                        {% if procedure.status == 'SCHEDULED' %}
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-clock"></i> Programado
+                                        </span>
+                                        {% elif procedure.status == 'IN_PROGRESS' %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-play"></i> En Curso
+                                        </span>
+                                        {% elif procedure.status == 'COMPLETED' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check"></i> Completado
+                                        </span>
+                                        {% elif procedure.status == 'CANCELLED' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times"></i> Cancelado
+                                        </span>
+                                        {% elif procedure.status == 'POSTPONED' %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-pause"></i> Pospuesto
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'ophthalmology:procedure_detail' procedure.pk %}" 
+                                               class="btn btn-sm btn-outline-primary" title="Ver Detalle">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'ophthalmology:procedure_update' procedure.pk %}" 
+                                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% if procedure.status == 'SCHEDULED' %}
+                                            <button class="btn btn-sm btn-outline-success" 
+                                                    onclick="updateStatus({{ procedure.pk }}, 'IN_PROGRESS')" 
+                                                    title="Iniciar Procedimiento">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            {% elif procedure.status == 'IN_PROGRESS' %}
+                                            <button class="btn btn-sm btn-outline-info" 
+                                                    onclick="updateStatus({{ procedure.pk }}, 'COMPLETED')" 
+                                                    title="Completar Procedimiento">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-procedures fa-3x mb-3"></i>
+                                            <h5>No hay procedimientos registrados</h5>
+                                            <p>Haga clic en "Nuevo Procedimiento" para agregar el primer procedimiento.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginación">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cambiar estado -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cambiar Estado del Procedimiento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de cambiar el estado del procedimiento?</p>
+                <div id="statusDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmStatusChange">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentProcedureId = null;
+let currentStatus = null;
+
+function updateStatus(procedureId, newStatus) {
+    currentProcedureId = procedureId;
+    currentStatus = newStatus;
+    
+    let statusText = '';
+    switch(newStatus) {
+        case 'IN_PROGRESS':
+            statusText = 'En Curso';
+            break;
+        case 'COMPLETED':
+            statusText = 'Completado';
+            break;
+        case 'CANCELLED':
+            statusText = 'Cancelado';
+            break;
+    }
+    
+    $('#statusDetails').html(`<strong>Nuevo estado:</strong> ${statusText}`);
+    $('#statusModal').modal('show');
+}
+
+$('#confirmStatusChange').click(function() {
+    if (currentProcedureId && currentStatus) {
+        // Aquí implementarías la llamada AJAX para actualizar el estado
+        // Por ahora, solo recargamos la página
+        location.reload();
+    }
+});
+
+$(document).ready(function() {
+    // Tooltip para botones
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Auto-actualización cada 2 minutos para procedimientos en curso
+    setInterval(function() {
+        if ($('.badge:contains("En Curso")').length > 0) {
+            // Solo actualizar si hay procedimientos en curso
+            console.log('Verificando estado de procedimientos...');
+        }
+    }, 120000);
+    
+    console.log('✅ Lista de procedimientos oftalmológicos cargada');
+});
+</script>
+{% endblock %}
+
+
+

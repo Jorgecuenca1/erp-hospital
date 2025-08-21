@@ -14,6 +14,6 @@ class CitaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Opcional: Filtrar pacientes y profesionales activos si es necesario
-        self.fields['paciente'].queryset = Paciente.objects.filter(activo=True) # Assuming 'activo' field in Paciente model
-        self.fields['profesional'].queryset = ProfesionalSalud.objects.filter(activo=True) 
+        # Filtrar todos los pacientes y profesionales disponibles
+        self.fields['paciente'].queryset = Paciente.objects.all()
+        self.fields['profesional'].queryset = ProfesionalSalud.objects.all() 

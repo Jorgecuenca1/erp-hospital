@@ -1,0 +1,392 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Editar{% else %}Nuevo{% endif %} Examen Oftalmológico - Hospital{% endblock %}
+
+{% block extra_css %}
+<style>
+.examination-form {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px 0;
+}
+.form-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+.section-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px 10px 0 0;
+    margin: -20px -20px 20px -20px;
+}
+.eye-diagram {
+    border: 2px solid #e9ecef;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+}
+.refraction-grid {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="examination-form">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-eye me-2 text-primary"></i>
+                            {% if object %}Editar Examen Oftalmológico{% else %}Nuevo Examen Oftalmológico{% endif %}
+                        </h4>
+                        <a href="{% url 'ophthalmology:examination_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver a la Lista
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Información Básica -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user-md me-2"></i>
+                                        Información Básica del Examen
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.patient.id_for_label }}" class="form-label">Paciente *</label>
+                                            {{ form.patient }}
+                                            {% if form.patient.errors %}
+                                                <div class="text-danger">{{ form.patient.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.ophthalmologist.id_for_label }}" class="form-label">Oftalmólogo *</label>
+                                            {{ form.ophthalmologist }}
+                                            {% if form.ophthalmologist.errors %}
+                                                <div class="text-danger">{{ form.ophthalmologist.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.appointment.id_for_label }}" class="form-label">Cita Relacionada</label>
+                                            {{ form.appointment }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.examination_date.id_for_label }}" class="form-label">Fecha y Hora del Examen *</label>
+                                            {{ form.examination_date }}
+                                            {% if form.examination_date.errors %}
+                                                <div class="text-danger">{{ form.examination_date.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.follow_up_date.id_for_label }}" class="form-label">Fecha de Seguimiento</label>
+                                            {{ form.follow_up_date }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Historia Clínica -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-file-medical-alt me-2"></i>
+                                        Historia Clínica
+                                    </h5>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.chief_complaint.id_for_label }}" class="form-label">Motivo de Consulta *</label>
+                                    {{ form.chief_complaint }}
+                                    {% if form.chief_complaint.errors %}
+                                        <div class="text-danger">{{ form.chief_complaint.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.history_present_illness.id_for_label }}" class="form-label">Historia de la Enfermedad Actual</label>
+                                    {{ form.history_present_illness }}
+                                </div>
+                            </div>
+
+                            <!-- Agudeza Visual -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Agudeza Visual
+                                    </h5>
+                                </div>
+                                <div class="text-center mb-3">
+                                    <div class="eye-diagram bg-primary text-white">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                    <span class="mx-4 text-muted">OD = Ojo Derecho | OI = Ojo Izquierdo</span>
+                                    <div class="eye-diagram bg-success text-white">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Sin Corrección</h6>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">OD Sin Corrección</label>
+                                                    {{ form.va_right_uncorrected }}
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">OI Sin Corrección</label>
+                                                    {{ form.va_left_uncorrected }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-success">Con Corrección</h6>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">OD Con Corrección</label>
+                                                    {{ form.va_right_corrected }}
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">OI Con Corrección</label>
+                                                    {{ form.va_left_corrected }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Refracción -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-glasses me-2"></i>
+                                        Refracción
+                                    </h5>
+                                </div>
+                                
+                                <div class="refraction-grid">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-eye me-2"></i>Ojo Derecho (OD)
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Esfera</label>
+                                                {{ form.sphere_right }}
+                                                <small class="form-text text-muted">Dioptrías</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Cilindro</label>
+                                                {{ form.cylinder_right }}
+                                                <small class="form-text text-muted">Dioptrías</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Eje</label>
+                                                {{ form.axis_right }}
+                                                <small class="form-text text-muted">Grados (0-180)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="refraction-grid">
+                                    <h6 class="text-success mb-3">
+                                        <i class="fas fa-eye me-2"></i>Ojo Izquierdo (OI)
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Esfera</label>
+                                                {{ form.sphere_left }}
+                                                <small class="form-text text-muted">Dioptrías</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Cilindro</label>
+                                                {{ form.cylinder_left }}
+                                                <small class="form-text text-muted">Dioptrías</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Eje</label>
+                                                {{ form.axis_left }}
+                                                <small class="form-text text-muted">Grados (0-180)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Presión Intraocular -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-tachometer-alt me-2"></i>
+                                        Presión Intraocular (PIO)
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">PIO Ojo Derecho</label>
+                                            {{ form.iop_right }}
+                                            <small class="form-text text-muted">mmHg (Normal: 10-21)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">PIO Ojo Izquierdo</label>
+                                            {{ form.iop_left }}
+                                            <small class="form-text text-muted">mmHg (Normal: 10-21)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Método de Medición</label>
+                                            {{ form.iop_method }}
+                                            <small class="form-text text-muted">Ej: Tonometría de aplanación</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Diagnóstico y Plan -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-stethoscope me-2"></i>
+                                        Diagnóstico y Plan de Tratamiento
+                                    </h5>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.diagnosis.id_for_label }}" class="form-label">Diagnóstico *</label>
+                                    {{ form.diagnosis }}
+                                    {% if form.diagnosis.errors %}
+                                        <div class="text-danger">{{ form.diagnosis.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.treatment_plan.id_for_label }}" class="form-label">Plan de Tratamiento</label>
+                                            {{ form.treatment_plan }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.medications.id_for_label }}" class="form-label">Medicamentos</label>
+                                            {{ form.medications }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Los campos marcados con * son obligatorios
+                                    </small>
+                                </div>
+                                <div>
+                                    <a href="{% url 'ophthalmology:examination_list' %}" class="btn btn-secondary me-2">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if object %}Actualizar Examen{% else %}Guardar Examen{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Validación del formulario
+    $('.needs-validation').on('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        $(this).addClass('was-validated');
+    });
+
+    // Auto-completar fecha actual si no está establecida
+    if (!$('#id_examination_date').val()) {
+        const now = new Date();
+        const isoString = now.toISOString().slice(0, 16);
+        $('#id_examination_date').val(isoString);
+    }
+
+    // Validación de valores de PIO
+    $('#id_iop_right, #id_iop_left').on('input', function() {
+        const value = parseInt($(this).val());
+        const label = $(this).closest('.mb-3').find('label');
+        
+        if (value > 21) {
+            label.addClass('text-warning').append(' <i class="fas fa-exclamation-triangle" title="PIO elevada"></i>');
+        } else {
+            label.removeClass('text-warning').find('i').remove();
+        }
+    });
+
+    console.log('✅ Formulario de examen oftalmológico cargado');
+});
+</script>
+{% endblock %}
+
+
+

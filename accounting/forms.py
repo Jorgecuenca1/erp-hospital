@@ -4,7 +4,7 @@ from .models import (
     PeriodoContable, CuentaContable, Tercero, Diario, Impuesto, 
     AsientoContable, LineaAsiento, DatosEmpresa, CentroCosto, 
     ComprobanteContable, CertificadoRetencion, MovimientoBancario, CierreContable, Presupuesto,
-    ReporteFiscal, DetalleFiscal
+    ReporteFiscal, DetalleFiscal, Pais, Departamento, Ciudad
 )
 
 class PeriodoContableForm(forms.ModelForm):
@@ -31,15 +31,36 @@ class CuentaContableForm(forms.ModelForm):
 class TerceroForm(forms.ModelForm):
     class Meta:
         model = Tercero
-        fields = '__all__'
+        fields = [
+            'tipo', 'nombre', 'nit', 'direccion', 'telefono', 'email', 'ciudad', 'activa',
+            'codigo_tercero', 'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido',
+            'razon_social', 'pais', 'departamento', 'ciudad_nueva', 'regimen_iva', 'responsable_ica', 'cupo_credito'
+        ]
+        
         widgets = {
+            'tipo': forms.Select(attrs={'class': 'form-control'}),
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'nit': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'ciudad': forms.TextInput(attrs={'class': 'form-control'}),
+            'activa': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'codigo_tercero': forms.TextInput(attrs={'class': 'form-control', 'readonly': True}),
+            'primer_nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'segundo_nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'primer_apellido': forms.TextInput(attrs={'class': 'form-control'}),
+            'segundo_apellido': forms.TextInput(attrs={'class': 'form-control'}),
+            'razon_social': forms.TextInput(attrs={'class': 'form-control'}),
+            'pais': forms.Select(attrs={'class': 'form-control'}),
+            'departamento': forms.Select(attrs={'class': 'form-control'}),
+            'ciudad_nueva': forms.Select(attrs={'class': 'form-control'}),
+            'regimen_iva': forms.Select(attrs={'class': 'form-control'}),
+            'responsable_ica': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'cupo_credito': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
         }
+    
+
 
 class DiarioForm(forms.ModelForm):
     class Meta:
@@ -58,27 +79,32 @@ class ImpuestoForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),
-            'porcentaje': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'porcentaje': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
             'tipo': forms.Select(attrs={'class': 'form-control'}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'inicio_vigencia': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'fin_vigencia': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'valor_base_minimo': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
         }
 
 class AsientoContableForm(forms.ModelForm):
     class Meta:
         model = AsientoContable
-        fields = ['fecha', 'descripcion', 'diario', 'periodo', 'tercero', 'referencia']
+        fields = ['fecha', 'descripcion', 'diario', 'periodo', 'tercero', 'centro_costo', 'referencia']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
             'diario': forms.Select(attrs={'class': 'form-control'}),
             'periodo': forms.Select(attrs={'class': 'form-control'}),
             'tercero': forms.Select(attrs={'class': 'form-control'}),
+            'centro_costo': forms.Select(attrs={'class': 'form-control'}),
             'referencia': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 class LineaAsientoForm(forms.ModelForm):
     class Meta:
         model = LineaAsiento
-        fields = ['cuenta', 'descripcion', 'debito', 'credito', 'impuesto', 'tercero']
+        fields = ['cuenta', 'descripcion', 'debito', 'credito', 'impuesto', 'tercero', 'centro_costo']
         widgets = {
             'cuenta': forms.Select(attrs={'class': 'form-control'}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
@@ -86,6 +112,7 @@ class LineaAsientoForm(forms.ModelForm):
             'credito': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
             'impuesto': forms.Select(attrs={'class': 'form-control'}),
             'tercero': forms.Select(attrs={'class': 'form-control'}),
+            'centro_costo': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def clean(self):
@@ -198,13 +225,44 @@ class CierreContableForm(forms.ModelForm):
 class PresupuestoForm(forms.ModelForm):
     class Meta:
         model = Presupuesto
-        fields = ['periodo', 'cuenta', 'centro_costo', 'monto_presupuestado']
+        fields = ['periodo', 'cuenta', 'centro_costo', 'monto_presupuestado', 'tipo_presupuesto']
         widgets = {
             'periodo': forms.Select(attrs={'class': 'form-control'}),
             'cuenta': forms.Select(attrs={'class': 'form-control'}),
             'centro_costo': forms.Select(attrs={'class': 'form-control'}),
             'monto_presupuestado': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'tipo_presupuesto': forms.Select(attrs={'class': 'form-control'}),
         } 
+
+# Formularios para los nuevos modelos de ubicación
+class PaisForm(forms.ModelForm):
+    class Meta:
+        model = Pais
+        fields = '__all__'
+        widgets = {
+            'codigo': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '3'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class DepartamentoForm(forms.ModelForm):
+    class Meta:
+        model = Departamento
+        fields = '__all__'
+        widgets = {
+            'codigo': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '5'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'pais': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class CiudadForm(forms.ModelForm):
+    class Meta:
+        model = Ciudad
+        fields = '__all__'
+        widgets = {
+            'codigo': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '8'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'departamento': forms.Select(attrs={'class': 'form-control'}),
+        }
 
 class ReporteFiscalForm(forms.ModelForm):
     """Formulario para reportes fiscales"""

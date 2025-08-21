@@ -1,26 +1,271 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
+{% block title %}{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Tercero - Contabilidad{% endblock %}
+
+{% block extra_css %}
+<style>
+    .persona-natural, .persona-juridica {
+        transition: all 0.3s ease;
+    }
+    .persona-natural.hidden, .persona-juridica.hidden {
+        display: none;
+    }
+    .form-section {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 5px;
+    }
+    .form-section h5 {
+        color: #007bff;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Tercero</h3>
+            <h3 class="mb-0">
+                <i class="fas fa-user-plus"></i>
+                {% if form.instance.pk %}Editar{% else %}Crear{% endif %} Tercero
+            </h3>
+            <small class="d-block mt-1">Gestión de personas naturales y jurídicas</small>
         </div>
         <div class="card-body">
-            <form method="post">
+            <form method="post" id="terceroForm">
                 {% csrf_token %}
-                {{ form|crispy }}
+                
+                <!-- Información Básica -->
+                <div class="form-section">
+                    <h5><i class="fas fa-id-card"></i> Información Básica</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.tipo|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.tipo_documento|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.numero_documento|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            {{ form.digito_verificacion|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Persona Natural -->
+                <div class="form-section persona-natural" id="personaNatural">
+                    <h5><i class="fas fa-user"></i> Datos de Persona Natural</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            {{ form.primer_nombre|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.segundo_nombre|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.primer_apellido|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.segundo_apellido|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Persona Jurídica -->
+                <div class="form-section persona-juridica hidden" id="personaJuridica">
+                    <h5><i class="fas fa-building"></i> Datos de Persona Jurídica</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.razon_social|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.nombre_comercial|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ubicación -->
+                <div class="form-section">
+                    <h5><i class="fas fa-map-marker-alt"></i> Ubicación</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.pais|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.departamento|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.ciudad|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            {{ form.direccion|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.codigo_postal|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contacto -->
+                <div class="form-section">
+                    <h5><i class="fas fa-phone"></i> Información de Contacto</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            {{ form.telefono_fijo|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.telefono_movil|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.pagina_web|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Tributaria -->
+                <div class="form-section">
+                    <h5><i class="fas fa-calculator"></i> Información Tributaria</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.regimen_iva|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                {{ form.responsable_ica }}
+                                <label class="form-check-label" for="{{ form.responsable_ica.id_for_label }}">
+                                    Responsable de ICA
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                {{ form.agente_retenedor }}
+                                <label class="form-check-label" for="{{ form.agente_retenedor.id_for_label }}">
+                                    Agente Retenedor
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                {{ form.autorretenedor }}
+                                <label class="form-check-label" for="{{ form.autorretenedor.id_for_label }}">
+                                    Autorretenedor
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Comercial -->
+                <div class="form-section">
+                    <h5><i class="fas fa-briefcase"></i> Información Comercial</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.actividad_economica|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.descripcion_actividad|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Financiera -->
+                <div class="form-section">
+                    <h5><i class="fas fa-dollar-sign"></i> Información Financiera</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form.cupo_credito|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.plazo_pago_dias|as_crispy_field }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.descuento_pronto_pago|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="form-section">
+                    <h5><i class="fas fa-comment"></i> Observaciones</h5>
+                    <div class="row">
+                        <div class="col-md-10">
+                            {{ form.observaciones|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check mt-4">
+                                {{ form.activa }}
+                                <label class="form-check-label" for="{{ form.activa.id_for_label }}">
+                                    <strong>Activo</strong>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <a href="{% url 'accounting:tercero_list' %}" class="btn btn-secondary">
                         <i class="fas fa-arrow-alt-circle-left"></i> Cancelar
                     </a>
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> Guardar
+                        <i class="fas fa-save"></i> Guardar Tercero
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePersonType() {
+    const tipoSelect = document.getElementById('{{ form.tipo.id_for_label }}');
+    const personaNatural = document.getElementById('personaNatural');
+    const personaJuridica = document.getElementById('personaJuridica');
+    
+    if (tipoSelect.value === 'NATURAL') {
+        personaNatural.classList.remove('hidden');
+        personaJuridica.classList.add('hidden');
+        
+        // Hacer obligatorios los campos de persona natural
+        document.getElementById('{{ form.primer_nombre.id_for_label }}').required = true;
+        document.getElementById('{{ form.primer_apellido.id_for_label }}').required = true;
+        document.getElementById('{{ form.razon_social.id_for_label }}').required = false;
+    } else if (tipoSelect.value === 'JURIDICA') {
+        personaNatural.classList.add('hidden');
+        personaJuridica.classList.remove('hidden');
+        
+        // Hacer obligatorios los campos de persona jurídica
+        document.getElementById('{{ form.razon_social.id_for_label }}').required = true;
+        document.getElementById('{{ form.primer_nombre.id_for_label }}').required = false;
+        document.getElementById('{{ form.primer_apellido.id_for_label }}').required = false;
+    }
+}
+
+// Ejecutar al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    togglePersonType();
+    
+    // Agregar event listener al select de tipo
+    const tipoSelect = document.getElementById('{{ form.tipo.id_for_label }}');
+    tipoSelect.addEventListener('change', togglePersonType);
+});
+</script>
 {% endblock %}

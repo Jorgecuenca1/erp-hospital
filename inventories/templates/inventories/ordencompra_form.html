@@ -1,0 +1,132 @@
+{% extends "inventories/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+{% if object %}Editar Orden de Compra{% else %}Nueva Orden de Compra{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    <i class="fas fa-shopping-cart"></i>
+                    {% if object %}
+                    Editar Orden de Compra - {{ object.numero }}
+                    {% else %}
+                    Nueva Orden de Compra
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post" id="ordenCompraForm">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.proveedor|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.fecha_orden|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.fecha_entrega_esperada|as_crispy_field }}
+                            </div>
+                        </div>
+                        {% if object %}
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.estado|as_crispy_field }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.observaciones|as_crispy_field }}
+                    </div>
+
+                    {% if object %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-list"></i> Detalles de la Orden
+                            </h5>
+
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Subtotal:</strong><br>
+                                            <span class="h5 text-primary">${{ object.subtotal|floatformat:2 }}</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Impuestos:</strong><br>
+                                            <span class="h5 text-warning">${{ object.impuestos|floatformat:2 }}</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Total:</strong><br>
+                                            <span class="h5 text-success">${{ object.total|floatformat:2 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group mt-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="{% url 'inventories:ordencompra_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    {% if object %}Actualizar{% else %}Crear{% endif %} Orden
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Configurar datepickers
+        const fechaOrden = document.querySelector('input[name="fecha_orden"]');
+        const fechaEntrega = document.querySelector('input[name="fecha_entrega_esperada"]');
+
+        if (fechaOrden) {
+            fechaOrden.type = 'date';
+        }
+
+        if (fechaEntrega) {
+            fechaEntrega.type = 'date';
+        }
+
+        // Validación de fechas
+        if (fechaOrden && fechaEntrega) {
+            fechaOrden.addEventListener('change', function () {
+                fechaEntrega.min = this.value;
+            });
+        }
+    });
+</script>
+

@@ -1,7 +1,14 @@
 from django.urls import path
-from .views import ChatSessionListView, ChatSessionDetailView
+from . import views
+
+app_name = 'livechat'
 
 urlpatterns = [
-    path('chat/', ChatSessionListView.as_view(), name='chatsession_list'),
-    path('chat/<int:pk>/', ChatSessionDetailView.as_view(), name='chatsession_detail'),
+    # Dashboard principal
+    path('', views.LiveChatDashboardView.as_view(), name='dashboard'),
+    # Conversaciones
+    path('conversaciones/', views.ConversacionListView.as_view(), name='conversacion_list'),
+    path('conversaciones/<int:pk>/', views.ConversacionDetailView.as_view(), name='conversacion_detail'),
+    # API endpoints
+    path('api/messages/', views.MessageAPIView.as_view(), name='api_messages'),
 ]

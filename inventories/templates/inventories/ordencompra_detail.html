@@ -1,0 +1,210 @@
+{% extends "inventories/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Orden de Compra - {{ orden.numero }}{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h1><i class="fas fa-shopping-cart"></i> Orden de Compra - {{ orden.numero }}</h1>
+    </div>
+    <div class="col-md-4 text-right">
+        <div class="btn-group" role="group">
+            <a href="{% url 'inventories:ordencompra_edit' orden.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'inventories:ordencompra_list' %}" class="btn btn-secondary">
+                <i class="fas fa-list"></i> Volver al Listado
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Información Principal -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> Información General</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Número:</dt>
+                            <dd class="col-sm-7">{{ orden.numero }}</dd>
+
+                            <dt class="col-sm-5">Proveedor:</dt>
+                            <dd class="col-sm-7">
+                                <strong>{{ orden.proveedor.nombre_completo }}</strong><br>
+                                <small class="text-muted">{{ orden.proveedor.numero_documento }}</small>
+                            </dd>
+
+                            <dt class="col-sm-5">Fecha Orden:</dt>
+                            <dd class="col-sm-7">{{ orden.fecha_orden|date:"d/m/Y" }}</dd>
+
+                            <dt class="col-sm-5">Fecha Entrega:</dt>
+                            <dd class="col-sm-7">
+                                {% if orden.fecha_entrega_esperada %}
+                                {{ orden.fecha_entrega_esperada|date:"d/m/Y" }}
+                                {% else %}
+                                <span class="text-muted">No definida</span>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">Estado:</dt>
+                            <dd class="col-sm-7">
+                                {% if orden.estado == 'BORRADOR' %}
+                                <span class="badge badge-secondary badge-lg">{{ orden.get_estado_display }}</span>
+                                {% elif orden.estado == 'ENVIADA' %}
+                                <span class="badge badge-info badge-lg">{{ orden.get_estado_display }}</span>
+                                {% elif orden.estado == 'CONFIRMADA' %}
+                                <span class="badge badge-warning badge-lg">{{ orden.get_estado_display }}</span>
+                                {% elif orden.estado == 'RECIBIDA' %}
+                                <span class="badge badge-success badge-lg">{{ orden.get_estado_display }}</span>
+                                {% elif orden.estado == 'FACTURADA' %}
+                                <span class="badge badge-primary badge-lg">{{ orden.get_estado_display }}</span>
+                                {% elif orden.estado == 'CANCELADA' %}
+                                <span class="badge badge-danger badge-lg">{{ orden.get_estado_display }}</span>
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-5">Contabilizada:</dt>
+                            <dd class="col-sm-7">
+                                {% if orden.contabilizada %}
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check"></i> Sí
+                                </span>
+                                {% else %}
+                                <span class="badge badge-warning">
+                                    <i class="fas fa-clock"></i> Pendiente
+                                </span>
+                                {% endif %}
+                            </dd>
+
+                            {% if orden.asiento_contable %}
+                            <dt class="col-sm-5">Asiento Contable:</dt>
+                            <dd class="col-sm-7">
+                                <a href="#" class="text-primary">
+                                    {{ orden.asiento_contable.numero_comprobante }}
+                                </a>
+                            </dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+
+                {% if orden.observaciones %}
+                <div class="row">
+                    <div class="col-12">
+                        <hr>
+                        <h6>Observaciones:</h6>
+                        <p class="text-muted">{{ orden.observaciones }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Detalles de la Orden -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Detalles de la Orden</h5>
+            </div>
+            <div class="card-body">
+                {% if orden.detalles.all %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Cantidad</th>
+                                <th class="text-right">Precio Unit.</th>
+                                <th class="text-right">Subtotal</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in orden.detalles.all %}
+                            <tr>
+                                <td>
+                                    <strong>{{ detalle.producto.nombre }}</strong><br>
+                                    <small class="text-muted">{{ detalle.producto.codigo }}</small>
+                                </td>
+                                <td class="text-center">{{ detalle.cantidad }}</td>
+                                <td class="text-right">${{ detalle.precio_unitario|floatformat:2 }}</td>
+                                <td class="text-right font-weight-bold">${{ detalle.subtotal|floatformat:2 }}</td>
+                                <td>
+                                    {% if detalle.observaciones %}
+                                    <small>{{ detalle.observaciones }}</small>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
+                    <p class="text-muted">No hay productos en esta orden</p>
+                    <a href="#" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Agregar Productos
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Resumen Financiero -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-calculator"></i> Resumen Financiero</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span class="font-weight-bold">${{ orden.subtotal|floatformat:2 }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Impuestos:</span>
+                    <span class="font-weight-bold text-warning">${{ orden.impuestos|floatformat:2 }}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <span class="h6">Total:</span>
+                    <span class="h5 text-success font-weight-bold">${{ orden.total|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recepciones -->
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-truck"></i> Recepciones</h6>
+            </div>
+            <div class="card-body">
+                {% if orden.recepciones.all %}
+                {% for recepcion in orden.recepciones.all %}
+                <div class="mb-2 p-2 border rounded">
+                    <strong>{{ recepcion.numero }}</strong><br>
+                    <small>{{ recepcion.fecha_recepcion|date:"d/m/Y H:i" }}</small><br>
+                    <span class="badge badge-sm badge-info">{{ recepcion.get_estado_display }}</span>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted mb-0">No hay recepciones registradas</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

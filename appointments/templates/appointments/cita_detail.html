@@ -23,8 +23,8 @@
             <h5 class="card-title">Cita #{{ cita.pk }}</h5>
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Paciente:</strong> <a href="{% url 'paciente_detail' cita.paciente.pk %}">{{ cita.paciente.nombres }} {{ cita.paciente.apellidos }}</a></p>
-                    <p><strong>Profesional:</strong> <a href="{% url 'profesional_detail' cita.profesional.pk %}">{{ cita.profesional.nombres }} {{ cita.profesional.apellidos }}</a></p>
+                    <p><strong>Paciente:</strong> <a href="{% url 'patients:paciente_detail' cita.paciente.pk %}">{{ cita.paciente.nombres }} {{ cita.paciente.apellidos }}</a></p>
+                    <p><strong>Profesional:</strong> <a href="{% url 'professionals:profesional_detail' cita.profesional.pk %}">{{ cita.profesional.nombres }} {{ cita.profesional.apellidos }}</a></p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Fecha:</strong> {{ cita.fecha_hora_inicio|date:"l, d F Y" }}</p>
@@ -38,10 +38,10 @@
             <p>{{ cita.notas|default:"Sin notas." }}</p>
         </div>
         <div class="card-footer d-flex justify-content-between">
-            <a href="{% url 'cita_list' %}" class="btn btn-secondary">Volver a la Lista</a>
+            <a href="{% url 'appointments:cita_list' %}" class="btn btn-secondary">Volver a la Lista</a>
             <div>
-                <a href="{% url 'cita_update' cita.pk %}" class="btn btn-primary">Editar Cita</a>
-                <a href="{% url 'cita_delete' cita.pk %}" class="btn btn-danger">Cancelar Cita</a>
+                <a href="{% url 'appointments:cita_update' cita.pk %}" class="btn btn-primary">Editar Cita</a>
+                <a href="{% url 'appointments:cita_delete' cita.pk %}" class="btn btn-danger">Cancelar Cita</a>
             </div>
         </div>
     </div>

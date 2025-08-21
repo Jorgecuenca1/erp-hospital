@@ -1,0 +1,378 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Examen {{ examination.examination_number }} - Hospital{% endblock %}
+
+{% block extra_css %}
+<style>
+.detail-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.section-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px 10px 0 0;
+}
+.refraction-display {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+}
+.eye-icon {
+    font-size: 2rem;
+    margin: 0 20px;
+}
+.normal-range {
+    color: #28a745;
+    font-weight: bold;
+}
+.abnormal-range {
+    color: #dc3545;
+    font-weight: bold;
+}
+.visual-acuity-chart {
+    text-align: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header del examen -->
+            <div class="card detail-card">
+                <div class="section-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="mb-0">
+                                <i class="fas fa-eye me-2"></i>
+                                Examen Oftalmológico #{{ examination.examination_number }}
+                            </h3>
+                            <p class="mb-0 mt-2">{{ examination.patient.first_name }} {{ examination.patient.last_name }}</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="btn-group">
+                                <a href="{% url 'ophthalmology:examination_update' examination.pk %}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Editar
+                                </a>
+                                <a href="{% url 'ophthalmology:examination_list' %}" class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Volver
+                                </a>
+                                <button onclick="window.print()" class="btn btn-info btn-sm">
+                                    <i class="fas fa-print me-1"></i>Imprimir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-user text-primary me-2"></i>Información del Paciente</h6>
+                            <p><strong>Nombre:</strong> {{ examination.patient.first_name }} {{ examination.patient.last_name }}</p>
+                            <p><strong>ID Paciente:</strong> {{ examination.patient.id }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar text-success me-2"></i>Información del Examen</h6>
+                            <p><strong>Fecha:</strong> {{ examination.examination_date|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Oftalmólogo:</strong> {{ examination.ophthalmologist.first_name }} {{ examination.ophthalmologist.last_name }}</p>
+                            {% if examination.follow_up_date %}
+                            <p><strong>Próximo Control:</strong> {{ examination.follow_up_date|date:"d/m/Y" }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historia Clínica -->
+            <div class="card detail-card">
+                <div class="section-header">
+                    <h5 class="mb-0"><i class="fas fa-file-medical-alt me-2"></i>Historia Clínica</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Motivo de Consulta</h6>
+                            <p class="border-start border-primary border-4 ps-3">{{ examination.chief_complaint }}</p>
+                        </div>
+                        {% if examination.history_present_illness %}
+                        <div class="col-12">
+                            <h6>Historia de la Enfermedad Actual</h6>
+                            <p class="border-start border-info border-4 ps-3">{{ examination.history_present_illness }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agudeza Visual -->
+            <div class="card detail-card">
+                <div class="section-header">
+                    <h5 class="mb-0"><i class="fas fa-eye me-2"></i>Agudeza Visual</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="visual-acuity-chart">
+                                <h6 class="text-primary">Sin Corrección</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <i class="fas fa-eye eye-icon text-primary"></i>
+                                        <h4>{{ examination.va_right_uncorrected|default:"--" }}</h4>
+                                        <small>Ojo Derecho</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="fas fa-eye eye-icon text-success"></i>
+                                        <h4>{{ examination.va_left_uncorrected|default:"--" }}</h4>
+                                        <small>Ojo Izquierdo</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="visual-acuity-chart">
+                                <h6 class="text-success">Con Corrección</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <i class="fas fa-glasses eye-icon text-primary"></i>
+                                        <h4>{{ examination.va_right_corrected|default:"--" }}</h4>
+                                        <small>Ojo Derecho</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <i class="fas fa-glasses eye-icon text-success"></i>
+                                        <h4>{{ examination.va_left_corrected|default:"--" }}</h4>
+                                        <small>Ojo Izquierdo</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Refracción -->
+            {% if examination.sphere_right or examination.sphere_left %}
+            <div class="card detail-card">
+                <div class="section-header">
+                    <h5 class="mb-0"><i class="fas fa-glasses me-2"></i>Refracción</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="refraction-display">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-eye me-2"></i>Ojo Derecho (OD)
+                                </h6>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Esfera:</strong></td>
+                                        <td>{{ examination.sphere_right|default:"--" }} D</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cilindro:</strong></td>
+                                        <td>{{ examination.cylinder_right|default:"--" }} D</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Eje:</strong></td>
+                                        <td>{{ examination.axis_right|default:"--" }}°</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="refraction-display">
+                                <h6 class="text-success mb-3">
+                                    <i class="fas fa-eye me-2"></i>Ojo Izquierdo (OI)
+                                </h6>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Esfera:</strong></td>
+                                        <td>{{ examination.sphere_left|default:"--" }} D</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cilindro:</strong></td>
+                                        <td>{{ examination.cylinder_left|default:"--" }} D</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Eje:</strong></td>
+                                        <td>{{ examination.axis_left|default:"--" }}°</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Presión Intraocular -->
+            {% if examination.iop_right or examination.iop_left %}
+            <div class="card detail-card">
+                <div class="section-header">
+                    <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Presión Intraocular</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 text-center">
+                            <h6>Ojo Derecho</h6>
+                            <h3 class="{% if examination.iop_right > 21 %}abnormal-range{% else %}normal-range{% endif %}">
+                                {{ examination.iop_right|default:"--" }} mmHg
+                            </h3>
+                            {% if examination.iop_right > 21 %}
+                            <small class="text-danger">
+                                <i class="fas fa-exclamation-triangle"></i> Elevada
+                            </small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h6>Ojo Izquierdo</h6>
+                            <h3 class="{% if examination.iop_left > 21 %}abnormal-range{% else %}normal-range{% endif %}">
+                                {{ examination.iop_left|default:"--" }} mmHg
+                            </h3>
+                            {% if examination.iop_left > 21 %}
+                            <small class="text-danger">
+                                <i class="fas fa-exclamation-triangle"></i> Elevada
+                            </small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Método de Medición</h6>
+                            <p>{{ examination.iop_method|default:"No especificado" }}</p>
+                            <small class="text-muted">Rango normal: 10-21 mmHg</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Diagnóstico y Plan -->
+            <div class="card detail-card">
+                <div class="section-header">
+                    <h5 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Diagnóstico y Plan de Tratamiento</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Diagnóstico</h6>
+                            <div class="alert alert-info">
+                                <i class="fas fa-clipboard-list me-2"></i>
+                                {{ examination.diagnosis }}
+                            </div>
+                        </div>
+                        {% if examination.treatment_plan %}
+                        <div class="col-md-6">
+                            <h6>Plan de Tratamiento</h6>
+                            <div class="border-start border-success border-4 ps-3">
+                                {{ examination.treatment_plan }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if examination.medications %}
+                        <div class="col-md-6">
+                            <h6>Medicamentos</h6>
+                            <div class="border-start border-warning border-4 ps-3">
+                                {{ examination.medications }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Relacionadas -->
+            <div class="card detail-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Acciones Relacionadas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{% url 'ophthalmology:procedure_create' %}?examination={{ examination.pk }}" 
+                               class="btn btn-outline-primary w-100">
+                                <i class="fas fa-procedures fa-2x d-block mb-2"></i>
+                                Programar Cirugía
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'ophthalmology:prescription_create' %}?examination={{ examination.pk }}" 
+                               class="btn btn-outline-success w-100">
+                                <i class="fas fa-glasses fa-2x d-block mb-2"></i>
+                                Crear Receta Óptica
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'ophthalmology:visual_field_create' %}?examination={{ examination.pk }}" 
+                               class="btn btn-outline-info w-100">
+                                <i class="fas fa-chart-area fa-2x d-block mb-2"></i>
+                                Test Campo Visual
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'ophthalmology:examination_create' %}?patient={{ examination.patient.pk }}" 
+                               class="btn btn-outline-warning w-100">
+                                <i class="fas fa-plus fa-2x d-block mb-2"></i>
+                                Nuevo Examen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Mejorar la presentación para impresión
+    $('button[onclick="window.print()"]').click(function() {
+        // Ocultar botones de acción al imprimir
+        $('.btn-group').hide();
+        setTimeout(function() {
+            $('.btn-group').show();
+        }, 1000);
+    });
+
+    console.log('✅ Detalles del examen oftalmológico cargados');
+});
+
+// CSS para impresión
+if (window.matchMedia) {
+    var mediaQueryList = window.matchMedia('print');
+    mediaQueryList.addListener(function(mql) {
+        if (mql.matches) {
+            $('.btn-group').hide();
+        } else {
+            $('.btn-group').show();
+        }
+    });
+}
+</script>
+
+<style media="print">
+.btn-group {
+    display: none !important;
+}
+.card {
+    border: 1px solid #ddd !important;
+    break-inside: avoid;
+}
+.section-header {
+    background: #333 !important;
+    color: white !important;
+}
+</style>
+{% endblock %}
+
+
+

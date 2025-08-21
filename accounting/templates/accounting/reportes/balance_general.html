@@ -1,0 +1,165 @@
+{% extends "accounting/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Balance General{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1><i class="fas fa-balance-scale"></i> Balance General</h1>
+        <p class="text-muted">Estado de situación financiera a {{ fecha_corte|date:"d/m/Y" }}</p>
+    </div>
+    <div class="col-md-4 text-right">
+        <form method="get" class="form-inline">
+            <div class="form-group mr-2">
+                <label for="fecha_corte" class="mr-1">Fecha Corte:</label>
+                <input type="date" name="fecha_corte" value="{{ fecha_corte|date:'Y-m-d' }}"
+                    class="form-control form-control-sm">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-search"></i> Filtrar
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <!-- ACTIVOS -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-plus-circle"></i> ACTIVOS</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="border-bottom pb-2">Activos Corrientes</h6>
+                {% if activos_corrientes %}
+                {% for activo in activos_corrientes %}
+                <div class="d-flex justify-content-between mb-1">
+                    <span>{{ activo.cuenta.codigo }} - {{ activo.cuenta.nombre }}</span>
+                    <span class="font-weight-bold">${{ activo.saldo|floatformat:2 }}</span>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>Total Activos Corrientes:</strong>
+                    <strong class="text-success">${{ total_activo_corriente|floatformat:2 }}</strong>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay activos registrados</p>
+                {% endif %}
+
+                <hr class="my-4">
+                <div class="d-flex justify-content-between">
+                    <h5>TOTAL ACTIVOS:</h5>
+                    <h5 class="text-success">${{ total_activos|floatformat:2 }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASIVOS Y PATRIMONIO -->
+    <div class="col-md-6">
+        <!-- PASIVOS -->
+        <div class="card mb-3">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-minus-circle"></i> PASIVOS</h5>
+            </div>
+            <div class="card-body">
+                {% if pasivos %}
+                {% for pasivo in pasivos %}
+                <div class="d-flex justify-content-between mb-1">
+                    <span>{{ pasivo.cuenta.codigo }} - {{ pasivo.cuenta.nombre }}</span>
+                    <span class="font-weight-bold">${{ pasivo.saldo|floatformat:2 }}</span>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>Total Pasivos:</strong>
+                    <strong class="text-warning">${{ total_pasivo|floatformat:2 }}</strong>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay pasivos registrados</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- PATRIMONIO -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-building"></i> PATRIMONIO</h5>
+            </div>
+            <div class="card-body">
+                {% if patrimonio %}
+                {% for cuenta_patrimonio in patrimonio %}
+                <div class="d-flex justify-content-between mb-1">
+                    <span>{{ cuenta_patrimonio.cuenta.codigo }} - {{ cuenta_patrimonio.cuenta.nombre }}</span>
+                    <span class="font-weight-bold">${{ cuenta_patrimonio.saldo|floatformat:2 }}</span>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>Total Patrimonio:</strong>
+                    <strong class="text-info">${{ total_patrimonio|floatformat:2 }}</strong>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay patrimonio registrado</p>
+                {% endif %}
+
+                <hr class="my-4">
+                <div class="d-flex justify-content-between">
+                    <h5>TOTAL PASIVO + PATRIMONIO:</h5>
+                    <h5 class="text-primary">${{ total_pasivo_patrimonio|floatformat:2 }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estado del Balance -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card {% if cuadra %}border-success{% else %}border-danger{% endif %}">
+            <div class="card-body text-center">
+                {% if cuadra %}
+                <h4 class="text-success">
+                    <i class="fas fa-check-circle"></i> Balance Cuadrado
+                </h4>
+                <p class="text-muted">El balance está correctamente cuadrado</p>
+                {% else %}
+                <h4 class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Balance Descuadrado
+                </h4>
+                <p class="text-muted">
+                    Diferencia: ${{ total_activos|floatformat:2 }} - ${{ total_pasivo_patrimonio|floatformat:2 }} =
+                    ${{ total_activos|sub:total_pasivo_patrimonio|floatformat:2 }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botones de Acción -->
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'accounting:reportes' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver a Reportes
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+        <button onclick="exportarExcel()" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function exportarExcel() {
+        alert('Función de exportación a Excel - Por implementar');
+    }
+</script>
+{% endblock %}
+

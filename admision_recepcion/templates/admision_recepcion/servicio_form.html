@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Editar Servicio{% else %}Nuevo Servicio{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-medical-bag me-2"></i>{% if object %}Editar Servicio{% else %}Nuevo Servicio{%
+                        endif %}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Información Básica -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre del Servicio *</label>
+                                    {{ form.nombre }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Código</label>
+                                    {{ form.codigo }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Tipo de Servicio *</label>
+                                    {{ form.tipo }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Categoría</label>
+                                    {{ form.categoria }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Códigos Médicos -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Códigos Médicos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Código CUPS</label>
+                                            {{ form.codigo_cups }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Código SOAT</label>
+                                            {{ form.codigo_soat }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Código ISS</label>
+                                            {{ form.codigo_iss }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información Operativa -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Información Operativa</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Duración (minutos)</label>
+                                            {{ form.duracion_minutos }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Precio Base</label>
+                                            {{ form.precio_base }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Estado</label>
+                                            {{ form.estado }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-3">
+                                            {{ form.requiere_autorizacion }}
+                                            <label class="form-check-label">
+                                                Requiere Autorización
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-3">
+                                            {{ form.requiere_preparacion }}
+                                            <label class="form-check-label">
+                                                Requiere Preparación
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descripción y Preparación -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Descripción</label>
+                                    {{ form.descripcion }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Instrucciones de Preparación</label>
+                                    {{ form.instrucciones_preparacion }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contraindicaciones y Observaciones -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Contraindicaciones</label>
+                                    {{ form.contraindicaciones }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Observaciones</label>
+                                    {{ form.observaciones }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admision_recepcion:servicio_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{% if object %}Actualizar{% else %}Crear{% endif %}
+                                Servicio
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -8,7 +8,7 @@ from .models import (
     PeriodoContable, CuentaContable, Tercero, Diario, Impuesto, 
     AsientoContable, LineaAsiento, DatosEmpresa, CentroCosto, 
     ComprobanteContable, CertificadoRetencion, MovimientoBancario, CierreContable, Presupuesto,
-    ReporteFiscal
+    ReporteFiscal, Pais, Departamento, Ciudad
 )
 from .forms import (
     PeriodoContableForm, CuentaContableForm, TerceroForm, DiarioForm, 
@@ -758,3 +758,410 @@ class ReporteFiscalDeleteView(LoginRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Reporte fiscal eliminado exitosamente.')
         return super().delete(request, *args, **kwargs)
+
+# ==================== GESTIÓN GEOGRÁFICA ====================
+
+# País
+class PaisListView(LoginRequiredMixin, ListView):
+    model = Pais
+    template_name = 'accounting/pais_list.html'
+    context_object_name = 'paises'
+    paginate_by = 20
+
+class PaisCreateView(LoginRequiredMixin, CreateView):
+    model = Pais
+    template_name = 'accounting/pais_form.html'
+    fields = ['codigo', 'nombre']
+    success_url = reverse_lazy('accounting:pais_list')
+
+class PaisUpdateView(LoginRequiredMixin, UpdateView):
+    model = Pais
+    template_name = 'accounting/pais_form.html'
+    fields = ['codigo', 'nombre']
+    success_url = reverse_lazy('accounting:pais_list')
+
+class PaisDeleteView(LoginRequiredMixin, DeleteView):
+    model = Pais
+    template_name = 'accounting/pais_confirm_delete.html'
+    success_url = reverse_lazy('accounting:pais_list')
+
+# Departamento
+class DepartamentoListView(LoginRequiredMixin, ListView):
+    model = Departamento
+    template_name = 'accounting/departamento_list.html'
+    context_object_name = 'departamentos'
+    paginate_by = 20
+
+class DepartamentoCreateView(LoginRequiredMixin, CreateView):
+    model = Departamento
+    template_name = 'accounting/departamento_form.html'
+    fields = ['codigo', 'nombre', 'pais']
+    success_url = reverse_lazy('accounting:departamento_list')
+
+class DepartamentoUpdateView(LoginRequiredMixin, UpdateView):
+    model = Departamento
+    template_name = 'accounting/departamento_form.html'
+    fields = ['codigo', 'nombre', 'pais']
+    success_url = reverse_lazy('accounting:departamento_list')
+
+class DepartamentoDeleteView(LoginRequiredMixin, DeleteView):
+    model = Departamento
+    template_name = 'accounting/departamento_confirm_delete.html'
+    success_url = reverse_lazy('accounting:departamento_list')
+
+# Ciudad
+class CiudadListView(LoginRequiredMixin, ListView):
+    model = Ciudad
+    template_name = 'accounting/ciudad_list.html'
+    context_object_name = 'ciudades'
+    paginate_by = 20
+
+class CiudadCreateView(LoginRequiredMixin, CreateView):
+    model = Ciudad
+    template_name = 'accounting/ciudad_form.html'
+    fields = ['codigo', 'nombre', 'departamento']
+    success_url = reverse_lazy('accounting:ciudad_list')
+
+class CiudadUpdateView(LoginRequiredMixin, UpdateView):
+    model = Ciudad
+    template_name = 'accounting/ciudad_form.html'
+    fields = ['codigo', 'nombre', 'departamento']
+    success_url = reverse_lazy('accounting:ciudad_list')
+
+class CiudadDeleteView(LoginRequiredMixin, DeleteView):
+    model = Ciudad
+    template_name = 'accounting/ciudad_confirm_delete.html'
+    success_url = reverse_lazy('accounting:ciudad_list')
+
+
+# =================== REPORTES AVANZADOS ===================
+
+class BalanceGeneralView(LoginRequiredMixin, TemplateView):
+    """Reporte de Balance General"""
+    template_name = 'accounting/reportes/balance_general.html'
+    login_url = '/admin/login/'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Parámetros
+        fecha_corte = self.request.GET.get('fecha_corte')
+        if fecha_corte:
+            try:
+                fecha_corte = datetime.strptime(fecha_corte, '%Y-%m-%d').date()
+            except ValueError:
+                fecha_corte = timezone.now().date()
+        else:
+            fecha_corte = timezone.now().date()
+        
+        context['fecha_corte'] = fecha_corte
+        
+        # ACTIVOS
+        # Activos Corrientes
+        cuentas_activo_corriente = CuentaContable.objects.filter(
+            codigo__startswith='1', tipo='ACTIVO'
+        )
+        
+        activos_corrientes = []
+        total_activo_corriente = 0
+        
+        for cuenta in cuentas_activo_corriente:
+            # Calcular saldo de la cuenta
+            movimientos = LineaAsiento.objects.filter(
+                cuenta_contable=cuenta,
+                asiento_contable__fecha__lte=fecha_corte
+            )
+            
+            saldo_debito = movimientos.aggregate(Sum('debito'))['debito__sum'] or 0
+            saldo_credito = movimientos.aggregate(Sum('credito'))['credito__sum'] or 0
+            saldo_final = saldo_debito - saldo_credito
+            
+            if saldo_final != 0:
+                activos_corrientes.append({
+                    'cuenta': cuenta,
+                    'saldo': saldo_final
+                })
+                total_activo_corriente += saldo_final
+        
+        # PASIVOS
+        cuentas_pasivo = CuentaContable.objects.filter(
+            codigo__startswith='2', tipo='PASIVO'
+        )
+        
+        pasivos = []
+        total_pasivo = 0
+        
+        for cuenta in cuentas_pasivo:
+            movimientos = LineaAsiento.objects.filter(
+                cuenta_contable=cuenta,
+                asiento_contable__fecha__lte=fecha_corte
+            )
+            
+            saldo_debito = movimientos.aggregate(Sum('debito'))['debito__sum'] or 0
+            saldo_credito = movimientos.aggregate(Sum('credito'))['credito__sum'] or 0
+            saldo_final = saldo_credito - saldo_debito  # Para pasivos es al revés
+            
+            if saldo_final != 0:
+                pasivos.append({
+                    'cuenta': cuenta,
+                    'saldo': saldo_final
+                })
+                total_pasivo += saldo_final
+        
+        # PATRIMONIO
+        cuentas_patrimonio = CuentaContable.objects.filter(
+            codigo__startswith='3', tipo='PATRIMONIO'
+        )
+        
+        patrimonio = []
+        total_patrimonio = 0
+        
+        for cuenta in cuentas_patrimonio:
+            movimientos = LineaAsiento.objects.filter(
+                cuenta_contable=cuenta,
+                asiento_contable__fecha__lte=fecha_corte
+            )
+            
+            saldo_debito = movimientos.aggregate(Sum('debito'))['debito__sum'] or 0
+            saldo_credito = movimientos.aggregate(Sum('credito'))['credito__sum'] or 0
+            saldo_final = saldo_credito - saldo_debito
+            
+            if saldo_final != 0:
+                patrimonio.append({
+                    'cuenta': cuenta,
+                    'saldo': saldo_final
+                })
+                total_patrimonio += saldo_final
+        
+        context.update({
+            'activos_corrientes': activos_corrientes,
+            'total_activo_corriente': total_activo_corriente,
+            'pasivos': pasivos,
+            'total_pasivo': total_pasivo,
+            'patrimonio': patrimonio,
+            'total_patrimonio': total_patrimonio,
+            'total_activos': total_activo_corriente,
+            'total_pasivo_patrimonio': total_pasivo + total_patrimonio,
+            'cuadra': abs(total_activo_corriente - (total_pasivo + total_patrimonio)) < 0.01
+        })
+        
+        return context
+
+
+class EstadoResultadosView(LoginRequiredMixin, TemplateView):
+    """Estado de Resultados (P&G)"""
+    template_name = 'accounting/reportes/estado_resultados.html'
+    login_url = '/admin/login/'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Parámetros
+        fecha_inicio = self.request.GET.get('fecha_inicio')
+        fecha_fin = self.request.GET.get('fecha_fin')
+        
+        if fecha_inicio:
+            try:
+                fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+            except ValueError:
+                fecha_inicio = timezone.now().date().replace(month=1, day=1)
+        else:
+            fecha_inicio = timezone.now().date().replace(month=1, day=1)
+            
+        if fecha_fin:
+            try:
+                fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+            except ValueError:
+                fecha_fin = timezone.now().date()
+        else:
+            fecha_fin = timezone.now().date()
+        
+        context['fecha_inicio'] = fecha_inicio
+        context['fecha_fin'] = fecha_fin
+        
+        # INGRESOS (Cuentas 4)
+        cuentas_ingresos = CuentaContable.objects.filter(
+            codigo__startswith='4', tipo='INGRESOS'
+        )
+        
+        ingresos = []
+        total_ingresos = 0
+        
+        for cuenta in cuentas_ingresos:
+            movimientos = LineaAsiento.objects.filter(
+                cuenta_contable=cuenta,
+                asiento_contable__fecha__gte=fecha_inicio,
+                asiento_contable__fecha__lte=fecha_fin
+            )
+            
+            saldo_debito = movimientos.aggregate(Sum('debito'))['debito__sum'] or 0
+            saldo_credito = movimientos.aggregate(Sum('credito'))['credito__sum'] or 0
+            saldo_final = saldo_credito - saldo_debito  # Ingresos tienen naturaleza crédito
+            
+            if saldo_final != 0:
+                ingresos.append({
+                    'cuenta': cuenta,
+                    'saldo': saldo_final
+                })
+                total_ingresos += saldo_final
+        
+        # COSTOS Y GASTOS (Cuentas 5 y 6)
+        cuentas_costos_gastos = CuentaContable.objects.filter(
+            codigo__startswith__in=['5', '6'], 
+            tipo__in=['COSTO', 'GASTO']
+        )
+        
+        costos_gastos = []
+        total_costos_gastos = 0
+        
+        for cuenta in cuentas_costos_gastos:
+            movimientos = LineaAsiento.objects.filter(
+                cuenta_contable=cuenta,
+                asiento_contable__fecha__gte=fecha_inicio,
+                asiento_contable__fecha__lte=fecha_fin
+            )
+            
+            saldo_debito = movimientos.aggregate(Sum('debito'))['debito__sum'] or 0
+            saldo_credito = movimientos.aggregate(Sum('credito'))['credito__sum'] or 0
+            saldo_final = saldo_debito - saldo_credito  # Gastos tienen naturaleza débito
+            
+            if saldo_final != 0:
+                costos_gastos.append({
+                    'cuenta': cuenta,
+                    'saldo': saldo_final
+                })
+                total_costos_gastos += saldo_final
+        
+        # Cálculos finales
+        utilidad_bruta = total_ingresos - total_costos_gastos
+        
+        context.update({
+            'ingresos': ingresos,
+            'total_ingresos': total_ingresos,
+            'costos_gastos': costos_gastos,
+            'total_costos_gastos': total_costos_gastos,
+            'utilidad_bruta': utilidad_bruta,
+            'margen_utilidad': (utilidad_bruta / total_ingresos * 100) if total_ingresos > 0 else 0
+        })
+        
+        return context
+
+
+class FlujoEfectivoView(LoginRequiredMixin, TemplateView):
+    """Flujo de Efectivo"""
+    template_name = 'accounting/reportes/flujo_efectivo.html'
+    login_url = '/admin/login/'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Parámetros
+        fecha_inicio = self.request.GET.get('fecha_inicio')
+        fecha_fin = self.request.GET.get('fecha_fin')
+        
+        if fecha_inicio:
+            try:
+                fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+            except ValueError:
+                fecha_inicio = timezone.now().date().replace(month=1, day=1)
+        else:
+            fecha_inicio = timezone.now().date().replace(month=1, day=1)
+            
+        if fecha_fin:
+            try:
+                fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+            except ValueError:
+                fecha_fin = timezone.now().date()
+        else:
+            fecha_fin = timezone.now().date()
+        
+        context['fecha_inicio'] = fecha_inicio
+        context['fecha_fin'] = fecha_fin
+        
+        # Flujo de Operación
+        ingresos_operacion = 50000000  # Datos ejemplo
+        gastos_operacion = 35000000
+        flujo_neto_operacion = ingresos_operacion - gastos_operacion
+        
+        # Flujo de Inversión
+        inversiones = 10000000
+        desinversiones = 5000000
+        flujo_neto_inversion = desinversiones - inversiones
+        
+        # Flujo de Financiación
+        prestamos = 15000000
+        pagos_prestamo = 8000000
+        flujo_neto_financiacion = prestamos - pagos_prestamo
+        
+        # Flujo Total
+        flujo_total = flujo_neto_operacion + flujo_neto_inversion + flujo_neto_financiacion
+        
+        context.update({
+            'ingresos_operacion': ingresos_operacion,
+            'gastos_operacion': gastos_operacion,
+            'flujo_neto_operacion': flujo_neto_operacion,
+            'inversiones': inversiones,
+            'desinversiones': desinversiones,
+            'flujo_neto_inversion': flujo_neto_inversion,
+            'prestamos': prestamos,
+            'pagos_prestamo': pagos_prestamo,
+            'flujo_neto_financiacion': flujo_neto_financiacion,
+            'flujo_total': flujo_total
+        })
+        
+        return context
+
+
+class AnalisisFinancieroView(LoginRequiredMixin, TemplateView):
+    """Análisis Financiero Avanzado"""
+    template_name = 'accounting/reportes/analisis_financiero.html'
+    login_url = '/admin/login/'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Período de análisis
+        fecha_fin = timezone.now().date()
+        fecha_inicio = fecha_fin.replace(month=1, day=1)
+        
+        # Datos de ejemplo para análisis financiero
+        activo_corriente = 75000000
+        pasivo_corriente = 45000000
+        ratio_liquidez = activo_corriente / pasivo_corriente if pasivo_corriente > 0 else 0
+        
+        ingresos = 120000000
+        gastos = 85000000
+        utilidad_neta = ingresos - gastos
+        margen_neto = (utilidad_neta / ingresos * 100) if ingresos > 0 else 0
+        
+        # ROA (Return on Assets)
+        total_activos = activo_corriente
+        roa = (utilidad_neta / total_activos * 100) if total_activos > 0 else 0
+        
+        # Análisis de Tendencias (últimos 6 meses)
+        tendencias = [
+            {'mes': '2025-02', 'ingresos': 18000000, 'gastos': 12000000, 'utilidad': 6000000},
+            {'mes': '2025-03', 'ingresos': 20000000, 'gastos': 13500000, 'utilidad': 6500000},
+            {'mes': '2025-04', 'ingresos': 19500000, 'gastos': 14000000, 'utilidad': 5500000},
+            {'mes': '2025-05', 'ingresos': 22000000, 'gastos': 15000000, 'utilidad': 7000000},
+            {'mes': '2025-06', 'ingresos': 21000000, 'gastos': 14500000, 'utilidad': 6500000},
+            {'mes': '2025-07', 'ingresos': 23500000, 'gastos': 16000000, 'utilidad': 7500000},
+        ]
+        
+        context.update({
+            'fecha_inicio': fecha_inicio,
+            'fecha_fin': fecha_fin,
+            'activo_corriente': activo_corriente,
+            'pasivo_corriente': pasivo_corriente,
+            'ratio_liquidez': ratio_liquidez,
+            'ingresos': ingresos,
+            'gastos': gastos,
+            'utilidad_neta': utilidad_neta,
+            'margen_neto': margen_neto,
+            'roa': roa,
+            'rotacion_inventario': 12.5,
+            'dias_inventario': 29,
+            'tendencias': tendencias
+        })
+        
+        return context
